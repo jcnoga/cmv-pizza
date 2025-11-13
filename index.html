@@ -33,12 +33,8 @@
        rules_version = '2';
        service cloud.firestore {
          match /databases/{database}/documents {
-           // Permite que cada usuário leia e escreva apenas nos documentos que ele criou.
            match /{collection}/{docId} {
              allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-           }
-           // Permite a criação de documentos se o userId do novo documento for o mesmo do usuário autenticado.
-           match /{collection}/{docId} {
              allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
            }
          }
@@ -50,7 +46,6 @@
           - Instale o Firebase CLI: `npm install -g firebase-tools`
           - Faça login: `firebase login`
           - Inicie o projeto na sua pasta: `firebase init hosting`
-            (Selecione seu projeto, use 'public' como diretório e configure como single-page app).
           - Copie este arquivo `index.html` para a pasta 'public' criada.
           - Faça o deploy: `firebase deploy`
 
@@ -59,7 +54,6 @@
           - Faça o upload deste arquivo como `index.html`.
           - No repositório, vá em "Settings" > "Pages".
           - Em "Source", selecione a branch principal (main/master) e clique em "Save".
-          - Seu site estará disponível em `https://<seu-usuario>.github.io/<seu-repositorio>/`
 
     ====================================================================================================
     -->
@@ -85,7 +79,7 @@
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2); }
         .btn { display: inline-block; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.3s, transform 0.1s; width: 100%; }
         .btn:disabled { background-color: var(--medium-gray); cursor: not-allowed; }
-        .btn:active { transform: scale(0.98); }
+        .btn:active:not(:disabled) { transform: scale(0.98); }
         .btn-primary { background-color: var(--primary-color); color: var(--white); } .btn-primary:hover { background-color: var(--primary-dark); }
         .btn-secondary { background-color: var(--dark-gray); color: var(--white); } .btn-secondary:hover { background-color: #333; }
         .btn-success { background-color: var(--success-color); color: var(--white); }
@@ -213,15 +207,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const firebaseConfig = {
-            apiKey: "COLE_SUA_API_KEY_AQUI",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJECT_ID",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID"
-        };
+	
+     const firebaseConfig = {
+       apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
+       authDomain: "cmv-pizza.firebaseapp.com",
+       projectId: "cmv-pizza",
+       storageBucket: "cmv-pizza.firebasestorage.app",
+       messagingSenderId: "1022435006716",
+       appId: "1:1022435006716:web:ec39f22702097beca25f79"
+     };
 
         let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
@@ -234,8 +228,15 @@
             console.warn("Firebase não configurado. Rodando em modo local.");
             initApp();
         } else {
-            try { firebaseApp = firebase.initializeApp(firebaseConfig); auth = firebase.auth(); db = firebase.firestore(); } 
-            catch (error) { console.error("Erro Firebase:", error); isLocalMode = true; initApp(); }
+            try { 
+                firebaseApp = firebase.initializeApp(firebaseConfig); 
+                auth = firebase.auth(); 
+                db = firebase.firestore(); 
+            } catch (error) { 
+                console.error("Erro Firebase:", error); 
+                isLocalMode = true; 
+                initApp(); 
+            }
         }
 
         const authContainer = document.getElementById('auth-container');
@@ -249,7 +250,7 @@
         function showView(viewId) { views.forEach(v => v.classList.remove('active')); navLinks.forEach(l => l.classList.remove('active')); document.getElementById(`${viewId}-view`)?.classList.add('active'); document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active'); }
 
         // ============================================================================================
-        // AUTHENTICATION (CORRECTED)
+        // AUTHENTICATION (CORRECTED & ROBUST)
         // ============================================================================================
         function setupAuthListeners() {
             if (isLocalMode) return;
@@ -270,82 +271,73 @@
                 }
             });
 
-            // LOGIN
             const loginForm = document.getElementById('login-form');
             loginForm.addEventListener('submit', async e => {
                 e.preventDefault();
-                const button = loginForm.querySelector('button');
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                
-                button.disabled = true;
-                button.textContent = 'Aguarde...';
-                
+                const button = loginForm.querySelector('button[type="submit"]');
+                button.disabled = true; button.textContent = 'Aguarde...';
                 try {
-                    await auth.signInWithEmailAndPassword(email, password);
-                    showToast("Login realizado com sucesso!");
-                    // onAuthStateChanged will handle the UI switch
+                    await auth.signInWithEmailAndPassword(
+                        document.getElementById('login-email').value,
+                        document.getElementById('login-password').value
+                    );
                 } catch (err) {
                     showToast(err.message, 'error');
-                } finally {
-                    button.disabled = false;
-                    button.textContent = 'Entrar';
+                    button.disabled = false; button.textContent = 'Entrar';
                 }
             });
 
-            // REGISTER
             const registerForm = document.getElementById('register-form');
             registerForm.addEventListener('submit', async e => {
                 e.preventDefault();
-                const button = registerForm.querySelector('button');
-                const email = document.getElementById('register-email').value;
-                const password = document.getElementById('register-password').value;
-                
-                button.disabled = true;
-                button.textContent = 'Aguarde...';
-
+                const button = registerForm.querySelector('button[type="submit"]');
+                button.disabled = true; button.textContent = 'Aguarde...';
                 try {
-                    await auth.createUserWithEmailAndPassword(email, password);
+                    await auth.createUserWithEmailAndPassword(
+                        document.getElementById('register-email').value,
+                        document.getElementById('register-password').value
+                    );
                     showToast("Cadastro realizado com sucesso! Faça o login.");
                     toggleAuthViews('login-view');
                 } catch (err) {
                     showToast(err.message, 'error');
                 } finally {
-                    button.disabled = false;
-                    button.textContent = 'Cadastrar';
+                    button.disabled = false; button.textContent = 'Cadastrar';
                 }
             });
-
-            // LOGOUT
-            document.getElementById('logout-button').addEventListener('click', () => {
-                auth.signOut();
-                showToast("Você saiu da sua conta.");
-            });
-
-            // PASSWORD RESET
+            
             const resetForm = document.getElementById('reset-password-form');
             resetForm.addEventListener('submit', async e => {
                 e.preventDefault();
-                const button = resetForm.querySelector('button');
-                const email = document.getElementById('reset-email').value;
-
-                button.disabled = true;
-                button.textContent = 'Aguarde...';
-
+                const button = resetForm.querySelector('button[type="submit"]');
+                button.disabled = true; button.textContent = 'Aguarde...';
                 try {
-                    await auth.sendPasswordResetEmail(email);
-                    showToast("Email de recuperação enviado! Verifique sua caixa de entrada.");
+                    await auth.sendPasswordResetEmail(document.getElementById('reset-email').value);
+                    showToast("Email de recuperação enviado!");
                     toggleAuthViews('login-view');
                 } catch (err) {
                     showToast(err.message, 'error');
                 } finally {
-                    button.disabled = false;
-                    button.textContent = 'Enviar link';
+                    button.disabled = false; button.textContent = 'Enviar link';
                 }
+            });
+
+            document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+            
+            ['show-register', 'show-login', 'show-reset-password', 'back-to-login'].forEach(id => {
+                document.getElementById(id).addEventListener('click', e => {
+                    e.preventDefault();
+                    const viewMap = {
+                        'show-register': 'register-view',
+                        'show-login': 'login-view',
+                        'show-reset-password': 'reset-password-view',
+                        'back-to-login': 'login-view'
+                    };
+                    toggleAuthViews(viewMap[id]);
+                });
             });
         }
         function toggleAuthViews(view) { ['login-view', 'register-view', 'reset-password-view'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById(view).classList.remove('hidden'); }
-        ['show-register', 'show-login', 'show-reset-password', 'back-to-login'].forEach(id => document.getElementById(id).addEventListener('click', e => { e.preventDefault(); const map = {'show-register': 'register-view', 'show-login': 'login-view', 'show-reset-password': 'reset-password-view', 'back-to-login': 'login-view'}; toggleAuthViews(map[id]); }));
 
         async function initApp() { showView('dashboard'); setupNavListeners(); setupFormListeners(); await loadAllData(); }
         function resetAppState() { fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; ['fornecedores-table', 'insumos-table', 'receitas-table'].forEach(id => document.getElementById(id)?.querySelector('tbody').innerHTML = ''); }
@@ -384,9 +376,6 @@
         function calculateRecipeIngredientsCost(ingredients = []) { return ingredients.reduce((total, ing) => total + calculateCustoIngrediente(ing.insumoId, ing.quantidade_g), 0); }
         function calculateRecipeCOGS(receita) { if (!receita) return 0; const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes); const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100); const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0); return custoComPerda + (receita.custo_embalagem_por_unidade || 0) + custoMaoDeObra + (configCache.rateio_por_pizza || 0); }
         
-        // ============================================================================================
-        // FORM HANDLING & EVENT LISTENERS
-        // ============================================================================================
         function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
         
         function setupFormListeners() {
@@ -405,13 +394,11 @@
                 e.preventDefault();
                 const fornecedorSelect = document.getElementById('insumo-fornecedor-select');
                 if (!fornecedorSelect.value) { showToast("Selecione um fornecedor.", "error"); return; }
-                const id = document.getElementById('insumo-id').value;
-                const custo = parseFloat(document.getElementById('insumo-custo-embalagem').value);
+                const id = document.getElementById('insumo-id').value, custo = parseFloat(document.getElementById('insumo-custo-embalagem').value);
                 const existing = id ? insumosCache.find(i => i.id === id) : null;
                 const historico = existing ? (existing.historico_precos || []) : [];
                 if (existing && custo !== existing.custo_embalagem) { historico.push({ data: new Date().toISOString(), preco: existing.custo_embalagem }); }
-                const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value);
-                const unidade = document.getElementById('insumo-unidade-embalagem').value;
+                const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unidade = document.getElementById('insumo-unidade-embalagem').value;
                 let qtd_g = qtd, base = 'g';
                 if (unidade === 'kg') qtd_g = qtd * 1000; else if (unidade === 'L') { qtd_g = qtd * 1000; base = 'ml'; } else if (unidade === 'un') base = 'un';
                 const data = { nome: document.getElementById('insumo-nome').value, fornecedorId: fornecedorSelect.value, fornecedorNome: fornecedorSelect.options[fornecedorSelect.selectedIndex].dataset.nome, custo_embalagem: custo, quantidade_embalagem: qtd, unidade_embalagem: unidade, qtd_embalagem_g: qtd_g, unidade_base: base, lote: document.getElementById('insumo-lote').value, validade: document.getElementById('insumo-validade').value, historico_precos: historico, id: id || null };
@@ -512,7 +499,6 @@
             noBtn.addEventListener('click', closeModal, { once: true });
         }
 
-        // EXPORTING & REPORTING
         document.getElementById('export-insumos-xlsx').addEventListener('click', () => { const data = insumosCache.map(i => ({ Nome: i.nome, Fornecedor: i.fornecedorNome, 'Custo Emb.': i.custo_embalagem, 'Qtd Emb.': i.quantidade_embalagem, Unidade: i.unidade_embalagem, 'Custo/g': calculateCustoPorGrama(i) })); const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Insumos"); XLSX.writeFile(wb, "insumos.xlsx"); });
         document.getElementById('export-receitas-xlsx').addEventListener('click', () => { const wb = XLSX.utils.book_new(); receitasCache.forEach(r => { const cogs = calculateRecipeCOGS(r); const data = [ { Item: 'Nome', Valor: r.nome }, { Item: 'COGS', Valor: cogs }, {}, { Item: 'Ingrediente', Qtd: 'Custo'} ]; r.ingredientes.forEach(ing => { data.push({ Item: ing.nome, Qtd: ing.quantidade_g, Custo: calculateCustoIngrediente(ing.insumoId, ing.quantidade_g) }); }); const ws = XLSX.utils.json_to_sheet(data, {skipHeader: true}); XLSX.utils.book_append_sheet(wb, ws, r.nome.substring(0, 30)); }); XLSX.writeFile(wb, "fichas_tecnicas.xlsx"); });
         function generateRecipePDF(id) { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const r = receitasCache.find(i => i.id === id); if (!r) return; const cogs = calculateRecipeCOGS(r); doc.setFontSize(18); doc.text(`Ficha Técnica - ${r.nome}`, 14, 22); doc.setFontSize(11); doc.text(`Versão: ${r.versao || '1.0'}`, 14, 30); const head = [['Ingrediente', 'Qtd (g/un)', 'Custo Unit.', 'Custo Total']]; const body = r.ingredientes.map(ing => { const ins = insumosCache.find(i => i.id === ing.insumoId); const cUnit = calculateCustoPorGrama(ins); return [ ing.nome, ing.quantidade_g, formatCurrency(cUnit), formatCurrency(cUnit * ing.quantidade_g) ]; }); doc.autoTable({ startY: 40, head, body }); doc.autoTable({ startY: doc.lastAutoTable.finalY + 10, head: [['Item de Custo', 'Valor']], body: [ ['Ingredientes', formatCurrency(calculateRecipeIngredientsCost(r.ingredientes))], ['Mão de Obra', formatCurrency(((configCache.custo_hora_mao_de_obra || 0) / 60) * (r.tempo_preparo_min || 0))], ['Embalagem', formatCurrency(r.custo_embalagem_por_unidade)], ['Rateio', formatCurrency(configCache.rateio_por_pizza)] ], theme: 'grid' }); doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text(`CUSTO TOTAL (COGS): ${formatCurrency(cogs)}`, 14, doc.lastAutoTable.finalY + 10); doc.save(`Ficha_${r.nome}.pdf`); }
