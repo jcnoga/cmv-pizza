@@ -84,6 +84,7 @@
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--medium-gray); border-radius: var(--border-radius); font-size: 1rem; }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2); }
         .btn { display: inline-block; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.3s, transform 0.1s; width: 100%; }
+        .btn:disabled { background-color: var(--medium-gray); cursor: not-allowed; }
         .btn:active { transform: scale(0.98); }
         .btn-primary { background-color: var(--primary-color); color: var(--white); } .btn-primary:hover { background-color: var(--primary-dark); }
         .btn-secondary { background-color: var(--dark-gray); color: var(--white); } .btn-secondary:hover { background-color: #333; }
@@ -213,14 +214,15 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-const firebaseConfig = {
-  apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
-  authDomain: "cmv-pizza.firebaseapp.com",
-  projectId: "cmv-pizza",
-  storageBucket: "cmv-pizza.firebasestorage.app",
-  messagingSenderId: "1022435006716",
-  appId: "1:1022435006716:web:ec39f22702097beca25f79"
-};
+        const firebaseConfig = {
+            apiKey: "COLE_SUA_API_KEY_AQUI",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
         let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {} };
@@ -246,16 +248,101 @@ const firebaseConfig = {
         function formatCurrency(value) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0); }
         function showView(viewId) { views.forEach(v => v.classList.remove('active')); navLinks.forEach(l => l.classList.remove('active')); document.getElementById(`${viewId}-view`)?.classList.add('active'); document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active'); }
 
+        // ============================================================================================
+        // AUTHENTICATION (CORRECTED)
+        // ============================================================================================
         function setupAuthListeners() {
             if (isLocalMode) return;
+            
             auth.onAuthStateChanged(user => {
-                if (user) { currentUser = { uid: user.uid, email: user.email }; authContainer.classList.add('hidden'); appContainer.classList.remove('hidden'); appNav.classList.remove('hidden'); initApp(); } 
-                else { currentUser = null; authContainer.classList.remove('hidden'); appContainer.classList.add('hidden'); appNav.classList.add('hidden'); resetAppState(); }
+                if (user) {
+                    currentUser = { uid: user.uid, email: user.email };
+                    authContainer.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    appNav.classList.remove('hidden');
+                    initApp();
+                } else {
+                    currentUser = null;
+                    authContainer.classList.remove('hidden');
+                    appContainer.classList.add('hidden');
+                    appNav.classList.add('hidden');
+                    resetAppState();
+                }
             });
-            document.getElementById('login-form').addEventListener('submit', async e => { e.preventDefault(); try { await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value); } catch (err) { showToast(err.message, 'error'); }});
-            document.getElementById('register-form').addEventListener('submit', async e => { e.preventDefault(); try { await auth.createUserWithEmailAndPassword(document.getElementById('register-email').value, document.getElementById('register-password').value); showToast("Cadastro feito!"); toggleAuthViews('login-view'); } catch (err) { showToast(err.message, 'error'); }});
-            document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
-            document.getElementById('reset-password-form').addEventListener('submit', async e => { e.preventDefault(); try { await auth.sendPasswordResetEmail(document.getElementById('reset-email').value); showToast("Email enviado!"); toggleAuthViews('login-view'); } catch (err) { showToast(err.message, 'error'); }});
+
+            // LOGIN
+            const loginForm = document.getElementById('login-form');
+            loginForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const button = loginForm.querySelector('button');
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                button.disabled = true;
+                button.textContent = 'Aguarde...';
+                
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    showToast("Login realizado com sucesso!");
+                    // onAuthStateChanged will handle the UI switch
+                } catch (err) {
+                    showToast(err.message, 'error');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Entrar';
+                }
+            });
+
+            // REGISTER
+            const registerForm = document.getElementById('register-form');
+            registerForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const button = registerForm.querySelector('button');
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                
+                button.disabled = true;
+                button.textContent = 'Aguarde...';
+
+                try {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                    showToast("Cadastro realizado com sucesso! Faça o login.");
+                    toggleAuthViews('login-view');
+                } catch (err) {
+                    showToast(err.message, 'error');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Cadastrar';
+                }
+            });
+
+            // LOGOUT
+            document.getElementById('logout-button').addEventListener('click', () => {
+                auth.signOut();
+                showToast("Você saiu da sua conta.");
+            });
+
+            // PASSWORD RESET
+            const resetForm = document.getElementById('reset-password-form');
+            resetForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const button = resetForm.querySelector('button');
+                const email = document.getElementById('reset-email').value;
+
+                button.disabled = true;
+                button.textContent = 'Aguarde...';
+
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    showToast("Email de recuperação enviado! Verifique sua caixa de entrada.");
+                    toggleAuthViews('login-view');
+                } catch (err) {
+                    showToast(err.message, 'error');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Enviar link';
+                }
+            });
         }
         function toggleAuthViews(view) { ['login-view', 'register-view', 'reset-password-view'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById(view).classList.remove('hidden'); }
         ['show-register', 'show-login', 'show-reset-password', 'back-to-login'].forEach(id => document.getElementById(id).addEventListener('click', e => { e.preventDefault(); const map = {'show-register': 'register-view', 'show-login': 'login-view', 'show-reset-password': 'reset-password-view', 'back-to-login': 'login-view'}; toggleAuthViews(map[id]); }));
@@ -267,23 +354,15 @@ const firebaseConfig = {
         // ============================================================================================
         // DATA CRUD FUNCTIONS
         // ============================================================================================
-
-        // --- FORNECEDORES ---
         async function fetchFornecedores() { if (isLocalMode) { fornecedoresCache = [...localData.fornecedores]; } else { try { const snapshot = await db.collection('fornecedores').where('userId', '==', currentUser.uid).orderBy('nome').get(); fornecedoresCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch fornecedores:", error); } } }
         async function saveFornecedor(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; try { if (isLocalMode) { if (isEditing) { const index = localData.fornecedores.findIndex(i => i.id === data.id); if (index > -1) localData.fornecedores[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.fornecedores.push(data); } } else { if (isEditing) { await db.collection('fornecedores').doc(data.id).update(data); } else { delete data.id; await db.collection('fornecedores').add(data); } } showToast(`Fornecedor ${isEditing ? 'atualizado' : 'salvo'}!`); } catch (error) { showToast("Erro ao salvar fornecedor.", 'error'); console.error(error); } }
         async function deleteFornecedor(id) { try { if (isLocalMode) { localData.fornecedores = localData.fornecedores.filter(i => i.id !== id); } else { await db.collection('fornecedores').doc(id).delete(); } showToast("Fornecedor excluído!"); } catch (error) { showToast("Erro ao excluir.", 'error'); } }
-
-        // --- INSUMOS ---
         async function fetchInsumos() { if (isLocalMode) { insumosCache = [...localData.insumos]; } else { try { const snapshot = await db.collection('insumos').where('userId', '==', currentUser.uid).orderBy('nome').get(); insumosCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch insumos:", error); } } }
         async function saveInsumo(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; try { if (isLocalMode) { if (isEditing) { const index = localData.insumos.findIndex(i => i.id === data.id); if (index > -1) localData.insumos[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.insumos.push(data); } } else { if (isEditing) { await db.collection('insumos').doc(data.id).update(data); } else { delete data.id; await db.collection('insumos').add(data); } } showToast(`Insumo ${isEditing ? 'atualizado' : 'salvo'}!`); } catch (error) { showToast("Erro ao salvar insumo.", 'error'); console.error(error); } }
         async function deleteInsumo(id) { try { if (isLocalMode) { localData.insumos = localData.insumos.filter(i => i.id !== id); } else { await db.collection('insumos').doc(id).delete(); } showToast("Insumo excluído!"); } catch (error) { showToast("Erro ao excluir.", 'error'); } }
-
-        // --- RECEITAS ---
         async function fetchReceitas() { if (isLocalMode) { receitasCache = [...localData.receitas]; } else { try { const snapshot = await db.collection('receitas').where('userId', '==', currentUser.uid).orderBy('nome').get(); receitasCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch receitas:", error); } } }
         async function saveReceita(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; try { if (isLocalMode) { if (isEditing) { const index = localData.receitas.findIndex(i => i.id === data.id); if (index > -1) localData.receitas[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.receitas.push(data); } } else { if (isEditing) { await db.collection('receitas').doc(data.id).update(data); } else { delete data.id; await db.collection('receitas').add(data); } } showToast(`Receita ${isEditing ? 'atualizada' : 'salva'}!`); } catch (error) { showToast("Erro ao salvar receita.", 'error'); console.error(error); } }
         async function deleteReceita(id) { try { if (isLocalMode) { localData.receitas = localData.receitas.filter(i => i.id !== id); } else { await db.collection('receitas').doc(id).delete(); } showToast("Receita excluída!"); } catch (error) { showToast("Erro ao excluir.", 'error'); } }
-
-        // --- CONFIGURAÇÕES ---
         async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } catch(error) { console.error("Erro configs:", error); } } displayConfiguracoes(); }
         async function saveConfiguracoes(configData) { configData.userId = isLocalMode ? 'local' : currentUser.uid; try { if(isLocalMode) { localData.configuracoes.default = configData; } else { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } showToast("Configurações salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); } catch(error) { showToast("Erro ao salvar.", 'error'); } }
         
@@ -315,9 +394,9 @@ const firebaseConfig = {
                 e.preventDefault();
                 const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null };
                 await saveFornecedor(data);
-                await fetchFornecedores(); // Refresh cache
-                renderFornecedoresTable(); // Re-render table
-                populateFornecedoresDropdowns(); // Update dropdowns elsewhere
+                await fetchFornecedores(); 
+                renderFornecedoresTable(); 
+                populateFornecedoresDropdowns();
                 resetFornecedorForm();
             });
             document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
@@ -376,7 +455,7 @@ const firebaseConfig = {
         function handleTableButtonClick(e) { const btn = e.target.closest('button'); if (!btn) return; if(btn.matches('.btn-edit-fornecedor')) editFornecedor(btn.dataset.id); else if (btn.matches('.btn-delete-fornecedor')) confirmDelete('fornecedor', btn.dataset.id); else if(btn.matches('.btn-edit-insumo')) editInsumo(btn.dataset.id); else if (btn.matches('.btn-delete-insumo')) confirmDelete('insumo', btn.dataset.id); else if (btn.matches('.btn-edit-receita')) editReceita(btn.dataset.id); else if (btn.matches('.btn-delete-receita')) confirmDelete('receita', btn.dataset.id); else if (btn.matches('.btn-view-report')) generateRecipePDF(btn.dataset.id); }
         
         function resetFornecedorForm() { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value = ''; document.getElementById('fornecedor-form-title').textContent = 'Cadastrar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); }
-        function editFornecedor(id) { const f = fornecedoresCache.find(i => i.id === id); if (!f) return; showView('fornecedores'); Object.keys(f).forEach(key => { const el = document.getElementById(`fornecedor-${key}`); if (el) el.value = f[key]; }); document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.remove('hidden'); window.scrollTo(0, 0); }
+        function editFornecedor(id) { const f = fornecedoresCache.find(i => i.id === id); if (!f) return; showView('fornecedores'); Object.keys(f).forEach(key => { const el = document.getElementById(`fornecedor-${key}`); if (el) el.value = f[key]; }); document.getElementById('fornecedor-id').value = f.id; document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.remove('hidden'); window.scrollTo(0, 0); }
         function resetInsumoForm() { document.getElementById('insumo-form').reset(); document.getElementById('insumo-id').value = ''; document.getElementById('insumo-form-title').textContent = 'Cadastrar Insumo'; document.getElementById('cancel-edit-insumo').classList.add('hidden'); }
         function editInsumo(id) { const i = insumosCache.find(item => item.id === id); if (!i) return; showView('insumos'); document.getElementById('insumo-id').value = i.id; document.getElementById('insumo-nome').value = i.nome; document.getElementById('insumo-fornecedor-select').value = i.fornecedorId; document.getElementById('insumo-custo-embalagem').value = i.custo_embalagem; document.getElementById('insumo-qtd-embalagem').value = i.quantidade_embalagem; document.getElementById('insumo-unidade-embalagem').value = i.unidade_embalagem; document.getElementById('insumo-lote').value = i.lote; document.getElementById('insumo-validade').value = i.validade; document.getElementById('insumo-form-title').textContent = 'Editar Insumo'; document.getElementById('cancel-edit-insumo').classList.remove('hidden'); window.scrollTo(0, 0); }
         function resetReceitaForm() { document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; document.getElementById('receita-form-title').textContent = 'Criar Receita'; document.getElementById('cancel-edit-receita').classList.add('hidden'); addIngredientRow(); }
