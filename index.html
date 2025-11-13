@@ -166,6 +166,7 @@ const firebaseConfig = {
   messagingSenderId: "1022435006716",
   appId: "1:1022435006716:web:ec39f22702097beca25f79"
 };
+
         let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {} };
@@ -386,7 +387,7 @@ const firebaseConfig = {
                 button.disabled = true; button.textContent = 'Aguarde...';
                 
                 try {
-                    const ingredientes = [];
+                    const ingredients = [];
                     let hasIncompleteRow = false;
                     document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
                         const select = row.querySelector('.ingredient-select');
@@ -401,17 +402,26 @@ const firebaseConfig = {
                             const selectedOption = select.options[select.selectedIndex];
                             const nome = selectedOption ? selectedOption.dataset.nome : null;
                             if (nome) {
-                                ingredientes.push({ insumoId, nome, quantidade_g });
+                                ingredients.push({ insumoId, nome, quantidade_g });
                             } else {
-                                hasIncompleteRow = true; // Safety check if option is somehow invalid
+                                hasIncompleteRow = true;
                             }
                         }
                     });
 
                     if (hasIncompleteRow) { throw new Error("Verifique se todos os ingredientes têm Insumo e Quantidade preenchidos."); } 
-                    if (ingredientes.length === 0) { throw new Error("Adicione ao menos um ingrediente válido à receita."); }
+                    if (ingredients.length === 0) { throw new Error("Adicione ao menos um ingrediente válido à receita."); }
                     
-                    const data = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, observacoes: document.getElementById('receita-observacoes').value, id: document.getElementById('receita-id').value || null };
+                    const data = { 
+                        nome: document.getElementById('receita-nome').value, 
+                        versao: document.getElementById('receita-versao').value, 
+                        ingredientes: ingredients, 
+                        tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, 
+                        custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, 
+                        perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, 
+                        observacoes: document.getElementById('receita-observacoes').value, 
+                        id: document.getElementById('receita-id').value || null 
+                    };
 
                     const success = await saveData('receitas', 'receitas', data);
                     if (success) {
