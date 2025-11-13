@@ -385,44 +385,21 @@ const firebaseConfig = {
         function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
         
         function setupFormListeners() {
-            const fornecedorForm = document.getElementById('fornecedor-form');
-            fornecedorForm.addEventListener('submit', async e => {
-                e.preventDefault();
-                const button = fornecedorForm.querySelector('button[type="submit"]');
-                button.disabled = true; button.textContent = 'Aguarde...';
-                const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null };
-                
-                const success = await saveData('fornecedores', 'fornecedores', data);
-                if (success) {
-                    await fetchFornecedores(); 
-                    renderFornecedoresTable(); 
-                    populateFornecedoresDropdowns();
-                    resetFornecedorForm();
-                }
-                button.disabled = false; button.textContent = 'Salvar Fornecedor';
-            });
+            document.getElementById('fornecedor-form').addEventListener('submit', async e => { e.preventDefault(); const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null }; await saveData('fornecedores', 'fornecedores', data); await fetchFornecedores(); renderFornecedoresTable(); populateFornecedoresDropdowns(); resetFornecedorForm(); });
             document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
-
-            const insumoForm = document.getElementById('insumo-form');
-            insumoForm.addEventListener('submit', async e => {
-                e.preventDefault();
-                const button = insumoForm.querySelector('button[type="submit"]');
-                button.disabled = true; button.textContent = 'Aguarde...';
-                
-                const fornecedorSelect = document.getElementById('insumo-fornecedor-select'); if (!fornecedorSelect.value) { showToast("Selecione um fornecedor.", "error"); button.disabled = false; button.textContent = 'Salvar Insumo'; return; }
-                const id = document.getElementById('insumo-id').value, custo = parseFloat(document.getElementById('insumo-custo-embalagem').value); const existing = id ? insumosCache.find(i => i.id === id) : null; const historico = existing ? (existing.historico_precos || []) : []; if (existing && custo !== existing.custo_embalagem) { historico.push({ data: new Date().toISOString(), preco: existing.custo_embalagem }); } const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unidade = document.getElementById('insumo-unidade-embalagem').value; let qtd_g = qtd, base = 'g'; if (unidade === 'kg') qtd_g = qtd * 1000; else if (unidade === 'L') { qtd_g = qtd * 1000; base = 'ml'; } else if (unidade === 'un') base = 'un';
-                const data = { nome: document.getElementById('insumo-nome').value, fornecedorId: fornecedorSelect.value, fornecedorNome: fornecedorSelect.options[fornecedorSelect.selectedIndex].dataset.nome, custo_embalagem: custo, quantidade_embalagem: qtd, unidade_embalagem: unidade, qtd_embalagem_g: qtd_g, unidade_base: base, lote: document.getElementById('insumo-lote').value, validade: document.getElementById('insumo-validade').value, historico_precos: historico, id: id || null };
-                
-                const success = await saveData('insumos', 'insumos', data);
-                if (success) {
-                    await fetchInsumos();
-                    renderInsumosTable();
-                    resetInsumoForm();
-                }
-                button.disabled = false; button.textContent = 'Salvar Insumo';
-            });
+            document.getElementById('insumo-form').addEventListener('submit', async e => { e.preventDefault(); const fornecedorSelect = document.getElementById('insumo-fornecedor-select'); if (!fornecedorSelect.value) { showToast("Selecione um fornecedor.", "error"); return; } const id = document.getElementById('insumo-id').value, custo = parseFloat(document.getElementById('insumo-custo-embalagem').value); const existing = id ? insumosCache.find(i => i.id === id) : null; const historico = existing ? (existing.historico_precos || []) : []; if (existing && custo !== existing.custo_embalagem) { historico.push({ data: new Date().toISOString(), preco: existing.custo_embalagem }); } const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unidade = document.getElementById('insumo-unidade-embalagem').value; let qtd_g = qtd, base = 'g'; if (unidade === 'kg') qtd_g = qtd * 1000; else if (unidade === 'L') { qtd_g = qtd * 1000; base = 'ml'; } else if (unidade === 'un') base = 'un'; const data = { nome: document.getElementById('insumo-nome').value, fornecedorId: fornecedorSelect.value, fornecedorNome: fornecedorSelect.options[fornecedorSelect.selectedIndex].dataset.nome, custo_embalagem: custo, quantidade_embalagem: qtd, unidade_embalagem: unidade, qtd_embalagem_g: qtd_g, unidade_base: base, lote: document.getElementById('insumo-lote').value, validade: document.getElementById('insumo-validade').value, historico_precos: historico, id: id || null }; await saveData('insumos', 'insumos', data); await fetchInsumos(); renderInsumosTable(); resetInsumoForm(); });
             document.getElementById('cancel-edit-insumo').addEventListener('click', resetInsumoForm);
 
+            const ingredientsList = document.getElementById('ingredients-list');
+            ingredientsList.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && e.target.classList.contains('ingredient-qty')) {
+                    e.preventDefault();
+                    document.getElementById('add-ingredient-btn').click();
+                    const newRow = ingredientsList.querySelector('.ingredient-row:last-child .ingredient-select');
+                    if(newRow) newRow.focus();
+                }
+            });
+            
             const receitaForm = document.getElementById('receita-form');
             receitaForm.addEventListener('submit', async e => {
                 e.preventDefault();
@@ -436,10 +413,10 @@ const firebaseConfig = {
                     const insumoId = select.value;
                     const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value) || 0;
 
-                    if (!insumoId && quantidade_g === 0) return; // Ignora linhas vazias
+                    if (!insumoId && quantidade_g === 0) return;
 
                     if (!insumoId || quantidade_g <= 0) {
-                        hasIncompleteRow = true; // Marca linha incompleta
+                        hasIncompleteRow = true;
                     } else {
                         const selectedOption = select.options[select.selectedIndex];
                         const nome = selectedOption.dataset.nome;
@@ -447,17 +424,8 @@ const firebaseConfig = {
                     }
                 });
 
-                if (hasIncompleteRow) {
-                    showToast("Verifique se todos os ingredientes têm Insumo e Quantidade preenchidos.", "error");
-                    button.disabled = false; button.textContent = 'Salvar Receita';
-                    return;
-                }
-                if (ingredients.length === 0) {
-                    showToast("Adicione ao menos um ingrediente válido à receita.", "error");
-                    button.disabled = false; button.textContent = 'Salvar Receita';
-                    return;
-                }
-
+                if (hasIncompleteRow) { showToast("Verifique se todos os ingredientes têm Insumo e Quantidade preenchidos.", "error"); button.disabled = false; button.textContent = 'Salvar Receita'; return; } 
+                if (ingredients.length === 0) { showToast("Adicione ao menos um ingrediente válido à receita.", "error"); button.disabled = false; button.textContent = 'Salvar Receita'; return; }
                 const data = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, observacoes: document.getElementById('receita-observacoes').value, id: document.getElementById('receita-id').value || null };
 
                 const success = await saveData('receitas', 'receitas', data);
@@ -470,8 +438,8 @@ const firebaseConfig = {
                 button.disabled = false; button.textContent = 'Salvar Receita';
             });
             document.getElementById('add-ingredient-btn').addEventListener('click', () => addIngredientRow());
-            document.getElementById('ingredients-list').addEventListener('change', e => { if(e.target.matches('.ingredient-select, .ingredient-qty')) updateTotalIngredientsCost(); });
-            document.getElementById('ingredients-list').addEventListener('click', e => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
+            ingredientsList.addEventListener('change', e => { if(e.target.matches('.ingredient-select, .ingredient-qty')) updateTotalIngredientsCost(); });
+            ingredientsList.addEventListener('click', e => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
             document.getElementById('cancel-edit-receita').addEventListener('click', resetReceitaForm);
             
             document.getElementById('configuracoes-form').addEventListener('submit', async e => { e.preventDefault(); const data = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; await saveConfiguracoes(data); });
