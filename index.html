@@ -12,7 +12,8 @@
     1.  COLE SUA CONFIGURAÇÃO `firebaseConfig` NA SEÇÃO <script> ABAIXO.
     2.  ATIVE "E-mail/senha" NA ABA "AUTHENTICATION" DO FIREBASE.
     3.  CRIE O "FIRESTORE DATABASE" EM MODO DE PRODUÇÃO.
-    4.  CRIE OS ÍNDICES COMPOSTOS (userId, nome) PARA AS COLEÇÕES 'fornecedores', 'insumos' e 'receitas'.
+    4.  CRIE OS ÍNDICES COMPOSTOS (userId ASC, nome ASC) PARA 'fornecedores', 'insumos', 'receitas'.
+    5.  CRIE O ÍNDICE COMPOSTO (userId ASC, mes DESC) PARA A NOVA COLEÇÃO 'custosMensais'.
     ====================================================================================================
     -->
 
@@ -54,7 +55,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card { background: var(--white); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; }
         .grid-container { display: grid; gap: 1.5rem; }
-        @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: repeat(3, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
         .kpi-card { text-align: center; }
         .kpi-card h3 { color: var(--dark-gray); font-size: 1rem; margin-bottom: 0.5rem; }
         .kpi-card .value { font-size: 2rem; font-weight: 700; color: var(--primary-dark); }
@@ -99,8 +100,10 @@
             <a href="#" class="nav-link" data-view="fornecedores">Fornecedores</a>
             <a href="#" class="nav-link" data-view="insumos">Insumos</a>
             <a href="#" class="nav-link" data-view="receitas">Receitas</a>
+            <a href="#" class="nav-link" data-view="custos-mensais">Custos Mensais</a>
+            <a href="#" class="nav-link" data-view="indicadores">Indicadores</a>
             <a href="#" class="nav-link" data-view="simulador">Simulador</a>
-            <a href="#" class="nav-link" data-view="configuracoes">⚙️ Configurações</a>
+            <a href="#" class="nav-link" data-view="configuracoes">⚙️</a>
             <button id="logout-button">Sair</button>
         </nav>
     </header>
@@ -135,6 +138,57 @@
                 <div class="card"><h2>Lista de Receitas</h2><div class="filter-container"><input type="text" id="receitas-filter" placeholder="🔎 Filtrar..."><button id="export-receitas-xlsx" class="btn btn-success btn-small">Exportar Fichas (XLSX)</button><button id="list-ingredients-pdf" class="btn btn-info btn-small">🖨️ Listar Ingredientes (PDF)</button></div><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Versão</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
+            <section id="custos-mensais-view" class="view">
+                <div class="card">
+                    <h2 id="custo-mensal-form-title">Lançar Custos do Mês</h2>
+                    <form id="custo-mensal-form">
+                        <input type="hidden" id="custo-mensal-id">
+                        <div class="form-row">
+                            <div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div>
+                            <div class="form-group"><label for="custo-mensal-faturamento">Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label for="custo-mensal-custosVariaveis">Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01"></div>
+                            <div class="form-group"><label for="custo-mensal-custosFixos">Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01"></div>
+                        </div>
+                        <div class="form-row">
+                             <div class="form-group"><label for="custo-mensal-despesasOperacionais">Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01"></div>
+                             <div class="form-group"><label for="custo-mensal-impostos">Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01"></div>
+                        </div>
+                        <div class="form-row">
+                           <div class="form-group"><label for="custo-mensal-outrasReceitasDespesas">Outras Receitas/Desp. (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" placeholder="Use valor negativo para despesa"></div>
+                           <div class="form-group"><label for="custo-mensal-numeroVendas">Número de Vendas</label><input type="number" id="custo-mensal-numeroVendas" step="1"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Mês</button>
+                        <button type="button" id="cancel-edit-custo-mensal" class="btn btn-secondary hidden" style="margin-top:0.5rem">Cancelar Edição</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>Histórico Mensal</h2>
+                    <table id="custos-mensais-table">
+                        <thead><tr><th>Mês</th><th>Faturamento</th><th>Lucro Líquido</th><th class="actions-cell">Ações</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="indicadores-view" class="view">
+                <div class="card">
+                    <h2>Indicadores Financeiros Mensais</h2>
+                    <div class="form-group">
+                        <label for="indicadores-mes-select">Selecione o Mês para Análise</label>
+                        <select id="indicadores-mes-select"><option value="">-- Escolha um mês --</option></select>
+                    </div>
+                    <div id="indicadores-results" class="hidden">
+                        <div class="grid-container grid-3">
+                            <div class="card kpi-card"><h3>Lucro Líquido</h3><div class="value" id="indicador-lucro-liquido">R$ 0,00</div></div>
+                            <div class="card kpi-card"><h3>Margem Líquida</h3><div class="value" id="indicador-margem-liquida">0,00%</div></div>
+                            <div class="card kpi-card"><h3>Markup</h3><div class="value" id="indicador-markup">0,00%</div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section id="simulador-view" class="view">
                  <div class="card"><h2>Simulador de Custo e Preço</h2><div class="form-group"><label for="simulador-receita-select">Selecione uma Receita</label><select id="simulador-receita-select"><option value="">-- Escolha --</option></select></div><div id="simulador-detalhes" class="hidden"><h3>Detalhes de Custo (COGS)</h3><table id="simulador-custos-table"><thead><tr><th>Item</th><th>Valor</th></tr></thead><tbody></tbody></table><p class="total-cost" id="simulador-cogs-total">COGS Total: R$ 0,00</p><div class="grid-container grid-2" style="margin-top: 2rem;"><div class="card"><h4>Calcular CMV por Preço</h4><div class="form-group"><label for="simulador-preco-venda">Preço de Venda (R$)</label><input type="number" id="simulador-preco-venda" step="0.01"></div><div id="simulador-resultado-cmv" class="simulator-result hidden"></div><div id="cmv-visualizer-container" class="hidden"><div class="cmv-visualizer"><div id="cmv-bar" class="cmv-visualizer-bar"></div></div></div></div><div class="card"><h4>Calcular Preço Sugerido</h4><div class="form-group"><label for="simulador-meta-cmv">Meta de CMV (%)</label><input type="number" id="simulador-meta-cmv" step="0.1"></div><div class="form-group"><label for="simulador-margem-desejada">Margem (%)</label><input type="number" id="simulador-margem-desejada" step="0.1"></div><div id="simulador-resultado-preco" class="simulator-result hidden"></div></div></div></div></div>
             </section>
@@ -165,11 +219,12 @@ const firebaseConfig = {
   storageBucket: "cmv-pizza.firebasestorage.app",
   messagingSenderId: "1022435006716",
   appId: "1:1022435006716:web:ec39f22702097beca25f79"
-};
+
+
         let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
-        let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {} };
-        let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {};
+        let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {}, custosMensais: [] };
+        let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {}, custosMensaisCache = [];
 
         if (firebaseConfig.apiKey.startsWith("COLE_SUA")) {
             isLocalMode = true;
@@ -295,18 +350,18 @@ const firebaseConfig = {
             setupFormListeners(); 
             await loadAllData(); 
         }
-        function resetAppState() { fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; ['fornecedores-table', 'insumos-table', 'receitas-table'].forEach(id => { const table = document.getElementById(id); if (table) table.querySelector('tbody').innerHTML = '' }); }
-        async function loadAllData() { await fetchConfiguracoes(); await fetchFornecedores(); await fetchInsumos(); await fetchReceitas(); renderAllTables(); populateAllDropdowns(); updateDashboard(); }
+        function resetAppState() { fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; custosMensaisCache = []; ['fornecedores-table', 'insumos-table', 'receitas-table', 'custos-mensais-table'].forEach(id => { const table = document.getElementById(id); if (table) table.querySelector('tbody').innerHTML = '' }); }
+        async function loadAllData() { await fetchConfiguracoes(); await Promise.all([fetchFornecedores(), fetchInsumos(), fetchReceitas(), fetchCustosMensais()]); renderAllTables(); populateAllDropdowns(); updateDashboard(); }
 
-        async function fetchCollection(collectionName, cacheArray, localKey) {
+        async function fetchCollection(collectionName, cacheArray, localKey, orderByField = 'nome', orderDirection = 'asc') {
             if (isLocalMode) { cacheArray.splice(0, cacheArray.length, ...localData[localKey]); return; }
             try {
-                const snapshot = await db.collection(collectionName).where('userId', '==', currentUser.uid).orderBy('nome').get();
+                const snapshot = await db.collection(collectionName).where('userId', '==', currentUser.uid).orderBy(orderByField, orderDirection).get();
                 const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 cacheArray.splice(0, cacheArray.length, ...data);
             } catch (error) {
                 console.error(`Erro ao buscar ${collectionName}:`, error);
-                if (error.code === 'failed-precondition') { showToast(`Erro: Índice do Firestore ausente para '${collectionName}'. Crie-o no Firebase (userId ASC, nome ASC).`, 'error');
+                if (error.code === 'failed-precondition') { showToast(`Erro: Índice do Firestore ausente para '${collectionName}'. Crie-o no Firebase.`, 'error');
                 } else { showToast(`Erro ao carregar ${collectionName}: ${error.message}`, 'error'); }
             }
         }
@@ -321,7 +376,7 @@ const firebaseConfig = {
                     if (isEditing) { await db.collection(collectionName).doc(data.id).update(data);
                     } else { delete data.id; await db.collection(collectionName).add(data); }
                 }
-                showToast(`${collectionName.slice(0, -1)} ${isEditing ? 'atualizado' : 'salvo'}!`);
+                showToast(`${collectionName.replace('sMensais', '').slice(0, -1)} ${isEditing ? 'atualizado' : 'salvo'}!`);
                 return true;
             } catch (error) {
                 const errorMsg = error.code === 'permission-denied' ? 'Permissão negada. Verifique suas Regras de Segurança do Firestore.' : error.message;
@@ -334,7 +389,7 @@ const firebaseConfig = {
              try {
                 if (isLocalMode) { localData[localKey] = localData[localKey].filter(i => i.id !== id);
                 } else { await db.collection(collectionName).doc(id).delete(); }
-                showToast(`${collectionName.slice(0, -1)} excluído!`);
+                showToast(`${collectionName.replace('sMensais', '').slice(0, -1)} excluído!`);
                 return true;
             } catch (error) { showToast("Erro ao excluir.", 'error'); return false; }
         }
@@ -342,23 +397,26 @@ const firebaseConfig = {
         async function fetchFornecedores() { await fetchCollection('fornecedores', fornecedoresCache, 'fornecedores'); }
         async function fetchInsumos() { await fetchCollection('insumos', insumosCache, 'insumos'); }
         async function fetchReceitas() { await fetchCollection('receitas', receitasCache, 'receitas'); }
-
+        async function fetchCustosMensais() { await fetchCollection('custosMensais', custosMensaisCache, 'custosMensais', 'mes', 'desc'); }
         async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } catch(error) { console.error("Erro configs:", error); } } displayConfiguracoes(); }
         async function saveConfiguracoes(configData) { configData.userId = currentUser.uid; try { if(isLocalMode) { localData.configuracoes.default = configData; } else { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } showToast("Configurações salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); } catch(error) { showToast("Erro ao salvar.", 'error'); } }
         
-        function renderAllTables() { renderFornecedoresTable(); renderInsumosTable(); renderReceitasTable(); }
-        function populateAllDropdowns() { populateFornecedoresDropdowns(); populateReceitaSelects(); }
+        function renderAllTables() { renderFornecedoresTable(); renderInsumosTable(); renderReceitasTable(); renderCustosMensaisTable(); }
+        function populateAllDropdowns() { populateFornecedoresDropdowns(); populateReceitaSelects(); populateIndicadoresMesSelect(); }
         function renderFornecedoresTable() { const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = ''; if (fornecedoresCache.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; } fornecedoresCache.forEach(f => { const insumosCount = insumosCache.filter(i => i.fornecedorId === f.id).length; const tr = document.createElement('tr'); tr.innerHTML = `<td>${f.nome}</td><td>${f.contato || '--'}</td><td>${f.telefone || '--'}</td><td>${insumosCount}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
         function renderInsumosTable(filter = '') { const tbody = document.getElementById('insumos-table').querySelector('tbody'); tbody.innerHTML = ''; const data = insumosCache.filter(i => i.nome.toLowerCase().includes(filter) || (i.fornecedorNome && i.fornecedorNome.toLowerCase().includes(filter))); if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum insumo encontrado.</td></tr>'; return; } data.forEach(i => { const custo = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : i.custo_embalagem; const tr = document.createElement('tr'); tr.innerHTML = `<td>${i.nome}</td><td>${formatCurrency(custo)} / ${i.unidade_base || 'g'}</td><td>${i.fornecedorNome || '--'}</td><td>${i.validade ? new Date(i.validade).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : '--'}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-insumo" data-id="${i.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-insumo" data-id="${i.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
         function renderReceitasTable(filter = '') { const tbody = document.getElementById('receitas-table').querySelector('tbody'); tbody.innerHTML = ''; const data = receitasCache.filter(r => r.nome.toLowerCase().includes(filter)); if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Nenhuma receita encontrada.</td></tr>'; return; } data.forEach(r => { const cogs = calculateRecipeCOGS(r); const tr = document.createElement('tr'); tr.innerHTML = `<td>${r.nome}</td><td>${formatCurrency(cogs)}</td><td>${r.versao || '1.0'}</td><td class="actions-cell"><button class="btn btn-info btn-small btn-view-report" data-id="${r.id}">📄</button> <button class="btn btn-secondary btn-small btn-edit-receita" data-id="${r.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-receita" data-id="${r.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
+        function renderCustosMensaisTable() { const tbody = document.getElementById('custos-mensais-table').querySelector('tbody'); tbody.innerHTML = ''; if (custosMensaisCache.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Nenhum custo mensal lançado.</td></tr>'; return; } custosMensaisCache.forEach(c => { const [year, month] = c.mes.split('-'); const lucro = calculateLucroLiquido(c); const tr = document.createElement('tr'); tr.innerHTML = `<td>${month}/${year}</td><td>${formatCurrency(c.faturamento)}</td><td>${formatCurrency(lucro)}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-custo-mensal" data-id="${c.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-custo-mensal" data-id="${c.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
         function populateFornecedoresDropdowns() { const select = document.getElementById('insumo-fornecedor-select'); const current = select.value; select.innerHTML = '<option value="">-- Selecione --</option>'; fornecedoresCache.forEach(f => { select.innerHTML += `<option value="${f.id}" data-nome="${f.nome}">${f.nome}</option>`; }); select.value = current; }
         function populateInsumosDropdowns(selectEl) { if(selectEl){ selectEl.innerHTML = '<option value="">Selecione um insumo</option>'; insumosCache.forEach(i => { const custo = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : i.custo_embalagem; selectEl.innerHTML += `<option value="${i.id}" data-nome="${i.nome}">${i.nome} (${formatCurrency(custo)}/${i.unidade_base || 'g'})</option>`; });}}
         function populateReceitaSelects() { const select = document.getElementById('simulador-receita-select'); const current = select.value; select.innerHTML = '<option value="">-- Escolha --</option>'; receitasCache.forEach(r => { select.innerHTML += `<option value="${r.id}">${r.nome}</option>`; }); select.value = current; }
+        function populateIndicadoresMesSelect() { const select = document.getElementById('indicadores-mes-select'); const current = select.value; select.innerHTML = '<option value="">-- Escolha um mês --</option>'; custosMensaisCache.forEach(c => { const [year, month] = c.mes.split('-'); select.innerHTML += `<option value="${c.id}">${month}/${year}</option>`; }); select.value = current; updateIndicadores(); }
         
         function calculateCustoPorGrama(insumo) { if (!insumo || !insumo.custo_embalagem || !insumo.qtd_embalagem_g) return 0; return insumo.custo_embalagem / insumo.qtd_embalagem_g; }
         function calculateCustoIngrediente(insumoId, quantidade_g) { const insumo = insumosCache.find(i => i.id === insumoId); if (!insumo) return 0; return calculateCustoPorGrama(insumo) * quantidade_g; }
         function calculateRecipeIngredientsCost(ingredients = []) { return ingredients.reduce((total, ing) => total + calculateCustoIngrediente(ing.insumoId, ing.quantidade_g), 0); }
         function calculateRecipeCOGS(receita) { if (!receita) return 0; const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes); const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100); const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0); return custoComPerda + (receita.custo_embalagem_por_unidade || 0) + custoMaoDeObra + (configCache.rateio_por_pizza || 0); }
+        function calculateLucroLiquido(custoMensal) { if (!custoMensal) return 0; return (custoMensal.faturamento || 0) + (custoMensal.outrasReceitasDespesas || 0) - (custoMensal.custosVariaveis || 0) - (custoMensal.custosFixos || 0) - (custoMensal.despesasOperacionais || 0) - (custoMensal.impostos || 0); }
         
         function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
         
@@ -370,88 +428,66 @@ const firebaseConfig = {
             document.getElementById('cancel-edit-insumo').addEventListener('click', resetInsumoForm);
             
             const ingredientsList = document.getElementById('ingredients-list');
-            ingredientsList.addEventListener('keydown', e => {
-                if (e.key === 'Enter' && e.target.classList.contains('ingredient-qty')) {
-                    e.preventDefault();
-                    addIngredientRow();
-                    const newRow = ingredientsList.querySelector('.ingredient-row:last-child .ingredient-select');
-                    if(newRow) newRow.focus();
-                }
-            });
+            ingredientsList.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.classList.contains('ingredient-qty')) { e.preventDefault(); addIngredientRow(); const newRow = ingredientsList.querySelector('.ingredient-row:last-child .ingredient-select'); if(newRow) newRow.focus(); } });
 
             const receitaForm = document.getElementById('receita-form');
             receitaForm.addEventListener('submit', async e => {
                 e.preventDefault();
                 const button = receitaForm.querySelector('button[type="submit"]');
                 button.disabled = true; button.textContent = 'Aguarde...';
-                
                 try {
-                    const ingredients = [];
-                    let hasIncompleteRow = false;
-                    document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
-                        const select = row.querySelector('.ingredient-select');
-                        const insumoId = select.value;
-                        const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value) || 0;
-
-                        if (!insumoId && quantidade_g === 0) return; 
-
-                        if (!insumoId || quantidade_g <= 0) {
-                            hasIncompleteRow = true;
-                        } else {
-                            const selectedOption = select.options[select.selectedIndex];
-                            const nome = selectedOption ? selectedOption.dataset.nome : null;
-                            if (nome) {
-                                ingredients.push({ insumoId, nome, quantidade_g });
-                            } else {
-                                hasIncompleteRow = true;
-                            }
-                        }
-                    });
-
+                    const ingredients = []; let hasIncompleteRow = false;
+                    document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { const select = row.querySelector('.ingredient-select'); const insumoId = select.value; const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value) || 0; if (!insumoId && quantidade_g === 0) return; if (!insumoId || quantidade_g <= 0) { hasIncompleteRow = true; } else { const selectedOption = select.options[select.selectedIndex]; const nome = selectedOption ? selectedOption.dataset.nome : null; if (nome) { ingredients.push({ insumoId, nome, quantidade_g }); } else { hasIncompleteRow = true; } } });
                     if (hasIncompleteRow) { throw new Error("Verifique se todos os ingredientes têm Insumo e Quantidade preenchidos."); } 
                     if (ingredients.length === 0) { throw new Error("Adicione ao menos um ingrediente válido à receita."); }
-                    
-                    const data = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes: ingredients, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, observacoes: document.getElementById('receita-observacoes').value, id: document.getElementById('receita-id').value || null };
-
+                    const data = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, observacoes: document.getElementById('receita-observacoes').value, id: document.getElementById('receita-id').value || null };
                     const success = await saveData('receitas', 'receitas', data);
-                    if (success) {
-                        await fetchReceitas();
-                        renderReceitasTable();
-                        populateReceitaSelects();
-                        resetReceitaForm();
-                    }
-                } catch (error) {
-                    showToast(error.message, 'error');
-                } finally {
-                    button.disabled = false; button.textContent = 'Salvar Receita';
-                }
+                    if (success) { await fetchReceitas(); renderReceitasTable(); populateReceitaSelects(); resetReceitaForm(); }
+                } catch (error) { showToast(error.message, 'error');
+                } finally { button.disabled = false; button.textContent = 'Salvar Receita'; }
             });
             document.getElementById('add-ingredient-btn').addEventListener('click', addIngredientRow);
             ingredientsList.addEventListener('change', e => { if(e.target.matches('.ingredient-select, .ingredient-qty')) updateTotalIngredientsCost(); });
             ingredientsList.addEventListener('click', e => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
             document.getElementById('cancel-edit-receita').addEventListener('click', resetReceitaForm);
+
+            const custoMensalForm = document.getElementById('custo-mensal-form');
+            custoMensalForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const button = custoMensalForm.querySelector('button[type="submit"]');
+                button.disabled = true; button.textContent = 'Aguarde...';
+                const data = { mes: document.getElementById('custo-mensal-mes').value, faturamento: parseFloat(document.getElementById('custo-mensal-faturamento').value) || 0, custosVariaveis: parseFloat(document.getElementById('custo-mensal-custosVariaveis').value) || 0, custosFixos: parseFloat(document.getElementById('custo-mensal-custosFixos').value) || 0, despesasOperacionais: parseFloat(document.getElementById('custo-mensal-despesasOperacionais').value) || 0, outrasReceitasDespesas: parseFloat(document.getElementById('custo-mensal-outrasReceitasDespesas').value) || 0, numeroVendas: parseInt(document.getElementById('custo-mensal-numeroVendas').value) || 0, impostos: parseFloat(document.getElementById('custo-mensal-impostos').value) || 0, id: document.getElementById('custo-mensal-id').value || null };
+                const success = await saveData('custosMensais', 'custosMensais', data);
+                if (success) { await fetchCustosMensais(); renderCustosMensaisTable(); populateIndicadoresMesSelect(); resetCustoMensalForm(); }
+                button.disabled = false; button.textContent = 'Salvar Mês';
+            });
+            document.getElementById('cancel-edit-custo-mensal').addEventListener('click', resetCustoMensalForm);
             
             document.getElementById('configuracoes-form').addEventListener('submit', async e => { e.preventDefault(); const data = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; await saveConfiguracoes(data); });
             document.getElementById('simulador-receita-select').addEventListener('change', updateSimulator);
             ['simulador-preco-venda', 'simulador-meta-cmv', 'simulador-margem-desejada'].forEach(id => document.getElementById(id).addEventListener('input', updateSimulator));
+            document.getElementById('indicadores-mes-select').addEventListener('change', updateIndicadores);
             document.getElementById('insumos-filter').addEventListener('input', e => renderInsumosTable(e.target.value.toLowerCase()));
             document.getElementById('receitas-filter').addEventListener('input', e => renderReceitasTable(e.target.value.toLowerCase()));
             document.body.addEventListener('click', handleTableButtonClick);
         }
 
-        function handleTableButtonClick(e) { const btn = e.target.closest('button'); if (!btn) return; if(btn.matches('.btn-edit-fornecedor')) editFornecedor(btn.dataset.id); else if (btn.matches('.btn-delete-fornecedor')) confirmDelete('fornecedor', btn.dataset.id); else if(btn.matches('.btn-edit-insumo')) editInsumo(btn.dataset.id); else if (btn.matches('.btn-delete-insumo')) confirmDelete('insumo', btn.dataset.id); else if (btn.matches('.btn-edit-receita')) editReceita(btn.dataset.id); else if (btn.matches('.btn-delete-receita')) confirmDelete('receita', btn.dataset.id); else if (btn.matches('.btn-view-report')) generateRecipePDF(btn.dataset.id); }
+        function handleTableButtonClick(e) { const btn = e.target.closest('button'); if (!btn) return; if(btn.matches('.btn-edit-fornecedor')) editFornecedor(btn.dataset.id); else if (btn.matches('.btn-delete-fornecedor')) confirmDelete('fornecedor', btn.dataset.id); else if(btn.matches('.btn-edit-insumo')) editInsumo(btn.dataset.id); else if (btn.matches('.btn-delete-insumo')) confirmDelete('insumo', btn.dataset.id); else if (btn.matches('.btn-edit-receita')) editReceita(btn.dataset.id); else if (btn.matches('.btn-delete-receita')) confirmDelete('receita', btn.dataset.id); else if(btn.matches('.btn-edit-custo-mensal')) editCustoMensal(btn.dataset.id); else if(btn.matches('.btn-delete-custo-mensal')) confirmDelete('custoMensal', btn.dataset.id); else if (btn.matches('.btn-view-report')) generateRecipePDF(btn.dataset.id); }
         function resetFornecedorForm() { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value = ''; document.getElementById('fornecedor-form-title').textContent = 'Cadastrar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); }
-        async function editReceita(id) { const r = receitasCache.find(i => i.id === id); if (!r) return; showView('receitas'); resetReceitaForm(); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-versao').value = r.versao; document.getElementById('receita-tempo-preparo').value = r.tempo_preparo_min; document.getElementById('receita-custo-embalagem').value = r.custo_embalagem_por_unidade; document.getElementById('receita-perda-percentual').value = r.perda_percentual; document.getElementById('receita-observacoes').value = r.observacoes; const ingredientsList = document.getElementById('ingredients-list'); ingredientsList.innerHTML = ''; await new Promise(resolve => setTimeout(resolve, 0)); r.ingredientes.forEach(ing => addIngredientRow(ing)); updateTotalIngredientsCost(); document.getElementById('receita-form-title').textContent = 'Editar Receita'; document.getElementById('cancel-edit-receita').classList.remove('hidden'); window.scrollTo(0, 0); }
         function editFornecedor(id) { const f = fornecedoresCache.find(i => i.id === id); if (!f) return; showView('fornecedores'); Object.keys(f).forEach(key => { const el = document.getElementById(`fornecedor-${key}`); if (el) el.value = f[key]; }); document.getElementById('fornecedor-id').value = f.id; document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.remove('hidden'); window.scrollTo(0, 0); }
         function resetInsumoForm() { document.getElementById('insumo-form').reset(); document.getElementById('insumo-id').value = ''; document.getElementById('insumo-form-title').textContent = 'Cadastrar Insumo'; document.getElementById('cancel-edit-insumo').classList.add('hidden'); }
         function editInsumo(id) { const i = insumosCache.find(item => item.id === id); if (!i) return; showView('insumos'); document.getElementById('insumo-id').value = i.id; document.getElementById('insumo-nome').value = i.nome; document.getElementById('insumo-fornecedor-select').value = i.fornecedorId; document.getElementById('insumo-custo-embalagem').value = i.custo_embalagem; document.getElementById('insumo-qtd-embalagem').value = i.quantidade_embalagem; document.getElementById('insumo-unidade-embalagem').value = i.unidade_embalagem; document.getElementById('insumo-lote').value = i.lote; document.getElementById('insumo-validade').value = i.validade; document.getElementById('insumo-form-title').textContent = 'Editar Insumo'; document.getElementById('cancel-edit-insumo').classList.remove('hidden'); window.scrollTo(0, 0); }
         function resetReceitaForm() { document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; document.getElementById('receita-form-title').textContent = 'Criar Receita'; document.getElementById('cancel-edit-receita').classList.add('hidden'); addIngredientRow(); }
+        async function editReceita(id) { const r = receitasCache.find(i => i.id === id); if (!r) return; showView('receitas'); resetReceitaForm(); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-versao').value = r.versao; document.getElementById('receita-tempo-preparo').value = r.tempo_preparo_min; document.getElementById('receita-custo-embalagem').value = r.custo_embalagem_por_unidade; document.getElementById('receita-perda-percentual').value = r.perda_percentual; document.getElementById('receita-observacoes').value = r.observacoes; const ingredientsList = document.getElementById('ingredients-list'); ingredientsList.innerHTML = ''; await new Promise(resolve => setTimeout(resolve, 50)); r.ingredientes.forEach(ing => addIngredientRow(ing)); updateTotalIngredientsCost(); document.getElementById('receita-form-title').textContent = 'Editar Receita'; document.getElementById('cancel-edit-receita').classList.remove('hidden'); window.scrollTo(0, 0); }
+        function resetCustoMensalForm() { document.getElementById('custo-mensal-form').reset(); document.getElementById('custo-mensal-id').value = ''; document.getElementById('custo-mensal-form-title').textContent = 'Lançar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.add('hidden'); }
+        function editCustoMensal(id) { const c = custosMensaisCache.find(i => i.id === id); if (!c) return; showView('custos-mensais'); document.getElementById('custo-mensal-id').value = c.id; document.getElementById('custo-mensal-mes').value = c.mes; document.getElementById('custo-mensal-faturamento').value = c.faturamento; document.getElementById('custo-mensal-custosVariaveis').value = c.custosVariaveis; document.getElementById('custo-mensal-custosFixos').value = c.custosFixos; document.getElementById('custo-mensal-despesasOperacionais').value = c.despesasOperacionais; document.getElementById('custo-mensal-outrasReceitasDespesas').value = c.outrasReceitasDespesas; document.getElementById('custo-mensal-numeroVendas').value = c.numeroVendas; document.getElementById('custo-mensal-impostos').value = c.impostos; document.getElementById('custo-mensal-form-title').textContent = 'Editar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.remove('hidden'); window.scrollTo(0, 0); }
         function addIngredientRow(ing = {}) { const div = document.createElement('div'); div.className = 'ingredient-row'; const select = document.createElement('select'); select.className = 'ingredient-select'; populateInsumosDropdowns(select); select.value = ing.insumoId || ''; div.innerHTML = `<div style="flex:3;">${select.outerHTML}</div><div style="flex:1;"><input type="number" class="ingredient-qty" placeholder="Qtd (g/un)" value="${ing.quantidade_g || ''}" step="0.1"></div><div class="costo-ingrediente">R$ 0,00</div><button type="button" class="btn btn-danger btn-small remove-ingredient-btn">X</button>`; document.getElementById('ingredients-list').appendChild(div); }
         function updateTotalIngredientsCost() { let total = 0; document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { const id = row.querySelector('.ingredient-select').value, qty = parseFloat(row.querySelector('.ingredient-qty').value) || 0, cost = calculateCustoIngrediente(id, qty); row.querySelector('.costo-ingrediente').textContent = formatCurrency(cost); total += cost; }); document.getElementById('custo-total-ingredientes').textContent = `Custo: ${formatCurrency(total)}`; }
         function displayConfiguracoes() { Object.keys(configCache).forEach(key => { const el = document.getElementById(`config-${key.replace(/_/g, '-')}`); if (el) el.value = configCache[key]; }); document.getElementById('alert-threshold-display').textContent = configCache.alerta_variacao || 10; }
         function updateSimulator() { const id = document.getElementById('simulador-receita-select').value, div = document.getElementById('simulador-detalhes'); if (!id) { div.classList.add('hidden'); return; } div.classList.remove('hidden'); const receita = receitasCache.find(r => r.id === id), cogs = calculateRecipeCOGS(receita); const tbody = document.getElementById('simulador-custos-table').querySelector('tbody'); tbody.innerHTML = `<tr><td>Ingredientes</td><td>${formatCurrency(calculateRecipeIngredientsCost(receita.ingredientes))}</td></tr><tr><td>Perda</td><td>${formatCurrency(calculateRecipeIngredientsCost(receita.ingredientes) * (receita.perda_percentual / 100 || 0))}</td></tr><tr><td>Mão de Obra</td><td>${formatCurrency((configCache.custo_hora_mao_de_obra / 60 || 0) * (receita.tempo_preparo_min || 0))}</td></tr><tr><td>Embalagem</td><td>${formatCurrency(receita.custo_embalagem_por_unidade)}</td></tr><tr><td>Rateio</td><td>${formatCurrency(configCache.rateio_por_pizza)}</td></tr>`; document.getElementById('simulador-cogs-total').textContent = `COGS Total: ${formatCurrency(cogs)}`; const preco = parseFloat(document.getElementById('simulador-preco-venda').value), cmvDiv = document.getElementById('simulador-resultado-cmv'), visDiv = document.getElementById('cmv-visualizer-container'); if (preco > 0) { const cmv = (cogs / preco) * 100, meta = configCache.meta_cmv_padrao || 30; let status = 'ok', sClass = 'cmv-ok'; if (cmv > meta * 1.1) { status = 'danger'; sClass = 'cmv-danger'; } else if (cmv > meta) { status = 'warn'; sClass = 'cmv-warn'; } cmvDiv.innerHTML = `<p>CMV: <strong class="${sClass}">${cmv.toFixed(2)}%</strong> (Meta: ${meta}%)</p>`; cmvDiv.classList.remove('hidden'); const bar = document.getElementById('cmv-bar'); bar.style.width = `${Math.min(cmv, 100)}%`; bar.className = `cmv-visualizer-bar ${status}`; visDiv.classList.remove('hidden'); } else { cmvDiv.classList.add('hidden'); visDiv.classList.add('hidden'); } const metaCMV = parseFloat(document.getElementById('simulador-meta-cmv').value), margem = parseFloat(document.getElementById('simulador-margem-desejada').value), precoDiv = document.getElementById('simulador-resultado-preco'); let html = ''; if (metaCMV > 0) html += `<p>Preço (Meta CMV): <strong>${formatCurrency(cogs / (metaCMV / 100))}</strong></p>`; if (margem > 0 && margem < 100) html += `<p>Preço (Margem ${margem}%): <strong>${formatCurrency(cogs / (1 - (margem / 100)))}</strong></p>`; if (html) { precoDiv.innerHTML = html; precoDiv.classList.remove('hidden'); } else { precoDiv.classList.add('hidden'); } }
         function updateDashboard() { document.getElementById('dashboard-num-fornecedores').textContent = fornecedoresCache.length; document.getElementById('dashboard-num-insumos').textContent = insumosCache.length; document.getElementById('dashboard-num-receitas').textContent = receitasCache.length; document.getElementById('dashboard-cmv-medio').textContent = `${(configCache.meta_cmv_padrao || 30).toFixed(1)}%`; const alertsDiv = document.getElementById('dashboard-alerts'); alertsDiv.innerHTML = ''; let alerts = 0; insumosCache.forEach(i => { if (i.historico_precos?.length) { const latest = i.custo_embalagem, prev = i.historico_precos[i.historico_precos.length-1].preco; if (prev > 0) { const variation = ((latest - prev) / prev) * 100; if (Math.abs(variation) > (configCache.alerta_variacao || 10)) { alerts++; alertsDiv.innerHTML += `<div class="alert-item">${i.nome} variou ${variation.toFixed(1)}%.</div>`; } } } }); if (alerts === 0) alertsDiv.innerHTML = '<p>Nenhuma variação de preço significativa.</p>'; const topTbody = document.getElementById('dashboard-top-insumos').querySelector('tbody'); topTbody.innerHTML = ''; if (insumosCache.length > 0) { [...insumosCache].sort((a,b) => calculateCustoPorGrama(b) - calculateCustoPorGrama(a)).slice(0, 5).forEach(i => topTbody.innerHTML += `<tr><td>${i.nome}</td><td>${formatCurrency(calculateCustoPorGrama(i))} / ${i.unidade_base || 'g'}</td></tr>`); } else { topTbody.innerHTML = '<tr><td colspan="2">Nenhum insumo.</td></tr>'; } }
-        function confirmDelete(type, id) { const modal = document.getElementById('confirm-modal'); document.getElementById('confirm-modal-text').textContent = `Tem certeza que deseja excluir este(a) ${type}?`; modal.style.display = 'block'; const yesBtn = document.getElementById('confirm-modal-yes'); const noBtn = document.getElementById('confirm-modal-no'); const handleYes = async () => { if (type === 'fornecedor') await deleteData('fornecedores', 'fornecedores', id); if (type === 'insumo') await deleteData('insumos', 'insumos', id); if (type === 'receita') await deleteData('receitas', 'receitas', id); await loadAllData(); closeModal(); }; const closeModal = () => { modal.style.display = 'none'; yesBtn.removeEventListener('click', handleYes); noBtn.removeEventListener('click', closeModal); }; yesBtn.addEventListener('click', handleYes, { once: true }); noBtn.addEventListener('click', closeModal, { once: true }); }
+        function updateIndicadores() { const id = document.getElementById('indicadores-mes-select').value; const resultsDiv = document.getElementById('indicadores-results'); if (!id) { resultsDiv.classList.add('hidden'); return; } resultsDiv.classList.remove('hidden'); const data = custosMensaisCache.find(c => c.id === id); if (!data) return; const custoTotal = (data.custosVariaveis || 0) + (data.custosFixos || 0) + (data.despesasOperacionais || 0) + (data.impostos || 0); const lucroLiquido = calculateLucroLiquido(data); const margemLiquida = (data.faturamento > 0) ? (lucroLiquido / data.faturamento) * 100 : 0; const markup = (custoTotal > 0) ? ((data.faturamento - custoTotal) / custoTotal) * 100 : 0; document.getElementById('indicador-lucro-liquido').textContent = formatCurrency(lucroLiquido); document.getElementById('indicador-margem-liquida').textContent = `${margemLiquida.toFixed(2)}%`; document.getElementById('indicador-markup').textContent = `${markup.toFixed(2)}%`; }
+        function confirmDelete(type, id) { const modal = document.getElementById('confirm-modal'); document.getElementById('confirm-modal-text').textContent = `Tem certeza que deseja excluir este(a) ${type}?`; modal.style.display = 'block'; const yesBtn = document.getElementById('confirm-modal-yes'); const noBtn = document.getElementById('confirm-modal-no'); const handleYes = async () => { if (type === 'fornecedor') await deleteData('fornecedores', 'fornecedores', id); if (type === 'insumo') await deleteData('insumos', 'insumos', id); if (type === 'receita') await deleteData('receitas', 'receitas', id); if (type === 'custoMensal') await deleteData('custosMensais', 'custosMensais', id); await loadAllData(); closeModal(); }; const closeModal = () => { modal.style.display = 'none'; yesBtn.removeEventListener('click', handleYes); noBtn.removeEventListener('click', closeModal); }; yesBtn.addEventListener('click', handleYes, { once: true }); noBtn.addEventListener('click', closeModal, { once: true }); }
         document.getElementById('export-insumos-xlsx').addEventListener('click', () => { const data = insumosCache.map(i => ({ Nome: i.nome, Fornecedor: i.fornecedorNome, 'Custo Emb.': i.custo_embalagem, 'Qtd Emb.': i.quantidade_embalagem, Unidade: i.unidade_embalagem, 'Custo/g': calculateCustoPorGrama(i) })); const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Insumos"); XLSX.writeFile(wb, "insumos.xlsx"); });
         document.getElementById('export-receitas-xlsx').addEventListener('click', () => { const wb = XLSX.utils.book_new(); receitasCache.forEach(r => { const cogs = calculateRecipeCOGS(r); const data = [ { Item: 'Nome', Valor: r.nome }, { Item: 'COGS', Valor: cogs }, {}, { Item: 'Ingrediente', Qtd: 'Custo'} ]; r.ingredientes.forEach(ing => { data.push({ Item: ing.nome, Qtd: ing.quantidade_g, Custo: calculateCustoIngrediente(ing.insumoId, ing.quantidade_g) }); }); const ws = XLSX.utils.json_to_sheet(data, {skipHeader: true}); XLSX.utils.book_append_sheet(wb, ws, r.nome.substring(0, 30)); }); XLSX.writeFile(wb, "fichas_tecnicas.xlsx"); });
         document.getElementById('list-ingredients-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(18); doc.text('Lista de Ingredientes por Receita', 14, 22); doc.setFontSize(11); let finalY = 30; receitasCache.forEach(r => { if (finalY > 260) { doc.addPage(); finalY = 20; } doc.setFont('helvetica', 'bold'); doc.text(`${r.nome}`, 14, finalY); finalY += 7; doc.setFont('helvetica', 'normal'); r.ingredientes.forEach(ing => { doc.text(`- ${ing.nome}: ${ing.quantidade_g} g`, 18, finalY); finalY += 7; }); finalY += 5; }); doc.save('Lista_Ingredientes.pdf'); });
