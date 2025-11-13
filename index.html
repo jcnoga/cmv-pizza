@@ -172,6 +172,7 @@ const firebaseConfig = {
         let localIdCounter = 0;
         let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {};
 
+        // --- INICIALIZAÇÃO E LÓGICA DE AUTENTICAÇÃO ---
         if (firebaseConfig.apiKey.startsWith("COLE_SUA")) {
             isLocalMode = true;
             console.warn("Firebase não configurado. Rodando em modo local.");
@@ -201,9 +202,6 @@ const firebaseConfig = {
         function formatCurrency(value) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0); }
         function showView(viewId) { views.forEach(v => v.classList.remove('active')); navLinks.forEach(l => l.classList.remove('active')); document.getElementById(`${viewId}-view`)?.classList.add('active'); document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active'); }
 
-        // ============================================================================================
-        // AUTHENTICATION (RECONSTRUCTED)
-        // ============================================================================================
         function setupAuthListeners() {
             auth.onAuthStateChanged(user => {
                 if (user) {
@@ -231,7 +229,6 @@ const firebaseConfig = {
                         document.getElementById('login-email').value,
                         document.getElementById('login-password').value
                     );
-                    // onAuthStateChanged will handle UI changes
                 } catch (err) {
                     showToast(err.message, 'error');
                 } finally {
@@ -275,7 +272,7 @@ const firebaseConfig = {
             });
 
             document.getElementById('logout-button').addEventListener('click', () => {
-                if(auth) auth.signOut();
+                if (auth) auth.signOut();
             });
             
             ['show-register', 'show-login', 'show-reset-password', 'back-to-login'].forEach(id => {
@@ -288,10 +285,22 @@ const firebaseConfig = {
         }
         function toggleAuthViews(view) { ['login-view', 'register-view', 'reset-password-view'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById(view).classList.remove('hidden'); }
 
-        async function initApp() { showView('dashboard'); setupNavListeners(); setupFormListeners(); await loadAllData(); }
+        async function initApp() { 
+            if (isLocalMode) {
+                currentUser = { uid: 'local', email: 'local@app.com' };
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                appNav.classList.remove('hidden');
+            }
+            showView('dashboard'); 
+            setupNavListeners(); 
+            setupFormListeners(); 
+            await loadAllData(); 
+        }
         function resetAppState() { fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; ['fornecedores-table', 'insumos-table', 'receitas-table'].forEach(id => { const table = document.getElementById(id); if (table) table.querySelector('tbody').innerHTML = '' }); }
         async function loadAllData() { await fetchConfiguracoes(); await fetchFornecedores(); await fetchInsumos(); await fetchReceitas(); renderAllTables(); populateAllDropdowns(); updateDashboard(); }
 
+        // --- DATA CRUD FUNCTIONS ---
         async function fetchFornecedores() { if (isLocalMode) { fornecedoresCache = [...localData.fornecedores]; } else { try { const snapshot = await db.collection('fornecedores').where('userId', '==', currentUser.uid).orderBy('nome').get(); fornecedoresCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch fornecedores:", error); } } }
         async function saveFornecedor(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; try { if (isLocalMode) { if (isEditing) { const index = localData.fornecedores.findIndex(i => i.id === data.id); if (index > -1) localData.fornecedores[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.fornecedores.push(data); } } else { if (isEditing) { await db.collection('fornecedores').doc(data.id).update(data); } else { delete data.id; await db.collection('fornecedores').add(data); } } showToast(`Fornecedor ${isEditing ? 'atualizado' : 'salvo'}!`); } catch (error) { showToast("Erro ao salvar fornecedor.", 'error'); console.error(error); } }
         async function deleteFornecedor(id) { try { if (isLocalMode) { localData.fornecedores = localData.fornecedores.filter(i => i.id !== id); } else { await db.collection('fornecedores').doc(id).delete(); } showToast("Fornecedor excluído!"); } catch (error) { showToast("Erro ao excluir.", 'error'); } }
@@ -304,6 +313,7 @@ const firebaseConfig = {
         async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } catch(error) { console.error("Erro configs:", error); } } displayConfiguracoes(); }
         async function saveConfiguracoes(configData) { configData.userId = isLocalMode ? 'local' : currentUser.uid; try { if(isLocalMode) { localData.configuracoes.default = configData; } else { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } showToast("Configurações salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); } catch(error) { showToast("Erro ao salvar.", 'error'); } }
         
+        // --- UI RENDERING ---
         function renderAllTables() { renderFornecedoresTable(); renderInsumosTable(); renderReceitasTable(); }
         function populateAllDropdowns() { populateFornecedoresDropdowns(); populateReceitaSelects(); }
         function renderFornecedoresTable() { const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = ''; if (fornecedoresCache.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; } fornecedoresCache.forEach(f => { const insumosCount = insumosCache.filter(i => i.fornecedorId === f.id).length; const tr = document.createElement('tr'); tr.innerHTML = `<td>${f.nome}</td><td>${f.contato || '--'}</td><td>${f.telefone || '--'}</td><td>${insumosCount}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
@@ -313,13 +323,14 @@ const firebaseConfig = {
         function populateInsumosDropdowns(selectEl) { if(selectEl){ selectEl.innerHTML = '<option value="">Selecione um insumo</option>'; insumosCache.forEach(i => { const custo = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : i.custo_embalagem; selectEl.innerHTML += `<option value="${i.id}" data-nome="${i.nome}">${i.nome} (${formatCurrency(custo)}/${i.unidade_base || 'g'})</option>`; });}}
         function populateReceitaSelects() { const select = document.getElementById('simulador-receita-select'); const current = select.value; select.innerHTML = '<option value="">-- Escolha --</option>'; receitasCache.forEach(r => { select.innerHTML += `<option value="${r.id}">${r.nome}</option>`; }); select.value = current; }
         
+        // --- CORE CALCULATIONS ---
         function calculateCustoPorGrama(insumo) { if (!insumo || !insumo.custo_embalagem || !insumo.qtd_embalagem_g) return 0; return insumo.custo_embalagem / insumo.qtd_embalagem_g; }
         function calculateCustoIngrediente(insumoId, quantidade_g) { const insumo = insumosCache.find(i => i.id === insumoId); if (!insumo) return 0; return calculateCustoPorGrama(insumo) * quantidade_g; }
         function calculateRecipeIngredientsCost(ingredients = []) { return ingredients.reduce((total, ing) => total + calculateCustoIngrediente(ing.insumoId, ing.quantidade_g), 0); }
         function calculateRecipeCOGS(receita) { if (!receita) return 0; const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes); const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100); const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0); return custoComPerda + (receita.custo_embalagem_por_unidade || 0) + custoMaoDeObra + (configCache.rateio_por_pizza || 0); }
         
+        // --- EVENT LISTENERS ---
         function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
-        
         function setupFormListeners() {
             document.getElementById('fornecedor-form').addEventListener('submit', async e => { e.preventDefault(); const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null }; await saveFornecedor(data); await fetchFornecedores(); renderFornecedoresTable(); populateFornecedoresDropdowns(); resetFornecedorForm(); });
             document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
@@ -355,9 +366,12 @@ const firebaseConfig = {
         document.getElementById('export-receitas-xlsx').addEventListener('click', () => { const wb = XLSX.utils.book_new(); receitasCache.forEach(r => { const cogs = calculateRecipeCOGS(r); const data = [ { Item: 'Nome', Valor: r.nome }, { Item: 'COGS', Valor: cogs }, {}, { Item: 'Ingrediente', Qtd: 'Custo'} ]; r.ingredientes.forEach(ing => { data.push({ Item: ing.nome, Qtd: ing.quantidade_g, Custo: calculateCustoIngrediente(ing.insumoId, ing.quantidade_g) }); }); const ws = XLSX.utils.json_to_sheet(data, {skipHeader: true}); XLSX.utils.book_append_sheet(wb, ws, r.nome.substring(0, 30)); }); XLSX.writeFile(wb, "fichas_tecnicas.xlsx"); });
         function generateRecipePDF(id) { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const r = receitasCache.find(i => i.id === id); if (!r) return; const cogs = calculateRecipeCOGS(r); doc.setFontSize(18); doc.text(`Ficha Técnica - ${r.nome}`, 14, 22); doc.setFontSize(11); doc.text(`Versão: ${r.versao || '1.0'}`, 14, 30); const head = [['Ingrediente', 'Qtd (g/un)', 'Custo Unit.', 'Custo Total']]; const body = r.ingredientes.map(ing => { const ins = insumosCache.find(i => i.id === ing.insumoId); const cUnit = calculateCustoPorGrama(ins); return [ ing.nome, ing.quantidade_g, formatCurrency(cUnit), formatCurrency(cUnit * ing.quantidade_g) ]; }); doc.autoTable({ startY: 40, head, body }); doc.autoTable({ startY: doc.lastAutoTable.finalY + 10, head: [['Item de Custo', 'Valor']], body: [ ['Ingredientes', formatCurrency(calculateRecipeIngredientsCost(r.ingredientes))], ['Mão de Obra', formatCurrency(((configCache.custo_hora_mao_de_obra || 0) / 60) * (r.tempo_preparo_min || 0))], ['Embalagem', formatCurrency(r.custo_embalagem_por_unidade)], ['Rateio', formatCurrency(configCache.rateio_por_pizza)] ], theme: 'grid' }); doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text(`CUSTO TOTAL (COGS): ${formatCurrency(cogs)}`, 14, doc.lastAutoTable.finalY + 10); doc.save(`Ficha_${r.nome}.pdf`); }
         document.getElementById('generate-general-report-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(20); doc.text('Relatório Geral', 14, 22); doc.setFontSize(12); doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30); doc.autoTable({ startY: 40, head: [['KPI', 'Valor']], body: [ ['Fornecedores', fornecedoresCache.length], ['Insumos', insumosCache.length], ['Receitas', receitasCache.length], ['Meta CMV', `${configCache.meta_cmv_padrao || 30}%`], ], }); doc.addPage(); doc.setFontSize(16); doc.text('Top 10 Receitas por Custo', 14, 22); const topR = [...receitasCache].sort((a,b) => calculateRecipeCOGS(b) - calculateRecipeCOGS(a)).slice(0,10); doc.autoTable({ startY: 30, head: [['Receita', 'Custo (COGS)']], body: topR.map(r => [r.nome, formatCurrency(calculateRecipeCOGS(r))]), }); doc.save('Relatorio_Geral.pdf'); });
-        document.getElementById('run-validation-button').addEventListener('click', () => { const div = document.getElementById('validation-results'); div.classList.remove('hidden'); div.innerHTML = 'Executando...'; const conf = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80 }; const ins = [{id:'f',c:80,q:25000},{id:'m',c:12,q:3000},{id:'q',c:28,q:1000},{id:'a',c:30,q:1000},{id:'o',c:0.1,q:1}]; const rec = {ings:[{i:'f',q:300},{i:'m',q:120},{i:'q',q:150},{i:'a',q:10},{i:'o',q:1}],t:8,e:1.5,p:0}; const cogsCalc = (c, i, r) => (r.ingredientes.reduce((t,ing) => t + ((i.find(x=>x.id===ing.insumoId).custo_embalagem/i.find(x=>x.id===ing.insumoId).qtd_embalagem_g)*ing.quantidade_g),0) * (1+(r.perda_percentual/100||0))) + ((c.custo_hora_mao_de_obra/60||0)*(r.tempo_preparo_min||0)) + (r.custo_embalagem_por_unidade||0) + (c.rateio_por_pizza||0); const cogs = cogsCalc(conf, ins.map(x=>({id:x.id,custo_embalagem:x.c,qtd_embalagem_g:x.q})), {ingredientes:rec.ings.map(y=>({insumoId:y.i,quantidade_g:y.q})),tempo_preparo_min:rec.t,custo_embalagem_por_unidade:rec.e,perda_percentual:rec.p}); const preco = cogs/0.3; const cogsOk = Math.abs(cogs - 11.01)<0.01; const precoOk = Math.abs(preco - 36.70)<0.01; div.innerHTML = `<h4>Resultados</h4><p>COGS: <strong>${formatCurrency(cogs)}</strong> (Esp: R$ 11,01) -> <span style="color:${cogsOk?'green':'red'}">${cogsOk?'OK':'ERRO'}</span></p><p>Preço (CMV 30%): <strong>${formatCurrency(preco)}</strong> (Esp: R$ 36,70) -> <span style="color:${precoOk?'green':'red'}">${precoOk?'OK':'ERRO'}</span></p>`; });
+        document.getElementById('run-validation-button').addEventListener('click', () => { const div = document.getElementById('validation-results'); div.classList.remove('hidden'); div.innerHTML = 'Executando...'; const conf = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80 }; const ins = [{id:'f',c:80,q:25000},{id:'m',c:12,q:3000},{id:'q',c:28,q:1000},{id:'a',c:30,q:1000},{id:'o',c:0.1,q:1}]; const rec = {ings:[{i:'f',q:300},{i:'m',q:120},{i:'q',q:150},{i:'a',q:10},{i:'o',q:1}],t:8,e:1.5,p:0}; const cogsCalc = (c, i, r) => (r.ingredientes.reduce((t,ing) => t + ((i.find(x=>x.id===ing.insumoId).c/i.find(x=>x.id===ing.insumoId).q)*ing.quantidade_g),0)) + ((c.custo_hora_mao_de_obra/60||0)*(r.tempo_preparo_min||0)) + (r.custo_embalagem_por_unidade||0) + (c.rateio_por_pizza||0); const cogs = cogsCalc(conf, ins.map(x=>({id:x.id,c:x.c,q:x.q})), {ingredientes:rec.ings.map(y=>({insumoId:y.i,quantidade_g:y.q})),tempo_preparo_min:rec.t,custo_embalagem_por_unidade:rec.e}); const preco = cogs/0.3; const cogsOk = Math.abs(cogs - 11.01)<0.01; const precoOk = Math.abs(preco - 36.70)<0.01; div.innerHTML = `<h4>Resultados</h4><p>COGS: <strong>${formatCurrency(cogs)}</strong> (Esp: R$ 11,01) -> <span style="color:${cogsOk?'green':'red'}">${cogsOk?'OK':'ERRO'}</span></p><p>Preço (CMV 30%): <strong>${formatCurrency(preco)}</strong> (Esp: R$ 36,70) -> <span style="color:${precoOk?'green':'red'}">${precoOk?'OK':'ERRO'}</span></p>`; });
         
-        if(isLocalMode) { currentUser = { uid: 'local' }; initApp(); }
+        if(isLocalMode) { 
+            currentUser = { uid: 'local' }; 
+            initApp(); 
+        }
     });
     </script>
 </body>
