@@ -3,352 +3,840 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de CMV para Pizzaria</title>
+    <title>Pizzaria Cost Control - Controle de Custos e CMV</title>
 
-    <!-- BIBLIOTECAS EXTERNAS (CDN) -->
-    <!-- Firebase v9 -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <!--
+    ====================================================================================================
+    INSTRUÇÕES DE CONFIGURAÇÃO E PUBLICAÇÃO
+    ====================================================================================================
 
-    <!-- Relatórios PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    1. CONFIGURAÇÃO DO FIREBASE:
+       - Crie um projeto no console do Firebase: https://console.firebase.google.com/
+       - No seu projeto, vá para "Configurações do projeto" (ícone de engrenagem).
+       - Na aba "Geral", role para baixo até "Seus apps".
+       - Clique no ícone da Web (</>) para criar um novo app da Web.
+       - Dê um nome ao seu app e clique em "Registrar app".
+       - O Firebase irá gerar um objeto de configuração `firebaseConfig`. Copie este objeto.
+       - COLE O OBJETO `firebaseConfig` NA SEÇÃO <script> ABAIXO, SUBSTITUINDO O OBJETO DE EXEMPLO.
 
-    <!-- Relatórios Excel (XLSX) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    2. ATIVAÇÃO DOS SERVIÇOS FIREBASE:
+       - No menu à esquerda do console Firebase, vá para "Authentication".
+       - Clique em "Começar" e na aba "Método de login", ative o provedor "E-mail/senha".
+       - No menu à esquerda, vá para "Firestore Database".
+       - Clique em "Criar banco de dados", inicie em "modo de produção" e escolha um local.
+
+    3. REGRAS DE SEGURANÇA DO FIRESTORE (RECOMENDADAS PARA PRODUÇÃO):
+       - No seu banco de dados Firestore, vá para a aba "Regras".
+       - Substitua as regras existentes pelas seguintes para garantir que apenas usuários autenticados
+         possam ler e escrever seus próprios dados:
+
+       rules_version = '2';
+       service cloud.firestore {
+         match /databases/{database}/documents {
+           // Permite que cada usuário leia e escreva apenas nos documentos que ele criou.
+           match /{collection}/{docId} {
+             allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+           }
+           // Permite a criação de documentos se o userId do novo documento for o mesmo do usuário autenticado.
+           match /{collection}/{docId} {
+             allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+           }
+         }
+       }
+
+    4. PUBLICAÇÃO (Exemplos):
+
+       A) FIREBASE HOSTING (Recomendado):
+          - Instale o Firebase CLI: `npm install -g firebase-tools`
+          - Faça login: `firebase login`
+          - Inicie o projeto na sua pasta: `firebase init hosting`
+            (Selecione seu projeto, use 'public' como diretório e configure como single-page app).
+          - Copie este arquivo `index.html` para a pasta 'public' criada.
+          - Faça o deploy: `firebase deploy`
+
+       B) GITHUB PAGES:
+          - Crie um repositório no GitHub.
+          - Faça o upload deste arquivo como `index.html`.
+          - No repositório, vá em "Settings" > "Pages".
+          - Em "Source", selecione a branch principal (main/master) e clique em "Save".
+          - Seu site estará disponível em `https://<seu-usuario>.github.io/<seu-repositorio>/`
+
+    ====================================================================================================
+    -->
 
     <style>
-        /* CSS GERAL */
         :root {
-            --primary-color: #D32F2F;
-            --secondary-color: #FFC107;
-            --dark-color: #212121;
-            --light-color: #FFFFFF;
-            --gray-color: #f4f4f4;
+            --primary-color: #D32F2F; /* Red */
+            --primary-dark: #B71C1C;
+            --secondary-color: #FFC107; /* Amber */
+            --light-gray: #f4f4f4;
+            --medium-gray: #ccc;
+            --dark-gray: #555;
+            --text-color: #333;
+            --white: #fff;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: var(--gray-color);
-            color: var(--dark-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
             line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
-        }
-
-        /* ESTILOS DE AUTENTICAÇÃO */
-        #auth-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background: var(--light-color);
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        /* ESTILOS DO APP PRINCIPAL */
-        #app-container {
-            display: none; /* Inicia oculto */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         header {
-            background: var(--dark-color);
-            color: var(--light-color);
-            padding: 1rem;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: var(--shadow);
         }
 
         header h1 {
-            margin: 0;
             font-size: 1.5rem;
         }
 
-        nav {
-            background: var(--primary-color);
-            padding: 0.5rem 1rem;
+        #auth-container, #app-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
 
-        nav button {
+        .auth-form {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            max-width: 450px;
+            margin: 2rem auto;
+        }
+        
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary-dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--dark-gray);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background-color: #333;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            color: var(--white);
+        }
+        
+        .btn-small {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            width: auto;
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .auth-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        nav a, nav button {
+            color: var(--white);
+            text-decoration: none;
             background: none;
             border: none;
-            color: var(--light-color);
-            padding: 10px 15px;
             cursor: pointer;
             font-size: 1rem;
-            transition: background 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            transition: background-color 0.2s;
+        }
+        
+        nav a:hover, nav button:hover, nav a.active {
+            background-color: rgba(255,255,255,0.2);
         }
 
-        nav button:hover, nav button.active {
-            background: rgba(0,0,0,0.2);
-        }
-
-        /* UTILITÁRIOS */
-        .hidden { display: none !important; }
-
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            cursor: pointer;
+        #logout-button {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
             font-weight: bold;
         }
 
-        button:hover {
-            opacity: 0.9;
+        main {
+            flex: 1;
         }
 
-        .button-secondary {
-            background-color: var(--secondary-color);
-            color: var(--dark-color);
+        .view {
+            display: none;
+        }
+        
+        .view.active {
+            display: block;
         }
 
         .card {
-            background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-container {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .grid-4 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .kpi-card {
+            text-align: center;
+        }
+
+        .kpi-card h3 {
+            color: var(--dark-gray);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 0.5rem;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 1rem;
         }
 
         th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 0.75rem;
             text-align: left;
+            border-bottom: 1px solid var(--medium-gray);
         }
 
         th {
-            background-color: var(--dark-color);
-            color: white;
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
         }
 
-        /* RESPONSIVIDADE */
-        @media (max-width: 768px) {
-            nav {
-                display: flex;
-                flex-direction: column;
-            }
-            header {
-                flex-direction: column;
-                text-align: center;
-            }
+        .actions-cell {
+            text-align: right;
+            white-space: nowrap;
+        }
+        
+        .actions-cell .btn {
+            margin-left: 0.5rem;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        #ingredients-list .ingredient-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--medium-gray);
+        }
+        
+        #ingredients-list .ingredient-row > * {
+            flex: 1;
+        }
+        
+        #ingredients-list .ingredient-row .costo-ingrediente {
+            flex: 0 0 120px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .total-cost {
+            text-align: right;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            color: var(--primary-dark);
+        }
+
+        .simulator-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #e8f5e9;
+            border-left: 5px solid var(--success-color);
+            border-radius: var(--border-radius);
+        }
+        
+        .simulator-result p {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .simulator-result strong {
+            color: var(--primary-dark);
+        }
+
+        .alert-item {
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            background-color: #fff3e0;
+            border: 1px solid #ffe0b2;
+            color: #e65100;
+        }
+
+        .cmv-ok { color: var(--success-color); }
+        .cmv-warn { color: var(--secondary-color); }
+        .cmv-danger { color: var(--error-color); }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            color: var(--white);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast.success { background-color: var(--success-color); }
+        .toast.error { background-color: var(--error-color); }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background-color: #e0e0e0;
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        
+        .modal-buttons {
+            margin-top: 20px;
+        }
+        .modal-buttons .btn {
+            width: 120px;
+            margin: 0 10px;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- TELA DE AUTENTICAÇÃO -->
-    <div id="auth-container">
-        <div id="login-view">
-            <h2>Login</h2>
-            <form id="login-form">
-                <input type="email" id="login-email" placeholder="Email" required>
-                <input type="password" id="login-password" placeholder="Senha" required>
-                <button type="submit">Entrar</button>
-            </form>
-            <p>Não tem uma conta? <a href="#" id="show-register">Registre-se</a></p>
-            <p><a href="#" id="show-forgot-password">Esqueci minha senha</a></p>
-        </div>
-
-        <div id="register-view" class="hidden">
-            <h2>Registrar</h2>
-            <form id="register-form">
-                <input type="email" id="register-email" placeholder="Email" required>
-                <input type="password" id="register-password" placeholder="Senha" required>
-                <button type="submit">Registrar</button>
-            </form>
-            <p>Já tem uma conta? <a href="#" id="show-login">Faça login</a></p>
-        </div>
-        
-        <div id="forgot-password-view" class="hidden">
-            <h2>Recuperar Senha</h2>
-            <form id="forgot-password-form">
-                <input type="email" id="forgot-password-email" placeholder="Digite seu email" required>
-                <button type="submit">Enviar Link de Recuperação</button>
-            </form>
-             <p><a href="#" id="back-to-login">Voltar para o Login</a></p>
-        </div>
-    </div>
-
-    <!-- APLICATIVO PRINCIPAL -->
-    <div id="app-container" class="container">
-        <header>
-            <h1>Calculadora de CMV</h1>
-            <div>
-                <span id="user-email"></span>
-                <button id="logout-btn" class="button-secondary">Sair</button>
-            </div>
-        </header>
-
-        <nav>
-            <button class="nav-btn active" data-target="dashboard-section">Dashboard</button>
-            <button class="nav-btn" data-target="insumos-section">Insumos</button>
-            <button class="nav-btn" data-target="receitas-section">Receitas</button>
-            <button class="nav-btn" data-target="simulador-section">Simulador de Preço</button>
-            <button class="nav-btn" data-target="relatorios-section">Relatórios</button>
-            <button class="nav-btn" data-target="configuracoes-section">Configurações</button>
+    <header>
+        <h1>Pizzaria Cost Control</h1>
+        <nav id="app-nav" class="hidden">
+            <a href="#" class="nav-link" data-view="dashboard">Dashboard</a>
+            <a href="#" class="nav-link" data-view="insumos">Insumos</a>
+            <a href="#" class="nav-link" data-view="receitas">Receitas</a>
+            <a href="#" class="nav-link" data-view="simulador">Simulador</a>
+            <a href="#" class="nav-link" data-view="configuracoes">Configurações</a>
+            <button id="logout-button">Sair</button>
         </nav>
+    </header>
 
-        <main>
-            <!-- SEÇÃO DASHBOARD -->
-            <section id="dashboard-section" class="app-section">
-                <div class="card">
-                    <h2>Dashboard</h2>
-                    <p>Bem-vindo! Em breve, gráficos e KPIs estarão disponíveis aqui.</p>
+    <main>
+        <!-- Auth Container -->
+        <div id="auth-container">
+            <!-- Login View -->
+            <div id="login-view" class="auth-form">
+                <h2>Login</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Senha</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </form>
+                <div class="auth-link">
+                    <p>Não tem uma conta? <a href="#" id="show-register">Cadastre-se</a></p>
+                    <p><a href="#" id="show-reset-password">Esqueceu a senha?</a></p>
+                </div>
+            </div>
+
+            <!-- Register View -->
+            <div id="register-view" class="auth-form hidden">
+                <h2>Cadastro</h2>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Senha</label>
+                        <input type="password" id="register-password" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </form>
+                <div class="auth-link">
+                    <p>Já tem uma conta? <a href="#" id="show-login">Faça login</a></p>
+                </div>
+            </div>
+
+            <!-- Password Reset View -->
+            <div id="reset-password-view" class="auth-form hidden">
+                <h2>Recuperar Senha</h2>
+                <form id="reset-password-form">
+                    <div class="form-group">
+                        <label for="reset-email">Email</label>
+                        <input type="email" id="reset-email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar link de recuperação</button>
+                </form>
+                <div class="auth-link">
+                    <p><a href="#" id="back-to-login">Voltar para o login</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Container -->
+        <div id="app-container" class="hidden">
+            <!-- Dashboard View -->
+            <section id="dashboard-view" class="view">
+                <h2>Dashboard</h2>
+                <div class="grid-container grid-4">
+                    <div class="card kpi-card">
+                        <h3>CMV Médio</h3>
+                        <div class="value" id="dashboard-cmv-medio">--%</div>
+                    </div>
+                    <div class="card kpi-card">
+                        <h3>Ticket Médio</h3>
+                        <div class="value" id="dashboard-ticket-medio">R$ --</div>
+                    </div>
+                    <div class="card kpi-card">
+                        <h3>Receitas</h3>
+                        <div class="value" id="dashboard-num-receitas">--</div>
+                    </div>
+                    <div class="card kpi-card">
+                        <h3>Insumos</h3>
+                        <div class="value" id="dashboard-num-insumos">--</div>
+                    </div>
+                </div>
+                <div class="grid-container grid-2">
+                    <div class="card">
+                        <h3>Alertas de Variação de Preço (> <span id="alert-threshold-display">10</span>%)</h3>
+                        <div id="dashboard-alerts">
+                           <p>Nenhum alerta no momento.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Top 5 Insumos por Custo</h3>
+                        <table id="dashboard-top-insumos">
+                            <thead><tr><th>Insumo</th><th>Custo/g</th></tr></thead>
+                            <tbody><tr><td colspan="2">Nenhum insumo cadastrado.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                 <div class="card">
+                    <button id="run-validation-button" class="btn btn-secondary">Executar Validação Margherita</button>
+                    <div id="validation-results" class="hidden" style="margin-top: 1rem; padding: 1rem; background: #eee;"></div>
                 </div>
             </section>
 
-            <!-- SEÇÃO INSUMOS -->
-            <section id="insumos-section" class="app-section hidden">
-                 <div class="card">
-                    <h2>Gerenciar Insumos</h2>
+            <!-- Insumos View -->
+            <section id="insumos-view" class="view">
+                <div class="card">
+                    <h2 id="insumo-form-title">Cadastrar Novo Insumo</h2>
                     <form id="insumo-form">
                         <input type="hidden" id="insumo-id">
-                        <input type="text" id="insumo-nome" placeholder="Nome do Insumo" required>
-                        <input type="text" id="insumo-fornecedor" placeholder="Fornecedor">
-                        <input type="number" step="0.01" id="insumo-custo" placeholder="Custo da Embalagem (R$)" required>
-                        <input type="number" step="0.01" id="insumo-qtd" placeholder="Quantidade na Embalagem" required>
-                        <select id="insumo-unidade">
-                            <option value="g">Gramas (g)</option>
-                            <option value="kg">Quilogramas (kg)</option>
-                            <option value="ml">Mililitros (ml)</option>
-                            <option value="l">Litros (l)</option>
-                            <option value="un">Unidade (un)</option>
-                        </select>
-                        <button type="submit">Salvar Insumo</button>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="insumo-nome">Nome</label>
+                                <input type="text" id="insumo-nome" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="insumo-fornecedor">Fornecedor</label>
+                                <input type="text" id="insumo-fornecedor">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="insumo-custo-embalagem">Custo Embalagem (R$)</label>
+                                <input type="number" id="insumo-custo-embalagem" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="insumo-qtd-embalagem">Qtd. na Embalagem</label>
+                                <input type="number" id="insumo-qtd-embalagem" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="insumo-unidade-embalagem">Unidade</label>
+                                <select id="insumo-unidade-embalagem" required>
+                                    <option value="kg">kg</option>
+                                    <option value="g">g</option>
+                                    <option value="L">L</option>
+                                    <option value="ml">ml</option>
+                                    <option value="un">unidade(s)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="insumo-rendimento">Rendimento (%)</label>
+                                <input type="number" id="insumo-rendimento" placeholder="100" value="100">
+                            </div>
+                        </div>
+                         <div class="form-row">
+                             <div class="form-group">
+                                <label for="insumo-lote">Lote</label>
+                                <input type="text" id="insumo-lote">
+                            </div>
+                             <div class="form-group">
+                                <label for="insumo-validade">Validade</label>
+                                <input type="date" id="insumo-validade">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Insumo</button>
+                        <button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden">Cancelar Edição</button>
                     </form>
                 </div>
                 <div class="card">
-                    <h3>Lista de Insumos</h3>
+                    <h2>Lista de Insumos</h2>
+                    <button id="export-insumos-xlsx" class="btn btn-success btn-small">Exportar XLSX</button>
                     <table id="insumos-table">
                         <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Custo Unitário</th>
+                                <th>Custo/g (ou un)</th>
                                 <th>Fornecedor</th>
-                                <th>Ações</th>
+                                <th>Validade</th>
+                                <th class="actions-cell">Ações</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                            <!-- Rows will be inserted by JavaScript -->
+                        </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- SEÇÃO RECEITAS -->
-            <section id="receitas-section" class="app-section hidden">
+            <!-- Receitas View -->
+            <section id="receitas-view" class="view">
                 <div class="card">
-                    <h2>Gerenciar Receitas (Ficha Técnica)</h2>
+                    <h2 id="receita-form-title">Criar Nova Receita (Ficha Técnica)</h2>
                     <form id="receita-form">
                         <input type="hidden" id="receita-id">
-                        <input type="text" id="receita-nome" placeholder="Nome da Pizza (Ex: Margherita v1)" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="receita-nome">Nome da Pizza</label>
+                                <input type="text" id="receita-nome" required>
+                            </div>
+                             <div class="form-group">
+                                <label for="receita-versao">Versão</label>
+                                <input type="text" id="receita-versao" placeholder="1.0">
+                            </div>
+                        </div>
                         
                         <h3>Ingredientes</h3>
-                        <div id="ingredientes-container">
-                            <!-- Ingredientes serão adicionados dinamicamente aqui -->
+                        <div id="ingredients-list">
+                            <!-- Ingredient rows will be added here -->
                         </div>
-                        <button type="button" id="add-ingrediente-btn">Adicionar Ingrediente</button>
-                        
-                        <hr style="margin: 20px 0;">
+                        <button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button>
+                        <div id="custo-total-ingredientes" class="total-cost">Custo Ingredientes: R$ 0,00</div>
 
-                        <h3>Outros Custos</h3>
-                        <input type="number" step="0.01" id="receita-embalagem-custo" placeholder="Custo da Embalagem (R$)" required>
+                        <h3>Custos Adicionais</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="receita-tempo-preparo">Tempo de Preparo (min)</label>
+                                <input type="number" id="receita-tempo-preparo" value="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="receita-custo-embalagem">Custo Embalagem (R$)</label>
+                                <input type="number" id="receita-custo-embalagem" step="0.01" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="receita-perda-percentual">Perda/Desperdício (%)</label>
+                                <input type="number" id="receita-perda-percentual" value="0">
+                            </div>
+                        </div>
                         
-                        <button type="submit" style="margin-top: 20px;">Salvar Receita</button>
+                        <div class="form-group">
+                            <label for="receita-observacoes">Observações</label>
+                            <textarea id="receita-observacoes" rows="3"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Salvar Receita</button>
+                        <button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar Edição</button>
                     </form>
                 </div>
-                 <div class="card">
-                    <h3>Lista de Receitas</h3>
+                <div class="card">
+                    <h2>Lista de Receitas</h2>
+                    <button id="export-receitas-xlsx" class="btn btn-success btn-small">Exportar Fichas XLSX</button>
                     <table id="receitas-table">
                         <thead>
                             <tr>
                                 <th>Nome</th>
                                 <th>Custo Total (COGS)</th>
-                                <th>Ações</th>
+                                <th>Versão</th>
+                                <th class="actions-cell">Ações</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                            <!-- Rows will be inserted by JavaScript -->
+                        </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- SEÇÃO SIMULADOR -->
-            <section id="simulador-section" class="app-section hidden">
-                <div class="card">
-                    <h2>Simulador de Preço de Venda</h2>
-                    <label for="simulador-receita-select">Selecione uma Receita:</label>
-                    <select id="simulador-receita-select"></select>
-                    
-                    <h3 id="simulador-cogs-resultado">Custo da Pizza (COGS): R$ 0.00</h3>
-                    
-                    <label for="simulador-meta-cmv">Meta de CMV (%):</label>
-                    <input type="number" id="simulador-meta-cmv" value="30">
-                    <h3 id="simulador-preco-sugerido">Preço de Venda Sugerido: R$ 0.00</h3>
+            <!-- Simulador View -->
+            <section id="simulador-view" class="view">
+                 <div class="card">
+                    <h2>Simulador de Preço e CMV</h2>
+                    <div class="form-group">
+                        <label for="simulador-receita-select">Selecione uma Receita</label>
+                        <select id="simulador-receita-select">
+                            <option value="">-- Escolha uma receita --</option>
+                        </select>
+                    </div>
+
+                    <div id="simulador-detalhes" class="hidden">
+                        <h3>Detalhes de Custo (COGS)</h3>
+                        <table id="simulador-custos-table">
+                            <thead>
+                                <tr><th>Item</th><th>Valor</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <p class="total-cost" id="simulador-cogs-total">COGS Total: R$ 0,00</p>
+                        
+                        <div class="grid-container grid-2" style="margin-top: 2rem;">
+                             <div class="card">
+                                <h4>Calcular CMV baseado no Preço</h4>
+                                <div class="form-group">
+                                    <label for="simulador-preco-venda">Preço de Venda (R$)</label>
+                                    <input type="number" id="simulador-preco-venda" step="0.01">
+                                </div>
+                                <div id="simulador-resultado-cmv" class="simulator-result hidden"></div>
+                            </div>
+                            <div class="card">
+                                <h4>Calcular Preço Sugerido</h4>
+                                <div class="form-group">
+                                    <label for="simulador-meta-cmv">Meta de CMV (%)</label>
+                                    <input type="number" id="simulador-meta-cmv" step="0.1">
+                                </div>
+                                 <div class="form-group">
+                                    <label for="simulador-margem-desejada">Margem de Lucro Desejada (%)</label>
+                                    <input type="number" id="simulador-margem-desejada" step="0.1">
+                                </div>
+                                <div id="simulador-resultado-preco" class="simulator-result hidden"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
-
-            <!-- SEÇÃO RELATÓRIOS -->
-            <section id="relatorios-section" class="app-section hidden">
-                <div class="card">
-                    <h2>Exportar Relatórios</h2>
-                    <p>Selecione uma receita para gerar relatórios detalhados.</p>
-                    <select id="relatorio-receita-select"></select>
-                    <br>
-                    <button id="export-pdf-btn">Exportar Detalhes para PDF</button>
-                    <button id="export-xlsx-btn" class="button-secondary">Exportar Detalhes para XLSX</button>
-                </div>
-            </section>
-
-            <!-- SEÇÃO CONFIGURAÇÕES -->
-            <section id="configuracoes-section" class="app-section hidden">
+            
+            <!-- Configurações View -->
+            <section id="configuracoes-view" class="view">
                 <div class="card">
                     <h2>Configurações Gerais</h2>
-                    <form id="config-form">
-                        <label for="config-mao-de-obra">Custo da Mão de Obra (R$ por hora):</label>
-                        <input type="number" step="0.01" id="config-mao-de-obra" value="20.00">
-                        
-                        <label for="config-tempo-pizza">Tempo de Preparo por Pizza (minutos):</label>
-                        <input type="number" id="config-tempo-pizza" value="8">
-
-                        <label for="config-rateio">Rateio de Custos Indiretos (R$ por pizza):</label>
-                        <input type="number" step="0.01" id="config-rateio" value="0.80">
-                        
-                        <button type="submit">Salvar Configurações</button>
+                    <form id="configuracoes-form">
+                        <div class="form-group">
+                            <label for="config-custo-hora-mao-de-obra">Custo da Hora de Mão de Obra (R$)</label>
+                            <input type="number" id="config-custo-hora-mao-de-obra" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="config-rateio-despesas-fixas">Rateio de Despesas Fixas por Pizza (R$)</label>
+                            <input type="number" id="config-rateio-despesas-fixas" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="config-meta-cmv-padrao">Meta de CMV Padrão (%)</label>
+                            <input type="number" id="config-meta-cmv-padrao" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="config-alerta-variacao">Alertar Variação de Preço acima de (%)</label>
+                            <input type="number" id="config-alerta-variacao" step="1" value="10">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Configurações</button>
                     </form>
                 </div>
             </section>
+        </div>
+    </main>
 
-        </main>
+    <footer>
+        <p>Pizzaria Cost Control &copy; 2025. Uma ferramenta para otimizar sua gestão.</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <p id="confirm-modal-text">Você tem certeza?</p>
+            <div class="modal-buttons">
+                <button id="confirm-modal-yes" class="btn btn-danger">Sim</button>
+                <button id="confirm-modal-no" class="btn btn-secondary">Não</button>
+            </div>
+        </div>
     </div>
 
-<script>
-    // --- CONFIGURAÇÃO DO FIREBASE ---
-    // ATENÇÃO: O erro (auth/api-key-not-valid) acontece se estas chaves não forem substituídas.
-    // Copie o objeto de configuração do seu projeto Firebase aqui.
-	
-// Your web app's Firebase configuration
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- SheetJS (XLSX) and jsPDF for exporting -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // ============================================================================================
+        // FIREBASE CONFIG - COLE A CONFIGURAÇÃO DO SEU PROJETO AQUI
+        // ============================================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
   authDomain: "cmv-pizza.firebaseapp.com",
@@ -357,487 +845,1053 @@ const firebaseConfig = {
   messagingSenderId: "1022435006716",
   appId: "1:1022435006716:web:ec39f22702097beca25f79"
 };
+        // ============================================================================================
 
-    // Inicializa o Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+        // --- App State and Initialization ---
+        let firebaseApp, auth, db;
+        let isLocalMode = false;
+        let currentUser = null;
 
-    // --- LÓGICA DO APLICATIVO ---
-    document.addEventListener('DOMContentLoaded', () => {
+        // Local data storage for offline mode
+        let localData = {
+            insumos: [],
+            receitas: [],
+            configuracoes: {}
+        };
+        
+        let localIdCounter = 0;
 
-        // Referências aos elementos da UI
+        // Check if Firebase config is provided
+        if (firebaseConfig.apiKey === "COLE_SUA_API_KEY_AQUI") {
+            isLocalMode = true;
+            console.warn("Firebase config não preenchida. Rodando em modo local (memória). Os dados não serão salvos.");
+            initApp();
+        } else {
+            try {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                console.log("Firebase inicializado com sucesso.");
+            } catch (error) {
+                console.error("Erro ao inicializar Firebase:", error);
+                alert("Não foi possível conectar ao Firebase. Verifique sua configuração e conexão.");
+                isLocalMode = true; // Fallback to local mode
+            }
+        }
+
+        // --- DOM Elements ---
         const authContainer = document.getElementById('auth-container');
         const appContainer = document.getElementById('app-container');
-        const userEmailSpan = document.getElementById('user-email');
-        const logoutBtn = document.getElementById('logout-btn');
+        const appNav = document.getElementById('app-nav');
         
         const loginView = document.getElementById('login-view');
         const registerView = document.getElementById('register-view');
-        const forgotPasswordView = document.getElementById('forgot-password-view');
+        const resetPasswordView = document.getElementById('reset-password-view');
         
-        let currentUser = null;
-        let userConfig = {
-            custo_hora_mao_de_obra: 20.00,
-            tempo_preparo_minutos: 8,
-            rateio_overhead_por_pizza: 0.80
-        };
+        const views = document.querySelectorAll('.view');
+        const navLinks = document.querySelectorAll('.nav-link');
 
-        // --- GERENCIAMENTO DE AUTENTICAÇÃO ---
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                authContainer.classList.add('hidden');
-                appContainer.style.display = 'block';
-                userEmailSpan.textContent = user.email;
-                loadInitialData();
-            } else {
-                currentUser = null;
-                authContainer.classList.remove('hidden');
-                appContainer.style.display = 'none';
-                userEmailSpan.textContent = '';
-            }
-        });
+        // --- Utility Functions ---
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+        }
         
-        // Navegação entre telas de autenticação
-        document.getElementById('show-register').addEventListener('click', (e) => {
-            e.preventDefault();
-            loginView.classList.add('hidden');
-            forgotPasswordView.classList.add('hidden');
-            registerView.classList.remove('hidden');
-        });
+        function showView(viewId) {
+            views.forEach(view => view.classList.remove('active'));
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            const activeView = document.getElementById(`${viewId}-view`);
+            if(activeView) activeView.classList.add('active');
+            
+            const activeLink = document.querySelector(`.nav-link[data-view="${viewId}"]`);
+            if(activeLink) activeLink.classList.add('active');
+        }
 
-        document.getElementById('show-login').addEventListener('click', (e) => {
-            e.preventDefault();
-            registerView.classList.add('hidden');
-            forgotPasswordView.classList.add('hidden');
-            loginView.classList.remove('hidden');
-        });
-        
-         document.getElementById('show-forgot-password').addEventListener('click', (e) => {
-            e.preventDefault();
-            loginView.classList.add('hidden');
-            registerView.classList.add('hidden');
-            forgotPasswordView.classList.remove('hidden');
-        });
-
-        document.getElementById('back-to-login').addEventListener('click', (e) => {
-            e.preventDefault();
-            forgotPasswordView.classList.add('hidden');
-            registerView.classList.add('hidden');
-            loginView.classList.remove('hidden');
-        });
-
-        // Event Listeners dos formulários de auth
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            auth.signInWithEmailAndPassword(email, password)
-                .catch(error => alert(`Erro no login: ${error.message}`));
-        });
-
-        document.getElementById('register-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            auth.createUserWithEmailAndPassword(email, password)
-                .catch(error => alert(`Erro no registro: ${error.message}`));
-        });
-
-        document.getElementById('forgot-password-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('forgot-password-email').value;
-            auth.sendPasswordResetEmail(email)
-                .then(() => alert('Link de recuperação enviado para o seu email!'))
-                .catch(error => alert(`Erro: ${error.message}`));
-        });
-
-        logoutBtn.addEventListener('click', () => auth.signOut());
-
-        // --- NAVEGAÇÃO INTERNA DO APP ---
-        const navButtons = document.querySelectorAll('.nav-btn');
-        const sections = document.querySelectorAll('.app-section');
-
-        navButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                navButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                sections.forEach(sec => sec.classList.add('hidden'));
-                document.getElementById(btn.dataset.target).classList.remove('hidden');
-            });
-        });
-        
-        // --- FUNÇÕES DE CÁLCULO ---
-        function calculateCogs(receita, insumos) {
-            if (!receita || !userConfig) return 0;
-
-            let custoIngredientes = 0;
-            receita.ingredientes.forEach(item => {
-                const insumo = insumos.find(i => i.id === item.insumoId);
-                if (insumo) {
-                    const custoPorGrama = insumo.custo / insumo.qtd;
-                    custoIngredientes += custoPorGrama * item.quantidade_g;
+        // ============================================================================================
+        // AUTHENTICATION
+        // ============================================================================================
+        function setupAuthListeners() {
+            if (isLocalMode) return;
+            
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = { uid: user.uid, email: user.email };
+                    authContainer.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    appNav.classList.remove('hidden');
+                    initApp();
+                } else {
+                    currentUser = null;
+                    authContainer.classList.remove('hidden');
+                    appContainer.classList.add('hidden');
+                    appNav.classList.add('hidden');
+                    resetAppState();
                 }
             });
 
-            const custoMaoDeObra = (userConfig.custo_hora_mao_de_obra / 60) * userConfig.tempo_preparo_minutos;
-            const custoEmbalagem = parseFloat(receita.custo_embalagem) || 0;
-            const custoRateio = parseFloat(userConfig.rateio_overhead_por_pizza) || 0;
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    showToast("Login realizado com sucesso!");
+                } catch (error) {
+                    showToast(`Erro no login: ${error.message}`, 'error');
+                }
+            });
+
+            document.getElementById('register-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                try {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                    showToast("Cadastro realizado com sucesso! Faça o login.");
+                    toggleAuthViews('login-view');
+                } catch (error) {
+                    showToast(`Erro no cadastro: ${error.message}`, 'error');
+                }
+            });
+
+            document.getElementById('logout-button').addEventListener('click', () => {
+                auth.signOut();
+                showToast("Você saiu da sua conta.");
+            });
             
-            return custoIngredientes + custoMaoDeObra + custoEmbalagem + custoRateio;
-        }
-
-        // Lógica para carregar todos os dados iniciais
-        async function loadInitialData() {
-            if (!currentUser) return;
-            await loadConfig();
-            await loadInsumos();
-            await loadReceitas();
-        }
-
-        // --- CONFIGURAÇÕES ---
-        const configForm = document.getElementById('config-form');
-        async function loadConfig() {
-            const doc = await db.collection('config').doc(currentUser.uid).get();
-            if (doc.exists) {
-                userConfig = doc.data();
-            } else {
-                // Salva configuração padrão se não existir
-                 await db.collection('config').doc(currentUser.uid).set(userConfig);
-            }
-            document.getElementById('config-mao-de-obra').value = userConfig.custo_hora_mao_de_obra;
-            document.getElementById('config-tempo-pizza').value = userConfig.tempo_preparo_minutos;
-            document.getElementById('config-rateio').value = userConfig.rateio_overhead_por_pizza;
+            document.getElementById('reset-password-form').addEventListener('submit', async (e) => {
+                 e.preventDefault();
+                const email = document.getElementById('reset-email').value;
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    showToast("Email de recuperação enviado! Verifique sua caixa de entrada.");
+                    toggleAuthViews('login-view');
+                } catch (error) {
+                    showToast(`Erro ao enviar email: ${error.message}`, 'error');
+                }
+            });
         }
         
-        configForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newConfig = {
-                custo_hora_mao_de_obra: parseFloat(document.getElementById('config-mao-de-obra').value),
-                tempo_preparo_minutos: parseInt(document.getElementById('config-tempo-pizza').value),
-                rateio_overhead_por_pizza: parseFloat(document.getElementById('config-rateio').value)
-            };
-            await db.collection('config').doc(currentUser.uid).set(newConfig);
-            userConfig = newConfig;
-            alert('Configurações salvas!');
-            loadReceitas(); // Recalcular custos
-        });
+        function toggleAuthViews(viewToShow) {
+            [loginView, registerView, resetPasswordView].forEach(v => v.classList.add('hidden'));
+            document.getElementById(viewToShow).classList.remove('hidden');
+        }
 
-        // --- GERENCIAMENTO DE INSUMOS ---
-        const insumoForm = document.getElementById('insumo-form');
-        const insumosTable = document.getElementById('insumos-table').getElementsByTagName('tbody')[0];
+        document.getElementById('show-register').addEventListener('click', (e) => { e.preventDefault(); toggleAuthViews('register-view'); });
+        document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); toggleAuthViews('login-view'); });
+        document.getElementById('show-reset-password').addEventListener('click', (e) => { e.preventDefault(); toggleAuthViews('reset-password-view'); });
+        document.getElementById('back-to-login').addEventListener('click', (e) => { e.preventDefault(); toggleAuthViews('login-view'); });
+
+        // ============================================================================================
+        // APP INITIALIZATION & STATE MANAGEMENT
+        // ============================================================================================
         let insumosCache = [];
-
-        insumoForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('insumo-id').value;
-            let qtd_em_g = parseFloat(document.getElementById('insumo-qtd').value);
-            const unidade = document.getElementById('insumo-unidade').value;
-
-            if (unidade === 'kg' || unidade === 'l') {
-                qtd_em_g *= 1000;
-            }
-
-            const insumoData = {
-                nome: document.getElementById('insumo-nome').value,
-                fornecedor: document.getElementById('insumo-fornecedor').value,
-                custo: parseFloat(document.getElementById('insumo-custo').value),
-                qtd: qtd_em_g,
-                unidadeBase: 'g', // Sempre salvamos em gramas
-                userId: currentUser.uid
-            };
-
-            if (id) {
-                await db.collection('insumos').doc(id).update(insumoData);
-            } else {
-                await db.collection('insumos').add(insumoData);
-            }
-
-            insumoForm.reset();
-            document.getElementById('insumo-id').value = '';
-            loadInsumos();
-        });
-
-        async function loadInsumos() {
-            insumosTable.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
-            const snapshot = await db.collection('insumos').where('userId', '==', currentUser.uid).get();
-            insumosCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            insumosTable.innerHTML = '';
-            if (insumosCache.length === 0) {
-                 insumosTable.innerHTML = '<tr><td colspan="4">Nenhum insumo cadastrado.</td></tr>';
-                 return;
-            }
-            
-            insumosCache.forEach(insumo => {
-                const row = insumosTable.insertRow();
-                const custoUnitario = (insumo.custo / insumo.qtd).toFixed(4);
-                row.innerHTML = `
-                    <td>${insumo.nome}</td>
-                    <td>R$ ${custoUnitario} /g</td>
-                    <td>${insumo.fornecedor}</td>
-                    <td>
-                        <button onclick="editInsumo('${insumo.id}')">Editar</button>
-                        <button onclick="deleteInsumo('${insumo.id}')">Excluir</button>
-                    </td>
-                `;
-            });
-            populateInsumosSelect();
-        }
-
-        window.editInsumo = (id) => {
-            const insumo = insumosCache.find(i => i.id === id);
-            document.getElementById('insumo-id').value = insumo.id;
-            document.getElementById('insumo-nome').value = insumo.nome;
-            document.getElementById('insumo-fornecedor').value = insumo.fornecedor;
-            document.getElementById('insumo-custo').value = insumo.custo;
-            // A conversão de volta para a unidade original de exibição pode ser complexa. Simplificamos para gramas.
-            document.getElementById('insumo-qtd').value = insumo.qtd;
-            document.getElementById('insumo-unidade').value = 'g';
-        };
-
-        window.deleteInsumo = async (id) => {
-            if (confirm('Tem certeza que deseja excluir este insumo?')) {
-                await db.collection('insumos').doc(id).delete();
-                loadInsumos();
-            }
-        };
-
-        // --- GERENCIAMENTO DE RECEITAS ---
-        const receitaForm = document.getElementById('receita-form');
-        const ingredientesContainer = document.getElementById('ingredientes-container');
-        const addIngredienteBtn = document.getElementById('add-ingrediente-btn');
-        const receitasTable = document.getElementById('receitas-table').getElementsByTagName('tbody')[0];
         let receitasCache = [];
-
-        function populateInsumosSelect() {
-            // Usado para preencher os dropdowns de ingredientes
+        let configCache = {};
+        
+        async function initApp() {
+            showView('dashboard');
+            setupNavListeners();
+            setupFormListeners();
+            await loadAllData();
+            updateDashboard();
+        }
+        
+        function resetAppState() {
+            insumosCache = [];
+            receitasCache = [];
+            configCache = {};
+            // Clear all tables and forms
+            document.getElementById('insumos-table').querySelector('tbody').innerHTML = '';
+            document.getElementById('receitas-table').querySelector('tbody').innerHTML = '';
+            //... clear other UI elements if needed
         }
 
-        addIngredienteBtn.addEventListener('click', () => {
-            const div = document.createElement('div');
-            div.classList.add('ingrediente-item');
-            let options = '<option value="">Selecione um insumo</option>';
-            insumosCache.forEach(i => {
-                options += `<option value="${i.id}">${i.nome}</option>`;
-            });
-
-            div.innerHTML = `
-                <select class="ingrediente-select" required>${options}</select>
-                <input type="number" class="ingrediente-qtd" placeholder="Qtd (g)" required>
-                <button type="button" onclick="this.parentElement.remove()">Remover</button>
-            `;
-            ingredientesContainer.appendChild(div);
-        });
-
-        receitaForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('receita-id').value;
-            
-            const ingredientes = [];
-            document.querySelectorAll('.ingrediente-item').forEach(item => {
-                const insumoId = item.querySelector('.ingrediente-select').value;
-                const quantidade_g = parseFloat(item.querySelector('.ingrediente-qtd').value);
-                if (insumoId && quantidade_g > 0) {
-                    ingredientes.push({ insumoId, quantidade_g });
-                }
-            });
-
-            const receitaData = {
-                nome: document.getElementById('receita-nome').value,
-                custo_embalagem: parseFloat(document.getElementById('receita-embalagem-custo').value),
-                ingredientes,
-                userId: currentUser.uid
-            };
-
-            if (id) {
-                await db.collection('receitas').doc(id).update(receitaData);
-            } else {
-                await db.collection('receitas').add(receitaData);
-            }
-            
-            receitaForm.reset();
-            document.getElementById('receita-id').value = '';
-            ingredientesContainer.innerHTML = '';
-            loadReceitas();
-        });
+        async function loadAllData() {
+            await fetchConfiguracoes();
+            await fetchInsumos();
+            await fetchReceitas();
+            populateReceitaSelects();
+        }
         
-        async function loadReceitas() {
-            receitasTable.innerHTML = '<tr><td colspan="3">Carregando...</td></tr>';
-            const snapshot = await db.collection('receitas').where('userId', '==', currentUser.uid).get();
-            receitasCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            receitasTable.innerHTML = '';
-             if (receitasCache.length === 0) {
-                 receitasTable.innerHTML = '<tr><td colspan="3">Nenhuma receita cadastrada.</td></tr>';
-                 return;
+        // ============================================================================================
+        // DATA MODELS & FIRESTORE/LOCAL Handlers
+        // ============================================================================================
+        
+        // CONFIGURAÇÕES
+        async function fetchConfiguracoes() {
+             if (isLocalMode) {
+                configCache = localData.configuracoes.default || {
+                    custo_hora_mao_de_obra: 20.00,
+                    rateio_por_pizza: 0.80,
+                    meta_cmv_padrao: 30,
+                    alerta_variacao: 10,
+                };
+             } else {
+                try {
+                    const doc = await db.collection('configuracoes').doc(currentUser.uid).get();
+                    if (doc.exists) {
+                        configCache = doc.data();
+                    } else {
+                        // Default values
+                        configCache = {
+                            custo_hora_mao_de_obra: 20.00,
+                            rateio_por_pizza: 0.80,
+                            meta_cmv_padrao: 30,
+                            alerta_variacao: 10,
+                        };
+                    }
+                } catch(error) { console.error("Erro ao buscar configurações:", error); }
             }
+            displayConfiguracoes();
+        }
 
-            receitasCache.forEach(receita => {
-                const cogs = calculateCogs(receita, insumosCache);
-                const row = receitasTable.insertRow();
-                row.innerHTML = `
-                    <td>${receita.nome}</td>
-                    <td>R$ ${cogs.toFixed(2)}</td>
-                    <td>
-                        <button onclick="editReceita('${receita.id}')">Editar</button>
-                        <button onclick="deleteReceita('${receita.id}')">Excluir</button>
+        async function saveConfiguracoes(configData) {
+            configData.userId = isLocalMode ? 'local' : currentUser.uid;
+            if(isLocalMode) {
+                localData.configuracoes.default = configData;
+                showToast("Configurações salvas localmente.");
+            } else {
+                try {
+                    await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true });
+                    showToast("Configurações salvas com sucesso!");
+                } catch(error) {
+                    showToast("Erro ao salvar configurações.", 'error');
+                    console.error("Erro ao salvar configurações:", error);
+                }
+            }
+            configCache = configData;
+            displayConfiguracoes();
+            updateDashboard();
+        }
+
+        // INSUMOS
+        async function fetchInsumos() {
+            if (isLocalMode) {
+                insumosCache = localData.insumos;
+            } else {
+                 try {
+                    const snapshot = await db.collection('insumos').where('userId', '==', currentUser.uid).orderBy('nome').get();
+                    insumosCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                 } catch (error) { console.error("Erro ao buscar insumos: ", error); }
+            }
+            renderInsumosTable();
+            updateDashboard();
+        }
+        
+        async function saveInsumo(insumoData) {
+            const isEditing = insumoData.id;
+            insumoData.userId = isLocalMode ? 'local' : currentUser.uid;
+            
+            if(isLocalMode) {
+                if(isEditing) {
+                    const index = localData.insumos.findIndex(i => i.id === insumoData.id);
+                    localData.insumos[index] = insumoData;
+                } else {
+                    insumoData.id = `local_${++localIdCounter}`;
+                    localData.insumos.push(insumoData);
+                }
+            } else {
+                try {
+                    if (isEditing) {
+                        const insumoRef = db.collection('insumos').doc(insumoData.id);
+                        await insumoRef.update(insumoData);
+                    } else {
+                        delete insumoData.id;
+                        await db.collection('insumos').add(insumoData);
+                    }
+                } catch(error) {
+                    showToast("Erro ao salvar insumo.", 'error');
+                    console.error("Erro ao salvar insumo: ", error);
+                    return;
+                }
+            }
+            showToast(`Insumo ${isEditing ? 'atualizado' : 'salvo'} com sucesso!`);
+            await fetchInsumos();
+            populateReceitaSelects(); // Update ingredient dropdowns
+        }
+        
+        async function deleteInsumo(id) {
+            if (isLocalMode) {
+                localData.insumos = localData.insumos.filter(i => i.id !== id);
+            } else {
+                try {
+                    await db.collection('insumos').doc(id).delete();
+                } catch(error) {
+                    showToast("Erro ao excluir insumo.", 'error');
+                    console.error("Erro ao excluir insumo: ", error);
+                    return;
+                }
+            }
+            showToast("Insumo excluído com sucesso!");
+            await fetchInsumos();
+        }
+
+        // RECEITAS
+        async function fetchReceitas() {
+            if (isLocalMode) {
+                receitasCache = localData.receitas;
+            } else {
+                 try {
+                    const snapshot = await db.collection('receitas').where('userId', '==', currentUser.uid).orderBy('nome').get();
+                    receitasCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                 } catch (error) { console.error("Erro ao buscar receitas: ", error); }
+            }
+            renderReceitasTable();
+            updateDashboard();
+        }
+        
+        async function saveReceita(receitaData) {
+            const isEditing = receitaData.id;
+            receitaData.userId = isLocalMode ? 'local' : currentUser.uid;
+            
+            if(isLocalMode) {
+                if(isEditing) {
+                    const index = localData.receitas.findIndex(r => r.id === receitaData.id);
+                    localData.receitas[index] = receitaData;
+                } else {
+                    receitaData.id = `local_${++localIdCounter}`;
+                    localData.receitas.push(receitaData);
+                }
+            } else {
+                try {
+                    if (isEditing) {
+                        const receitaRef = db.collection('receitas').doc(receitaData.id);
+                        await receitaRef.update(receitaData);
+                    } else {
+                        delete receitaData.id;
+                        await db.collection('receitas').add(receitaData);
+                    }
+                } catch(error) {
+                    showToast("Erro ao salvar receita.", 'error');
+                    console.error("Erro ao salvar receita: ", error);
+                    return;
+                }
+            }
+            showToast(`Receita ${isEditing ? 'atualizada' : 'salva'} com sucesso!`);
+            await fetchReceitas();
+            populateReceitaSelects();
+        }
+
+        async function deleteReceita(id) {
+            if (isLocalMode) {
+                localData.receitas = localData.receitas.filter(r => r.id !== id);
+            } else {
+                try {
+                    await db.collection('receitas').doc(id).delete();
+                } catch(error) {
+                    showToast("Erro ao excluir receita.", 'error');
+                    console.error("Erro ao excluir receita: ", error);
+                    return;
+                }
+            }
+            showToast("Receita excluída com sucesso!");
+            await fetchReceitas();
+        }
+
+        // ============================================================================================
+        // RENDER & UI FUNCTIONS
+        // ============================================================================================
+        
+        function renderInsumosTable() {
+            const tbody = document.getElementById('insumos-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            if (insumosCache.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">Nenhum insumo cadastrado.</td></tr>';
+                return;
+            }
+            insumosCache.forEach(insumo => {
+                const custoPorGrama = insumo.qtd_embalagem_g > 0 ? (insumo.custo_embalagem / insumo.qtd_embalagem_g) : insumo.custo_embalagem;
+                const displayUnit = (insumo.unidade_base === 'un') ? 'un' : 'g';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${insumo.nome}</td>
+                    <td>${formatCurrency(custoPorGrama)} / ${displayUnit}</td>
+                    <td>${insumo.fornecedor || '--'}</td>
+                    <td>${insumo.validade ? new Date(insumo.validade).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : '--'}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn-secondary btn-small btn-edit-insumo" data-id="${insumo.id}">Editar</button>
+                        <button class="btn btn-danger btn-small btn-delete-insumo" data-id="${insumo.id}">Excluir</button>
                     </td>
                 `;
+                tbody.appendChild(tr);
             });
-            updateSimuladorOptions();
         }
         
-        window.deleteReceita = async (id) => {
-             if (confirm('Tem certeza que deseja excluir esta receita?')) {
-                await db.collection('receitas').doc(id).delete();
-                loadReceitas();
+        function renderReceitasTable() {
+            const tbody = document.getElementById('receitas-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            if (receitasCache.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">Nenhuma receita cadastrada.</td></tr>';
+                return;
             }
-        }
-        
-        window.editReceita = (id) => {
-            const receita = receitasCache.find(r => r.id === id);
-            document.getElementById('receita-id').value = receita.id;
-            document.getElementById('receita-nome').value = receita.nome;
-            document.getElementById('receita-embalagem-custo').value = receita.custo_embalagem;
-            ingredientesContainer.innerHTML = '';
-            receita.ingredientes.forEach(ing => {
-                addIngredienteBtn.click();
-                const lastItem = ingredientesContainer.lastChild;
-                lastItem.querySelector('.ingrediente-select').value = ing.insumoId;
-                lastItem.querySelector('.ingrediente-qtd').value = ing.quantidade_g;
+            receitasCache.forEach(receita => {
+                const cogs = calculateRecipeCOGS(receita);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${receita.nome}</td>
+                    <td>${formatCurrency(cogs)}</td>
+                    <td>${receita.versao || '1.0'}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn-success btn-small btn-view-report" data-id="${receita.id}">Relatório</button>
+                        <button class="btn btn-secondary btn-small btn-edit-receita" data-id="${receita.id}">Editar</button>
+                        <button class="btn btn-danger btn-small btn-delete-receita" data-id="${receita.id}">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
-            document.querySelector('.nav-btn[data-target="receitas-section"]').click();
         }
 
+        function populateInsumosDropdown(selectElement) {
+            selectElement.innerHTML = '<option value="">Selecione um insumo</option>';
+            insumosCache.forEach(insumo => {
+                const custoPorGrama = insumo.qtd_embalagem_g > 0 ? (insumo.custo_embalagem / insumo.qtd_embalagem_g) : insumo.custo_embalagem;
+                const displayUnit = (insumo.unidade_base === 'un') ? 'un' : 'g';
+                const option = document.createElement('option');
+                option.value = insumo.id;
+                option.textContent = `${insumo.nome} (${formatCurrency(custoPorGrama)}/${displayUnit})`;
+                option.dataset.nome = insumo.nome;
+                selectElement.appendChild(option);
+            });
+        }
 
-        // --- SIMULADOR DE PREÇO ---
-        const simuladorSelect = document.getElementById('simulador-receita-select');
-        const simuladorCogs = document.getElementById('simulador-cogs-resultado');
-        const simuladorMeta = document.getElementById('simulador-meta-cmv');
-        const simuladorPreco = document.getElementById('simulador-preco-sugerido');
-
-        function updateSimuladorOptions() {
-            simuladorSelect.innerHTML = '<option value="">Selecione uma receita</option>';
-            document.getElementById('relatorio-receita-select').innerHTML = '<option value="">Selecione uma receita</option>';
-
+        function populateReceitaSelects() {
+            const select = document.getElementById('simulador-receita-select');
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- Escolha uma receita --</option>';
             receitasCache.forEach(receita => {
                 const option = document.createElement('option');
                 option.value = receita.id;
                 option.textContent = receita.nome;
-                simuladorSelect.appendChild(option);
-                document.getElementById('relatorio-receita-select').appendChild(option.cloneNode(true));
+                select.appendChild(option);
             });
+            select.value = currentVal;
+        }
+
+        // ============================================================================================
+        // CORE LOGIC & CALCULATIONS
+        // ============================================================================================
+        
+        function calculateCustoPorGrama(insumo) {
+            if (!insumo || !insumo.custo_embalagem || !insumo.qtd_embalagem_g) return 0;
+            // For units ('un'), qtd_embalagem_g is the number of units
+            return insumo.custo_embalagem / insumo.qtd_embalagem_g;
+        }
+
+        function calculateCustoIngrediente(insumoId, quantidade_g) {
+            const insumo = insumosCache.find(i => i.id === insumoId);
+            if (!insumo) return 0;
+            const custoPorGrama = calculateCustoPorGrama(insumo);
+            return custoPorGrama * quantidade_g;
+        }
+
+        function calculateRecipeIngredientsCost(ingredients) {
+             return ingredients.reduce((total, ing) => {
+                return total + calculateCustoIngrediente(ing.insumoId, ing.quantidade_g);
+            }, 0);
+        }
+
+        function calculateRecipeCOGS(receita) {
+            if (!receita) return 0;
+            const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes || []);
+            const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100);
+            const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0);
+            
+            const cogs = custoComPerda +
+                         (receita.custo_embalagem_por_unidade || 0) +
+                         custoMaoDeObra +
+                         (configCache.rateio_por_pizza || 0);
+            return cogs;
         }
         
-        function runSimulador() {
-            const receitaId = simuladorSelect.value;
+        // ============================================================================================
+        // EVENT LISTENERS & FORM HANDLING
+        // ============================================================================================
+
+        function setupNavListeners() {
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const viewId = e.target.getAttribute('data-view');
+                    showView(viewId);
+                });
+            });
+        }
+
+        function setupFormListeners() {
+            // INSUMO FORM
+            document.getElementById('insumo-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('insumo-id').value;
+                const nome = document.getElementById('insumo-nome').value;
+                const custo_embalagem = parseFloat(document.getElementById('insumo-custo-embalagem').value);
+                
+                const existingInsumo = id ? insumosCache.find(i => i.id === id) : null;
+                const oldPrice = existingInsumo ? existingInsumo.custo_embalagem : null;
+                const historico_precos = existingInsumo ? (existingInsumo.historico_precos || []) : [];
+
+                if (oldPrice !== null && custo_embalagem !== oldPrice) {
+                    historico_precos.push({ data: new Date().toISOString(), preco: oldPrice });
+                }
+
+                const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value);
+                const unidade = document.getElementById('insumo-unidade-embalagem').value;
+                let qtd_embalagem_g = qtd;
+                let unidade_base = 'g';
+
+                if (unidade === 'kg') {
+                    qtd_embalagem_g = qtd * 1000;
+                } else if (unidade === 'L') {
+                    qtd_embalagem_g = qtd * 1000;
+                    unidade_base = 'ml';
+                } else if (unidade === 'un') {
+                    unidade_base = 'un';
+                }
+
+                const insumoData = {
+                    nome,
+                    fornecedor: document.getElementById('insumo-fornecedor').value,
+                    custo_embalagem,
+                    quantidade_embalagem: qtd,
+                    unidade_embalagem: unidade,
+                    qtd_embalagem_g,
+                    unidade_base,
+                    rendimento_percentual: parseFloat(document.getElementById('insumo-rendimento').value) || 100,
+                    lote: document.getElementById('insumo-lote').value,
+                    validade: document.getElementById('insumo-validade').value,
+                    historico_precos
+                };
+                if (id) insumoData.id = id;
+
+                await saveInsumo(insumoData);
+                resetInsumoForm();
+            });
+            
+            document.getElementById('cancel-edit-insumo').addEventListener('click', resetInsumoForm);
+
+            // RECEITA FORM
+            document.getElementById('add-ingredient-btn').addEventListener('click', addIngredientRow);
+            
+            document.getElementById('ingredients-list').addEventListener('change', (e) => {
+                 if(e.target.classList.contains('ingredient-select') || e.target.classList.contains('ingredient-qty')) {
+                    updateTotalIngredientsCost();
+                 }
+            });
+            
+            document.getElementById('ingredients-list').addEventListener('click', (e) => {
+                if(e.target.classList.contains('remove-ingredient-btn')) {
+                    e.target.closest('.ingredient-row').remove();
+                    updateTotalIngredientsCost();
+                }
+            });
+
+            document.getElementById('receita-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const ingredients = [];
+                document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
+                    const insumoId = row.querySelector('.ingredient-select').value;
+                    const nome = row.querySelector('.ingredient-select').selectedOptions[0].dataset.nome;
+                    const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value);
+                    if(insumoId && quantidade_g > 0) {
+                        ingredients.push({ insumoId, nome, quantidade_g });
+                    }
+                });
+
+                if (ingredients.length === 0) {
+                    showToast("Adicione pelo menos um ingrediente.", "error");
+                    return;
+                }
+
+                const receitaData = {
+                    nome: document.getElementById('receita-nome').value,
+                    versao: document.getElementById('receita-versao').value,
+                    ingredientes: ingredients,
+                    tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value),
+                    custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value),
+                    perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value),
+                    observacoes: document.getElementById('receita-observacoes').value,
+                };
+                const id = document.getElementById('receita-id').value;
+                if(id) receitaData.id = id;
+                
+                await saveReceita(receitaData);
+                resetReceitaForm();
+            });
+            
+             document.getElementById('cancel-edit-receita').addEventListener('click', resetReceitaForm);
+            
+            // CONFIG FORM
+            document.getElementById('configuracoes-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const configData = {
+                    custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value),
+                    rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value),
+                    meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value),
+                    alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value),
+                };
+                await saveConfiguracoes(configData);
+            });
+            
+            // SIMULATOR
+            document.getElementById('simulador-receita-select').addEventListener('change', updateSimulator);
+            document.getElementById('simulador-preco-venda').addEventListener('input', updateSimulator);
+            document.getElementById('simulador-meta-cmv').addEventListener('input', updateSimulator);
+            document.getElementById('simulador-margem-desejada').addEventListener('input', updateSimulator);
+
+            // TABLE CLICKS (EDIT/DELETE)
+            document.body.addEventListener('click', handleTableButtonClick);
+        }
+
+        function handleTableButtonClick(e) {
+            const target = e.target;
+            if(target.matches('.btn-edit-insumo')) {
+                editInsumo(target.dataset.id);
+            } else if (target.matches('.btn-delete-insumo')) {
+                confirmDelete('insumo', target.dataset.id);
+            } else if (target.matches('.btn-edit-receita')) {
+                editReceita(target.dataset.id);
+            } else if (target.matches('.btn-delete-receita')) {
+                confirmDelete('receita', target.dataset.id);
+            } else if (target.matches('.btn-view-report')) {
+                generateRecipePDF(target.dataset.id);
+            }
+        }
+        
+        // --- Insumo Form Helpers ---
+        function resetInsumoForm() {
+            document.getElementById('insumo-form').reset();
+            document.getElementById('insumo-id').value = '';
+            document.getElementById('insumo-form-title').textContent = 'Cadastrar Novo Insumo';
+            document.getElementById('cancel-edit-insumo').classList.add('hidden');
+        }
+
+        function editInsumo(id) {
+            const insumo = insumosCache.find(i => i.id === id);
+            if (!insumo) return;
+            showView('insumos');
+            document.getElementById('insumo-id').value = insumo.id;
+            document.getElementById('insumo-nome').value = insumo.nome;
+            document.getElementById('insumo-fornecedor').value = insumo.fornecedor;
+            document.getElementById('insumo-custo-embalagem').value = insumo.custo_embalagem;
+            document.getElementById('insumo-qtd-embalagem').value = insumo.quantidade_embalagem;
+            document.getElementById('insumo-unidade-embalagem').value = insumo.unidade_embalagem;
+            document.getElementById('insumo-rendimento').value = insumo.rendimento_percentual;
+            document.getElementById('insumo-lote').value = insumo.lote;
+            document.getElementById('insumo-validade').value = insumo.validade;
+            
+            document.getElementById('insumo-form-title').textContent = 'Editar Insumo';
+            document.getElementById('cancel-edit-insumo').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+        
+        // --- Receita Form Helpers ---
+        function resetReceitaForm() {
+            document.getElementById('receita-form').reset();
+            document.getElementById('receita-id').value = '';
+            document.getElementById('ingredients-list').innerHTML = '';
+            document.getElementById('custo-total-ingredientes').textContent = 'Custo Ingredientes: R$ 0,00';
+            document.getElementById('receita-form-title').textContent = 'Criar Nova Receita (Ficha Técnica)';
+            document.getElementById('cancel-edit-receita').classList.add('hidden');
+            addIngredientRow(); // Add one empty row to start
+        }
+
+        function addIngredientRow(ingredient = {}) {
+            const div = document.createElement('div');
+            div.className = 'ingredient-row';
+            const select = document.createElement('select');
+            select.className = 'ingredient-select';
+            populateInsumosDropdown(select);
+            select.value = ingredient.insumoId || '';
+
+            div.innerHTML = `
+                <div style="flex:3;">${select.outerHTML}</div>
+                <div style="flex:1;"><input type="number" class="ingredient-qty" placeholder="Qtd (g/un)" value="${ingredient.quantidade_g || ''}" step="0.1"></div>
+                <div class="costo-ingrediente">R$ 0,00</div>
+                <button type="button" class="btn btn-danger btn-small remove-ingredient-btn" style="flex:0;">X</button>
+            `;
+            document.getElementById('ingredients-list').appendChild(div);
+        }
+
+        function updateTotalIngredientsCost() {
+            let totalCost = 0;
+            document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
+                const insumoId = row.querySelector('.ingredient-select').value;
+                const qty = parseFloat(row.querySelector('.ingredient-qty').value) || 0;
+                const cost = calculateCustoIngrediente(insumoId, qty);
+                row.querySelector('.costo-ingrediente').textContent = formatCurrency(cost);
+                totalCost += cost;
+            });
+            document.getElementById('custo-total-ingredientes').textContent = `Custo Ingredientes: ${formatCurrency(totalCost)}`;
+        }
+
+        function editReceita(id) {
+            const receita = receitasCache.find(r => r.id === id);
+            if (!receita) return;
+            showView('receitas');
+            resetReceitaForm();
+
+            document.getElementById('receita-id').value = receita.id;
+            document.getElementById('receita-nome').value = receita.nome;
+            document.getElementById('receita-versao').value = receita.versao;
+            document.getElementById('receita-tempo-preparo').value = receita.tempo_preparo_min;
+            document.getElementById('receita-custo-embalagem').value = receita.custo_embalagem_por_unidade;
+            document.getElementById('receita-perda-percentual').value = receita.perda_percentual;
+            document.getElementById('receita-observacoes').value = receita.observacoes;
+            
+            const ingredientsList = document.getElementById('ingredients-list');
+            ingredientsList.innerHTML = ''; // Clear the initial empty row
+            receita.ingredientes.forEach(ing => addIngredientRow(ing));
+            updateTotalIngredientsCost();
+            
+            document.getElementById('receita-form-title').textContent = 'Editar Receita';
+            document.getElementById('cancel-edit-receita').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        // --- Config Form Helper ---
+        function displayConfiguracoes() {
+            document.getElementById('config-custo-hora-mao-de-obra').value = configCache.custo_hora_mao_de_obra || '';
+            document.getElementById('config-rateio-despesas-fixas').value = configCache.rateio_por_pizza || '';
+            document.getElementById('config-meta-cmv-padrao').value = configCache.meta_cmv_padrao || '';
+            document.getElementById('config-alerta-variacao').value = configCache.alerta_variacao || 10;
+            document.getElementById('alert-threshold-display').textContent = configCache.alerta_variacao || 10;
+        }
+
+        // --- Simulator ---
+        function updateSimulator() {
+            const receitaId = document.getElementById('simulador-receita-select').value;
+            const detalhesDiv = document.getElementById('simulador-detalhes');
             if (!receitaId) {
-                simuladorCogs.textContent = 'Custo da Pizza (COGS): R$ 0.00';
-                simuladorPreco.textContent = 'Preço de Venda Sugerido: R$ 0.00';
+                detalhesDiv.classList.add('hidden');
                 return;
             }
+            detalhesDiv.classList.remove('hidden');
 
             const receita = receitasCache.find(r => r.id === receitaId);
-            const cogs = calculateCogs(receita, insumosCache);
-            simuladorCogs.textContent = `Custo da Pizza (COGS): R$ ${cogs.toFixed(2)}`;
+            const cogs = calculateRecipeCOGS(receita);
             
-            const metaCMV = parseFloat(simuladorMeta.value) / 100;
-            if (metaCMV > 0) {
-                const precoSugerido = cogs / metaCMV;
-                simuladorPreco.textContent = `Preço de Venda Sugerido: R$ ${precoSugerido.toFixed(2)}`;
+            const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes);
+            const perdaValor = custoIngredientes * ((receita.perda_percentual || 0) / 100);
+            const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0);
+
+            const tbody = document.getElementById('simulador-custos-table').querySelector('tbody');
+            tbody.innerHTML = `
+                <tr><td>Custo dos Ingredientes</td><td>${formatCurrency(custoIngredientes)}</td></tr>
+                <tr><td>Perda/Desperdício (${receita.perda_percentual || 0}%)</td><td>${formatCurrency(perdaValor)}</td></tr>
+                <tr><td>Mão de Obra (${receita.tempo_preparo_min} min)</td><td>${formatCurrency(custoMaoDeObra)}</td></tr>
+                <tr><td>Embalagem</td><td>${formatCurrency(receita.custo_embalagem_por_unidade)}</td></tr>
+                <tr><td>Rateio Despesas Fixas</td><td>${formatCurrency(configCache.rateio_por_pizza)}</td></tr>
+            `;
+            document.getElementById('simulador-cogs-total').textContent = `COGS Total: ${formatCurrency(cogs)}`;
+
+            // CMV calculation
+            const precoVenda = parseFloat(document.getElementById('simulador-preco-venda').value);
+            const cmvResultDiv = document.getElementById('simulador-resultado-cmv');
+            if (precoVenda > 0) {
+                const cmv = (cogs / precoVenda) * 100;
+                const cmvStatus = cmv > configCache.meta_cmv_padrao ? 'cmv-danger' : 'cmv-ok';
+                cmvResultDiv.innerHTML = `<p>CMV: <strong class="${cmvStatus}">${cmv.toFixed(2)}%</strong></p>`;
+                cmvResultDiv.classList.remove('hidden');
             } else {
-                simuladorPreco.textContent = 'Preço de Venda Sugerido: R$ 0.00';
+                cmvResultDiv.classList.add('hidden');
+            }
+
+            // Price suggestion
+            const metaCMV = parseFloat(document.getElementById('simulador-meta-cmv').value);
+            const margemDesejada = parseFloat(document.getElementById('simulador-margem-desejada').value);
+            const precoResultDiv = document.getElementById('simulador-resultado-preco');
+            let precoHtml = '';
+            
+            if (metaCMV > 0) {
+                const precoSugerido = cogs / (metaCMV / 100);
+                precoHtml += `<p>Preço para Meta CMV: <strong>${formatCurrency(precoSugerido)}</strong></p>`;
+            }
+            if (margemDesejada > 0 && margemDesejada < 100) {
+                 const precoSugerido = cogs / (1 - (margemDesejada / 100));
+                 precoHtml += `<p>Preço para Margem ${margemDesejada}%: <strong>${formatCurrency(precoSugerido)}</strong></p>`;
+            }
+
+            if(precoHtml) {
+                precoResultDiv.innerHTML = precoHtml;
+                precoResultDiv.classList.remove('hidden');
+            } else {
+                precoResultDiv.classList.add('hidden');
             }
         }
         
-        simuladorSelect.addEventListener('change', runSimulador);
-        simuladorMeta.addEventListener('input', runSimulador);
+        // --- Dashboard ---
+        function updateDashboard() {
+            // KPIs
+            document.getElementById('dashboard-num-insumos').textContent = insumosCache.length;
+            document.getElementById('dashboard-num-receitas').textContent = receitasCache.length;
+            // Dummy values for Ticket and CMV for now
+            document.getElementById('dashboard-cmv-medio').textContent = `${(configCache.meta_cmv_padrao || 30).toFixed(1)}%`;
+            document.getElementById('dashboard-ticket-medio').textContent = `R$ --`;
 
-
-        // --- RELATÓRIOS ---
-        const exportPdfBtn = document.getElementById('export-pdf-btn');
-        const exportXlsxBtn = document.getElementById('export-xlsx-btn');
-        const relatorioSelect = document.getElementById('relatorio-receita-select');
-
-        function getDetalhesReceita(receitaId) {
-            const receita = receitasCache.find(r => r.id === receitaId);
-            if (!receita) return null;
-
-            const cogs = calculateCogs(receita, insumosCache);
-            const detalhes = [];
+            // Price variation alerts
+            const alertsDiv = document.getElementById('dashboard-alerts');
+            alertsDiv.innerHTML = '';
+            let alertsFound = 0;
+            const alertThreshold = configCache.alerta_variacao || 10;
             
-            // Ingredientes
-            let custoTotalIngredientes = 0;
-            receita.ingredientes.forEach(item => {
-                const insumo = insumosCache.find(i => i.id === item.insumoId);
-                const custoPorGrama = insumo.custo / insumo.qtd;
-                const custoItem = custoPorGrama * item.quantidade_g;
-                custoTotalIngredientes += custoItem;
-                detalhes.push(['Ingrediente: ' + insumo.nome, `${item.quantidade_g.toFixed(2)} g`, `R$ ${custoItem.toFixed(2)}`]);
+            insumosCache.forEach(insumo => {
+                if (insumo.historico_precos && insumo.historico_precos.length > 0) {
+                    const latestPrice = insumo.custo_embalagem;
+                    const previousPrice = insumo.historico_precos[insumo.historico_precos.length - 1].preco;
+                    if (previousPrice > 0) {
+                        const variation = ((latestPrice - previousPrice) / previousPrice) * 100;
+                        if (Math.abs(variation) > alertThreshold) {
+                            alertsFound++;
+                            const alertItem = document.createElement('div');
+                            alertItem.className = 'alert-item';
+                            alertItem.textContent = `${insumo.nome} variou ${variation.toFixed(1)}%. Preço anterior: ${formatCurrency(previousPrice)}, Preço atual: ${formatCurrency(latestPrice)}`;
+                            alertsDiv.appendChild(alertItem);
+                        }
+                    }
+                }
             });
-
-            // Outros Custos
-            const custoMaoDeObra = (userConfig.custo_hora_mao_de_obra / 60) * userConfig.tempo_preparo_minutos;
-            detalhes.push(['Mão de Obra', `${userConfig.tempo_preparo_minutos} min`, `R$ ${custoMaoDeObra.toFixed(2)}`]);
-            detalhes.push(['Embalagem', '1 un', `R$ ${receita.custo_embalagem.toFixed(2)}`]);
-            detalhes.push(['Rateio de Despesas', '1 un', `R$ ${userConfig.rateio_overhead_por_pizza.toFixed(2)}`]);
-
-            return {
-                nome: receita.nome,
-                cogs: cogs,
-                detalhes: detalhes
-            };
-        }
-
-        exportPdfBtn.addEventListener('click', () => {
-            const receitaId = relatorioSelect.value;
-            if (!receitaId) {
-                alert('Por favor, selecione uma receita para gerar o relatório.');
-                return;
+            if (alertsFound === 0) {
+                alertsDiv.innerHTML = '<p>Nenhuma variação de preço significativa.</p>';
             }
 
-            const data = getDetalhesReceita(receitaId);
+            // Top insumos by cost
+            const topInsumosTbody = document.getElementById('dashboard-top-insumos').querySelector('tbody');
+            topInsumosTbody.innerHTML = '';
+            if (insumosCache.length > 0) {
+                const sortedInsumos = [...insumosCache].sort((a, b) => calculateCustoPorGrama(b) - calculateCustoPorGrama(a));
+                sortedInsumos.slice(0, 5).forEach(insumo => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${insumo.nome}</td><td>${formatCurrency(calculateCustoPorGrama(insumo))} / ${insumo.unidade_base || 'g'}</td>`;
+                    topInsumosTbody.appendChild(tr);
+                });
+            } else {
+                topInsumosTbody.innerHTML = '<tr><td colspan="2">Nenhum insumo cadastrado.</td></tr>';
+            }
+        }
+        
+        // --- Confirmation Modal ---
+        function confirmDelete(type, id) {
+            const modal = document.getElementById('confirm-modal');
+            const text = document.getElementById('confirm-modal-text');
+            text.textContent = `Tem certeza que deseja excluir este(a) ${type}? Esta ação não pode ser desfeita.`;
+            modal.style.display = 'block';
+
+            const yesBtn = document.getElementById('confirm-modal-yes');
+            const noBtn = document.getElementById('confirm-modal-no');
+
+            const handleYes = async () => {
+                if (type === 'insumo') await deleteInsumo(id);
+                if (type === 'receita') await deleteReceita(id);
+                closeModal();
+            };
+
+            const closeModal = () => {
+                modal.style.display = 'none';
+                yesBtn.removeEventListener('click', handleYes);
+                noBtn.removeEventListener('click', closeModal);
+            };
+
+            yesBtn.addEventListener('click', handleYes);
+            noBtn.addEventListener('click', closeModal);
+        }
+
+        // ============================================================================================
+        // EXPORTING
+        // ============================================================================================
+        document.getElementById('export-insumos-xlsx').addEventListener('click', () => {
+            const data = insumosCache.map(i => ({
+                Nome: i.nome,
+                Fornecedor: i.fornecedor,
+                'Custo Embalagem (R$)': i.custo_embalagem,
+                'Qtd Embalagem': i.quantidade_embalagem,
+                'Unidade': i.unidade_embalagem,
+                'Custo por g/un (R$)': calculateCustoPorGrama(i)
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Insumos");
+            XLSX.writeFile(wb, "insumos_pizzaria.xlsx");
+        });
+
+        document.getElementById('export-receitas-xlsx').addEventListener('click', () => {
+             const wb = XLSX.utils.book_new();
+             receitasCache.forEach(receita => {
+                const cogs = calculateRecipeCOGS(receita);
+                const data = [
+                    { Item: 'Nome da Receita', Valor: receita.nome },
+                    { Item: 'Versão', Valor: receita.versao },
+                    { Item: 'COGS TOTAL', Valor: cogs },
+                    {},
+                    { Item: 'Ingrediente', 'Qtd (g/un)': 'Custo (R$)'}
+                ];
+                receita.ingredientes.forEach(ing => {
+                    data.push({
+                        Item: ing.nome,
+                        'Qtd (g/un)': ing.quantidade_g,
+                        'Custo (R$)': calculateCustoIngrediente(ing.insumoId, ing.quantidade_g)
+                    });
+                });
+                const ws = XLSX.utils.json_to_sheet(data, {skipHeader: true});
+                XLSX.utils.book_append_sheet(wb, ws, receita.nome.substring(0, 30));
+            });
+            XLSX.writeFile(wb, "fichas_tecnicas_pizzaria.xlsx");
+        });
+
+        function generateRecipePDF(receitaId) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
-            doc.text(`Relatório de Custo - ${data.nome}`, 14, 16);
-            doc.text(`Custo Total (COGS): R$ ${data.cogs.toFixed(2)}`, 14, 24);
+            const receita = receitasCache.find(r => r.id === receitaId);
+            if (!receita) return;
 
-            doc.autoTable({
-                startY: 30,
-                head: [['Item', 'Quantidade', 'Custo (R$)']],
-                body: data.detalhes,
+            const cogs = calculateRecipeCOGS(receita);
+            const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes);
+            const perdaValor = custoIngredientes * ((receita.perda_percentual || 0) / 100);
+            const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0);
+
+            doc.setFontSize(18);
+            doc.text(`Ficha Técnica - ${receita.nome}`, 14, 22);
+            doc.setFontSize(11);
+            doc.text(`Versão: ${receita.versao || '1.0'}`, 14, 30);
+            
+            // Tabela de Ingredientes
+            const head = [['Ingrediente', 'Quantidade (g/un)', 'Custo Unitário (g/un)', 'Custo Total']];
+            const body = receita.ingredientes.map(ing => {
+                const insumo = insumosCache.find(i => i.id === ing.insumoId);
+                const custoUnit = calculateCustoPorGrama(insumo);
+                const custoTotal = custoUnit * ing.quantidade_g;
+                return [
+                    ing.nome,
+                    ing.quantidade_g,
+                    formatCurrency(custoUnit),
+                    formatCurrency(custoTotal)
+                ];
             });
 
-            doc.save(`relatorio_${data.nome.replace(/\s/g, '_')}.pdf`);
-        });
+            doc.autoTable({
+                startY: 40,
+                head: head,
+                body: body,
+                theme: 'striped'
+            });
 
-        exportXlsxBtn.addEventListener('click', () => {
-            const receitaId = relatorioSelect.value;
-            if (!receitaId) {
-                alert('Por favor, selecione uma receita para gerar o relatório.');
-                return;
-            }
-            const data = getDetalhesReceita(receitaId);
+            let finalY = doc.lastAutoTable.finalY + 10;
             
-            const worksheetData = [
-                ['Item', 'Quantidade', 'Custo (R$)'],
-                ...data.detalhes,
-                [],
-                ['Custo Total (COGS)', '', `R$ ${data.cogs.toFixed(2)}`]
-            ];
+            // Tabela de Resumo de Custos
+            doc.autoTable({
+                startY: finalY,
+                head: [['Item de Custo', 'Valor']],
+                body: [
+                    ['Custo Total Ingredientes', formatCurrency(custoIngredientes)],
+                    [`Perda (${receita.perda_percentual || 0}%)`, formatCurrency(perdaValor)],
+                    ['Mão de Obra', formatCurrency(custoMaoDeObra)],
+                    ['Embalagem', formatCurrency(receita.custo_embalagem_por_unidade)],
+                    ['Rateio Despesas', formatCurrency(configCache.rateio_por_pizza)]
+                ],
+                theme: 'grid'
+            });
 
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-            XLSX.utils.book_append_sheet(wb, ws, 'RelatorioCMV');
-            XLSX.writeFile(wb, `relatorio_${data.nome.replace(/\s/g, '_')}.xlsx`);
+            finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`CUSTO TOTAL (COGS): ${formatCurrency(cogs)}`, 14, finalY);
+
+            doc.save(`Ficha_Tecnica_${receita.nome}.pdf`);
+        }
+
+        // ============================================================================================
+        // VALIDATION TEST
+        // ============================================================================================
+        document.getElementById('run-validation-button').addEventListener('click', async () => {
+            const resultsDiv = document.getElementById('validation-results');
+            resultsDiv.classList.remove('hidden');
+            resultsDiv.innerHTML = 'Executando validação...';
+
+            const mockConfig = {
+                custo_hora_mao_de_obra: 20.00,
+                rateio_por_pizza: 0.80,
+            };
+
+            const mockInsumos = [
+                { id: 'val-farinha', nome: 'Farinha', custo_embalagem: 80, qtd_embalagem_g: 25000 },
+                { id: 'val-molho', nome: 'Molho', custo_embalagem: 12, qtd_embalagem_g: 3000 },
+                { id: 'val-mussarela', nome: 'Mussarela', custo_embalagem: 28, qtd_embalagem_g: 1000 },
+                { id: 'val-azeite', nome: 'Azeite', custo_embalagem: 30, qtd_embalagem_g: 1000 }, // 1L ~= 1000g for simplicity
+                { id: 'val-outros', nome: 'Outros', custo_embalagem: 0.10, qtd_embalagem_g: 1 }, // Custo direto
+            ];
+            
+            // Temporarily replace cache for calculation
+            const originalInsumosCache = [...insumosCache];
+            const originalConfigCache = {...configCache};
+            insumosCache.length = 0; // Clear array
+            insumosCache.push(...mockInsumos);
+            Object.assign(configCache, mockConfig);
+
+            const mockReceita = {
+                nome: 'Margherita Validação',
+                ingredientes: [
+                    { insumoId: 'val-farinha', quantidade_g: 300 },
+                    { insumoId: 'val-molho', quantidade_g: 120 },
+                    { insumoId: 'val-mussarela', quantidade_g: 150 },
+                    { insumoId: 'val-azeite', quantidade_g: 10 },
+                    { insumoId: 'val-outros', quantidade_g: 1 },
+                ],
+                tempo_preparo_min: 8,
+                custo_embalagem_por_unidade: 1.50,
+                perda_percentual: 0
+            };
+
+            const cogsCalculado = calculateRecipeCOGS(mockReceita);
+            const precoSugerido = cogsCalculado / (30 / 100);
+
+            const cogsEsperado = 11.01;
+            const precoEsperado = 36.70;
+
+            const cogsOk = Math.abs(cogsCalculado - cogsEsperado) < 0.01;
+            const precoOk = Math.abs(precoSugerido - precoEsperado) < 0.01;
+            
+            resultsDiv.innerHTML = `
+                <h4>Resultados da Validação Margherita</h4>
+                <p>COGS Calculado: <strong>${formatCurrency(cogsCalculado)}</strong> (Esperado: R$ 11,01) -> <span style="color:${cogsOk ? 'green':'red'}">${cogsOk ? 'OK' : 'FALHOU'}</span></p>
+                <p>Preço Sugerido (CMV 30%): <strong>${formatCurrency(precoSugerido)}</strong> (Esperado: R$ 36,70) -> <span style="color:${precoOk ? 'green':'red'}">${precoOk ? 'OK' : 'FALHOU'}</span></p>
+                <hr>
+                <h5>Detalhes do Cálculo:</h5>
+                <p>Farinha (300g): ${formatCurrency(calculateCustoIngrediente('val-farinha', 300))}</p>
+                <p>Molho (120g): ${formatCurrency(calculateCustoIngrediente('val-molho', 120))}</p>
+                <p>Mussarela (150g): ${formatCurrency(calculateCustoIngrediente('val-mussarela', 150))}</p>
+                <p>Azeite (10g): ${formatCurrency(calculateCustoIngrediente('val-azeite', 10))}</p>
+                <p>Outros: ${formatCurrency(calculateCustoIngrediente('val-outros', 1))}</p>
+                <p>Embalagem: ${formatCurrency(1.50)}</p>
+                <p>Mão de Obra (8 min): ${formatCurrency((20 / 60) * 8)}</p>
+                <p>Rateio: ${formatCurrency(0.80)}</p>
+            `;
+
+            // Restore original cache
+            insumosCache.length = 0;
+            insumosCache.push(...originalInsumosCache);
+            Object.assign(configCache, originalConfigCache);
         });
+
+        // Start Auth check
+        setupAuthListeners();
+        // If local mode, bypass auth check and init
+        if(isLocalMode) {
+             currentUser = { uid: 'local', email: 'local@user.com' };
+             authContainer.classList.add('hidden');
+             appContainer.classList.remove('hidden');
+             appNav.classList.remove('hidden');
+             initApp();
+        }
 
     });
-</script>
-
+    </script>
 </body>
 </html>
