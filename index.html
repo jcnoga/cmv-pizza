@@ -66,21 +66,12 @@
 
     <style>
         :root {
-            --primary-color: #D32F2F; /* Red */
-            --primary-dark: #B71C1C;
-            --secondary-color: #FFC107; /* Amber */
-            --light-gray: #f4f4f4;
-            --medium-gray: #ccc;
-            --dark-gray: #555;
-            --text-color: #333;
-            --white: #fff;
-            --success-color: #4CAF50;
-            --error-color: #f44336;
-            --info-color: #2196F3;
-            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --primary-color: #D32F2F; --primary-dark: #B71C1C; --secondary-color: #FFC107;
+            --light-gray: #f4f4f4; --medium-gray: #ccc; --dark-gray: #555;
+            --text-color: #333; --white: #fff; --success-color: #4CAF50;
+            --error-color: #f44336; --info-color: #2196F3; --shadow: 0 2px 8px rgba(0,0,0,0.1);
             --border-radius: 8px;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--light-gray); color: var(--text-color); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
         header { background-color: var(--primary-color); color: var(--white); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); flex-wrap: wrap; }
@@ -94,23 +85,19 @@
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2); }
         .btn { display: inline-block; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.3s, transform 0.1s; width: 100%; }
         .btn:active { transform: scale(0.98); }
-        .btn-primary { background-color: var(--primary-color); color: var(--white); }
-        .btn-primary:hover { background-color: var(--primary-dark); }
-        .btn-secondary { background-color: var(--dark-gray); color: var(--white); }
-        .btn-secondary:hover { background-color: #333; }
+        .btn-primary { background-color: var(--primary-color); color: var(--white); } .btn-primary:hover { background-color: var(--primary-dark); }
+        .btn-secondary { background-color: var(--dark-gray); color: var(--white); } .btn-secondary:hover { background-color: #333; }
         .btn-success { background-color: var(--success-color); color: var(--white); }
         .btn-danger { background-color: var(--error-color); color: var(--white); }
         .btn-info { background-color: var(--info-color); color: var(--white); }
         .btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; width: auto; }
-        .auth-link { text-align: center; margin-top: 1rem; }
-        .auth-link a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+        .auth-link { text-align: center; margin-top: 1rem; } .auth-link a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
         nav { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
         nav a, nav button { color: var(--white); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 0.5rem 1rem; border-radius: var(--border-radius); transition: background-color 0.2s; }
         nav a:hover, nav button:hover, nav a.active { background-color: rgba(255,255,255,0.2); }
         #logout-button { background-color: var(--secondary-color); color: var(--text-color); font-weight: bold; }
         main { flex: 1; }
-        .view { display: none; }
-        .view.active { display: block; animation: fadeIn 0.5s; }
+        .view { display: none; } .view.active { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card { background: var(--white); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; }
         .grid-container { display: grid; gap: 1.5rem; }
@@ -132,15 +119,12 @@
         #ingredients-list .ingredient-row .costo-ingrediente { flex: 0 0 120px; font-weight: bold; text-align: right; }
         .total-cost { text-align: right; font-size: 1.5rem; font-weight: bold; margin-top: 1rem; color: var(--primary-dark); }
         .simulator-result { margin-top: 1rem; padding: 1rem; background-color: #e8f5e9; border-left: 5px solid var(--success-color); border-radius: var(--border-radius); }
-        .simulator-result p { font-size: 1.2rem; margin-bottom: 0.5rem; }
-        .simulator-result strong { color: var(--primary-dark); }
+        .simulator-result p { font-size: 1.2rem; margin-bottom: 0.5rem; } .simulator-result strong { color: var(--primary-dark); }
         .alert-item { padding: 0.75rem; border-radius: var(--border-radius); margin-bottom: 0.5rem; background-color: #fff3e0; border: 1px solid #ffe0b2; color: #e65100; }
         .cmv-ok { color: var(--success-color); } .cmv-warn { color: #f57c00; } .cmv-danger { color: var(--error-color); }
         .cmv-visualizer { width: 100%; background-color: var(--medium-gray); border-radius: var(--border-radius); height: 25px; overflow: hidden; margin-top: 0.5rem; }
         .cmv-visualizer-bar { height: 100%; transition: width 0.5s; }
-        .cmv-visualizer-bar.ok { background-color: var(--success-color); }
-        .cmv-visualizer-bar.warn { background-color: var(--secondary-color); }
-        .cmv-visualizer-bar.danger { background-color: var(--error-color); }
+        .cmv-visualizer-bar.ok { background-color: var(--success-color); } .cmv-visualizer-bar.warn { background-color: var(--secondary-color); } .cmv-visualizer-bar.danger { background-color: var(--error-color); }
         .filter-container { margin-bottom: 1rem; }
         .filter-container input { padding: 0.5rem; border-radius: var(--border-radius); border: 1px solid var(--medium-gray); width: 100%; max-width: 400px; }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; border-radius: var(--border-radius); color: var(--white); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.5s, visibility 0.5s; }
@@ -149,8 +133,7 @@
         footer { text-align: center; padding: 1.5rem; margin-top: 2rem; background-color: #e0e0e0; color: var(--dark-gray); font-size: 0.9rem; }
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
         .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: var(--border-radius); text-align: center; }
-        .modal-buttons { margin-top: 20px; }
-        .modal-buttons .btn { width: 120px; margin: 0 10px; }
+        .modal-buttons { margin-top: 20px; } .modal-buttons .btn { width: 120px; margin: 0 10px; }
         .hidden { display: none; }
     </style>
 </head>
@@ -170,16 +153,13 @@
     </header>
 
     <main>
-        <!-- Auth Container -->
         <div id="auth-container">
             <div id="login-view" class="auth-form"><h2>Login</h2><form id="login-form"><div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required></div><div class="form-group"><label for="login-password">Senha</label><input type="password" id="login-password" required></div><button type="submit" class="btn btn-primary">Entrar</button></form><div class="auth-link"><p>Não tem conta? <a href="#" id="show-register">Cadastre-se</a></p><p><a href="#" id="show-reset-password">Esqueceu a senha?</a></p></div></div>
             <div id="register-view" class="auth-form hidden"><h2>Cadastro</h2><form id="register-form"><div class="form-group"><label for="register-email">Email</label><input type="email" id="register-email" required></div><div class="form-group"><label for="register-password">Senha</label><input type="password" id="register-password" required minlength="6"></div><button type="submit" class="btn btn-primary">Cadastrar</button></form><div class="auth-link"><p>Já tem conta? <a href="#" id="show-login">Faça login</a></p></div></div>
             <div id="reset-password-view" class="auth-form hidden"><h2>Recuperar Senha</h2><form id="reset-password-form"><div class="form-group"><label for="reset-email">Email</label><input type="email" id="reset-email" required></div><button type="submit" class="btn btn-primary">Enviar link</button></form><div class="auth-link"><p><a href="#" id="back-to-login">Voltar</a></p></div></div>
         </div>
 
-        <!-- App Container -->
         <div id="app-container" class="hidden">
-            <!-- Dashboard View -->
             <section id="dashboard-view" class="view">
                 <h2>Dashboard</h2>
                 <div class="grid-container grid-4">
@@ -195,30 +175,25 @@
                  <div class="card"><h3>Ações Rápidas</h3><button id="run-validation-button" class="btn btn-secondary btn-small">Validar Margherita</button><button id="generate-general-report-pdf" class="btn btn-info btn-small" style="margin-left: 1rem;">Relatório Geral (PDF)</button><div id="validation-results" class="hidden" style="margin-top: 1rem; padding: 1rem; background: #eee;"></div></div>
             </section>
             
-            <!-- Fornecedores View -->
             <section id="fornecedores-view" class="view">
                 <div class="card"><h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label for="fornecedor-nome">Nome</label><input type="text" id="fornecedor-nome" required></div><div class="form-group"><label for="fornecedor-contato">Contato</label><input type="text" id="fornecedor-contato"></div></div><div class="form-row"><div class="form-group"><label for="fornecedor-telefone">Telefone</label><input type="tel" id="fornecedor-telefone"></div><div class="form-group"><label for="fornecedor-email">Email</label><input type="email" id="fornecedor-email"></div></div><div class="form-group"><label for="fornecedor-endereco">Endereço</label><input type="text" id="fornecedor-endereco"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
                 <div class="card"><h2>Lista de Fornecedores</h2><table id="fornecedores-table"><thead><tr><th>Nome</th><th>Contato</th><th>Telefone</th><th>Insumos</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- Insumos View -->
             <section id="insumos-view" class="view">
                 <div class="card"><h2 id="insumo-form-title">Cadastrar Insumo</h2><form id="insumo-form"><input type="hidden" id="insumo-id"><div class="form-row"><div class="form-group"><label for="insumo-nome">Nome</label><input type="text" id="insumo-nome" required></div><div class="form-group"><label for="insumo-fornecedor-select">Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div></div><div class="form-row"><div class="form-group"><label for="insumo-custo-embalagem">Custo Embalagem (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div><div class="form-group"><label for="insumo-qtd-embalagem">Qtd. Embalagem</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div><div class="form-group"><label for="insumo-unidade-embalagem">Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div></div><div class="form-row"><div class="form-group"><label for="insumo-lote">Lote</label><input type="text" id="insumo-lote"></div><div class="form-group"><label for="insumo-validade">Validade</label><input type="date" id="insumo-validade"></div></div><button type="submit" class="btn btn-primary">Salvar Insumo</button><button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
                 <div class="card"><h2>Lista de Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="🔎 Filtrar..."></div><button id="export-insumos-xlsx" class="btn btn-success btn-small">Exportar XLSX</button><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo/g (un)</th><th>Fornecedor</th><th>Validade</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- Receitas View -->
             <section id="receitas-view" class="view">
                 <div class="card"><h2 id="receita-form-title">Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-row"><div class="form-group"><label for="receita-nome">Nome da Pizza</label><input type="text" id="receita-nome" required></div><div class="form-group"><label for="receita-versao">Versão</label><input type="text" id="receita-versao" placeholder="1.0"></div></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div id="custo-total-ingredientes" class="total-cost">Custo: R$ 0,00</div><h3>Custos Adicionais</h3><div class="form-row"><div class="form-group"><label for="receita-tempo-preparo">Preparo (min)</label><input type="number" id="receita-tempo-preparo" value="0" required></div><div class="form-group"><label for="receita-custo-embalagem">Embalagem (R$)</label><input type="number" id="receita-custo-embalagem" step="0.01" value="0"></div><div class="form-group"><label for="receita-perda-percentual">Perda (%)</label><input type="number" id="receita-perda-percentual" value="0"></div></div><div class="form-group"><label for="receita-observacoes">Observações</label><textarea id="receita-observacoes" rows="3"></textarea></div><button type="submit" class="btn btn-primary">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
                 <div class="card"><h2>Lista de Receitas</h2><div class="filter-container"><input type="text" id="receitas-filter" placeholder="🔎 Filtrar..."></div><button id="export-receitas-xlsx" class="btn btn-success btn-small">Exportar XLSX</button><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Versão</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- Simulador View -->
             <section id="simulador-view" class="view">
                  <div class="card"><h2>Simulador de Custo e Preço</h2><div class="form-group"><label for="simulador-receita-select">Selecione uma Receita</label><select id="simulador-receita-select"><option value="">-- Escolha --</option></select></div><div id="simulador-detalhes" class="hidden"><h3>Detalhes de Custo (COGS)</h3><table id="simulador-custos-table"><thead><tr><th>Item</th><th>Valor</th></tr></thead><tbody></tbody></table><p class="total-cost" id="simulador-cogs-total">COGS Total: R$ 0,00</p><div class="grid-container grid-2" style="margin-top: 2rem;"><div class="card"><h4>Calcular CMV por Preço</h4><div class="form-group"><label for="simulador-preco-venda">Preço de Venda (R$)</label><input type="number" id="simulador-preco-venda" step="0.01"></div><div id="simulador-resultado-cmv" class="simulator-result hidden"></div><div id="cmv-visualizer-container" class="hidden"><div class="cmv-visualizer"><div id="cmv-bar" class="cmv-visualizer-bar"></div></div></div></div><div class="card"><h4>Calcular Preço Sugerido</h4><div class="form-group"><label for="simulador-meta-cmv">Meta de CMV (%)</label><input type="number" id="simulador-meta-cmv" step="0.1"></div><div class="form-group"><label for="simulador-margem-desejada">Margem (%)</label><input type="number" id="simulador-margem-desejada" step="0.1"></div><div id="simulador-resultado-preco" class="simulator-result hidden"></div></div></div></div></div>
             </section>
             
-            <!-- Configurações View -->
             <section id="configuracoes-view" class="view">
                 <div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label for="config-rateio-despesas-fixas">Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label for="config-meta-cmv-padrao">Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label for="config-alerta-variacao">Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div>
             </section>
@@ -246,7 +221,6 @@ const firebaseConfig = {
   messagingSenderId: "1022435006716",
   appId: "1:1022435006716:web:ec39f22702097beca25f79"
 };
-
         let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {} };
@@ -291,27 +265,27 @@ const firebaseConfig = {
         async function loadAllData() { await fetchConfiguracoes(); await fetchFornecedores(); await fetchInsumos(); await fetchReceitas(); renderAllTables(); populateAllDropdowns(); updateDashboard(); }
 
         // ============================================================================================
-        // DATA FETCHING & SAVING (Explicit Functions)
+        // DATA CRUD FUNCTIONS
         // ============================================================================================
 
         // --- FORNECEDORES ---
         async function fetchFornecedores() { if (isLocalMode) { fornecedoresCache = [...localData.fornecedores]; } else { try { const snapshot = await db.collection('fornecedores').where('userId', '==', currentUser.uid).orderBy('nome').get(); fornecedoresCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch fornecedores:", error); } } }
-        async function saveFornecedor(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; if (isLocalMode) { if (isEditing) { const index = localData.fornecedores.findIndex(i => i.id === data.id); if (index > -1) localData.fornecedores[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.fornecedores.push(data); } } else { try { if (isEditing) { await db.collection('fornecedores').doc(data.id).update(data); } else { delete data.id; await db.collection('fornecedores').add(data); } } catch (error) { showToast("Erro ao salvar fornecedor.", 'error'); console.error(error); return; } } showToast(`Fornecedor ${isEditing ? 'atualizado' : 'salvo'}!`); }
-        async function deleteFornecedor(id) { if (isLocalMode) { localData.fornecedores = localData.fornecedores.filter(i => i.id !== id); } else { try { await db.collection('fornecedores').doc(id).delete(); } catch (error) { showToast("Erro ao excluir.", 'error'); return; } } showToast("Fornecedor excluído!"); }
+        async function saveFornecedor(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; try { if (isLocalMode) { if (isEditing) { const index = localData.fornecedores.findIndex(i => i.id === data.id); if (index > -1) localData.fornecedores[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.fornecedores.push(data); } } else { if (isEditing) { await db.collection('fornecedores').doc(data.id).update(data); } else { delete data.id; await db.collection('fornecedores').add(data); } } showToast(`Fornecedor ${isEditing ? 'atualizado' : 'salvo'}!`); } catch (error) { showToast("Erro ao salvar fornecedor.", 'error'); console.error(error); } }
+        async function deleteFornecedor(id) { try { if (isLocalMode) { localData.fornecedores = localData.fornecedores.filter(i => i.id !== id); } else { await db.collection('fornecedores').doc(id).delete(); } showToast("Fornecedor excluído!"); } catch (error) { showToast("Erro ao excluir.", 'error'); } }
 
         // --- INSUMOS ---
         async function fetchInsumos() { if (isLocalMode) { insumosCache = [...localData.insumos]; } else { try { const snapshot = await db.collection('insumos').where('userId', '==', currentUser.uid).orderBy('nome').get(); insumosCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch insumos:", error); } } }
-        async function saveInsumo(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; if (isLocalMode) { if (isEditing) { const index = localData.insumos.findIndex(i => i.id === data.id); if (index > -1) localData.insumos[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.insumos.push(data); } } else { try { if (isEditing) { await db.collection('insumos').doc(data.id).update(data); } else { delete data.id; await db.collection('insumos').add(data); } } catch (error) { showToast("Erro ao salvar insumo.", 'error'); console.error(error); return; } } showToast(`Insumo ${isEditing ? 'atualizado' : 'salvo'}!`); }
-        async function deleteInsumo(id) { if (isLocalMode) { localData.insumos = localData.insumos.filter(i => i.id !== id); } else { try { await db.collection('insumos').doc(id).delete(); } catch (error) { showToast("Erro ao excluir.", 'error'); return; } } showToast("Insumo excluído!"); }
+        async function saveInsumo(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; try { if (isLocalMode) { if (isEditing) { const index = localData.insumos.findIndex(i => i.id === data.id); if (index > -1) localData.insumos[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.insumos.push(data); } } else { if (isEditing) { await db.collection('insumos').doc(data.id).update(data); } else { delete data.id; await db.collection('insumos').add(data); } } showToast(`Insumo ${isEditing ? 'atualizado' : 'salvo'}!`); } catch (error) { showToast("Erro ao salvar insumo.", 'error'); console.error(error); } }
+        async function deleteInsumo(id) { try { if (isLocalMode) { localData.insumos = localData.insumos.filter(i => i.id !== id); } else { await db.collection('insumos').doc(id).delete(); } showToast("Insumo excluído!"); } catch (error) { showToast("Erro ao excluir.", 'error'); } }
 
         // --- RECEITAS ---
         async function fetchReceitas() { if (isLocalMode) { receitasCache = [...localData.receitas]; } else { try { const snapshot = await db.collection('receitas').where('userId', '==', currentUser.uid).orderBy('nome').get(); receitasCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch receitas:", error); } } }
-        async function saveReceita(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; if (isLocalMode) { if (isEditing) { const index = localData.receitas.findIndex(i => i.id === data.id); if (index > -1) localData.receitas[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.receitas.push(data); } } else { try { if (isEditing) { await db.collection('receitas').doc(data.id).update(data); } else { delete data.id; await db.collection('receitas').add(data); } } catch (error) { showToast("Erro ao salvar receita.", 'error'); console.error(error); return; } } showToast(`Receita ${isEditing ? 'atualizada' : 'salva'}!`); }
-        async function deleteReceita(id) { if (isLocalMode) { localData.receitas = localData.receitas.filter(i => i.id !== id); } else { try { await db.collection('receitas').doc(id).delete(); } catch (error) { showToast("Erro ao excluir.", 'error'); return; } } showToast("Receita excluída!"); }
+        async function saveReceita(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; try { if (isLocalMode) { if (isEditing) { const index = localData.receitas.findIndex(i => i.id === data.id); if (index > -1) localData.receitas[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.receitas.push(data); } } else { if (isEditing) { await db.collection('receitas').doc(data.id).update(data); } else { delete data.id; await db.collection('receitas').add(data); } } showToast(`Receita ${isEditing ? 'atualizada' : 'salva'}!`); } catch (error) { showToast("Erro ao salvar receita.", 'error'); console.error(error); } }
+        async function deleteReceita(id) { try { if (isLocalMode) { localData.receitas = localData.receitas.filter(i => i.id !== id); } else { await db.collection('receitas').doc(id).delete(); } showToast("Receita excluída!"); } catch (error) { showToast("Erro ao excluir.", 'error'); } }
 
         // --- CONFIGURAÇÕES ---
         async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } catch(error) { console.error("Erro configs:", error); } } displayConfiguracoes(); }
-        async function saveConfiguracoes(configData) { configData.userId = isLocalMode ? 'local' : currentUser.uid; if(isLocalMode) { localData.configuracoes.default = configData; } else { try { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } catch(error) { showToast("Erro ao salvar.", 'error'); return; } } showToast("Configurações salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); }
+        async function saveConfiguracoes(configData) { configData.userId = isLocalMode ? 'local' : currentUser.uid; try { if(isLocalMode) { localData.configuracoes.default = configData; } else { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } showToast("Configurações salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); } catch(error) { showToast("Erro ao salvar.", 'error'); } }
         
         // ============================================================================================
         // UI RENDERING & POPULATION
@@ -337,28 +311,28 @@ const firebaseConfig = {
         function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
         
         function setupFormListeners() {
-            // --- FORNECEDOR FORM ---
             document.getElementById('fornecedor-form').addEventListener('submit', async e => {
                 e.preventDefault();
                 const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null };
                 await saveFornecedor(data);
-                await fetchFornecedores();
-                renderFornecedoresTable();
-                populateFornecedoresDropdowns();
+                await fetchFornecedores(); // Refresh cache
+                renderFornecedoresTable(); // Re-render table
+                populateFornecedoresDropdowns(); // Update dropdowns elsewhere
                 resetFornecedorForm();
             });
             document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
 
-            // --- INSUMO FORM ---
             document.getElementById('insumo-form').addEventListener('submit', async e => {
                 e.preventDefault();
                 const fornecedorSelect = document.getElementById('insumo-fornecedor-select');
                 if (!fornecedorSelect.value) { showToast("Selecione um fornecedor.", "error"); return; }
-                const id = document.getElementById('insumo-id').value, custo = parseFloat(document.getElementById('insumo-custo-embalagem').value);
+                const id = document.getElementById('insumo-id').value;
+                const custo = parseFloat(document.getElementById('insumo-custo-embalagem').value);
                 const existing = id ? insumosCache.find(i => i.id === id) : null;
                 const historico = existing ? (existing.historico_precos || []) : [];
                 if (existing && custo !== existing.custo_embalagem) { historico.push({ data: new Date().toISOString(), preco: existing.custo_embalagem }); }
-                const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unidade = document.getElementById('insumo-unidade-embalagem').value;
+                const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value);
+                const unidade = document.getElementById('insumo-unidade-embalagem').value;
                 let qtd_g = qtd, base = 'g';
                 if (unidade === 'kg') qtd_g = qtd * 1000; else if (unidade === 'L') { qtd_g = qtd * 1000; base = 'ml'; } else if (unidade === 'un') base = 'un';
                 const data = { nome: document.getElementById('insumo-nome').value, fornecedorId: fornecedorSelect.value, fornecedorNome: fornecedorSelect.options[fornecedorSelect.selectedIndex].dataset.nome, custo_embalagem: custo, quantidade_embalagem: qtd, unidade_embalagem: unidade, qtd_embalagem_g: qtd_g, unidade_base: base, lote: document.getElementById('insumo-lote').value, validade: document.getElementById('insumo-validade').value, historico_precos: historico, id: id || null };
@@ -369,7 +343,6 @@ const firebaseConfig = {
             });
             document.getElementById('cancel-edit-insumo').addEventListener('click', resetInsumoForm);
 
-            // --- RECEITA FORM ---
             document.getElementById('add-ingredient-btn').addEventListener('click', () => addIngredientRow());
             document.getElementById('ingredients-list').addEventListener('change', e => { if(e.target.matches('.ingredient-select, .ingredient-qty')) updateTotalIngredientsCost(); });
             document.getElementById('ingredients-list').addEventListener('click', e => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
@@ -378,7 +351,7 @@ const firebaseConfig = {
                 const ingredients = []; let hasError = false;
                 document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
                     const select = row.querySelector('.ingredient-select'), id = select.value, qty = parseFloat(row.querySelector('.ingredient-qty').value);
-                    if (id && qty > 0) { ingredients.push({ insumoId: id, nome: select.options[select.selectedIndex].dataset.nome, quantidade_g: qty }); }
+                    if (id && qty > 0) { ingredients.push({ insumoId: id, nome: select.options[select.selectedIndex].dataset.nome, quantidade_g: qty }); } 
                     else if (id || qty) { hasError = true; }
                 });
                 if (hasError) { showToast("Preencha todos os campos de ingredientes.", "error"); return; }
@@ -392,7 +365,6 @@ const firebaseConfig = {
             });
             document.getElementById('cancel-edit-receita').addEventListener('click', resetReceitaForm);
             
-            // --- OTHER LISTENERS ---
             document.getElementById('configuracoes-form').addEventListener('submit', async e => { e.preventDefault(); const data = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; await saveConfiguracoes(data); });
             document.getElementById('simulador-receita-select').addEventListener('change', updateSimulator);
             ['simulador-preco-venda', 'simulador-meta-cmv', 'simulador-margem-desejada'].forEach(id => document.getElementById(id).addEventListener('input', updateSimulator));
@@ -453,7 +425,7 @@ const firebaseConfig = {
                 if (type === 'fornecedor') await deleteFornecedor(id);
                 if (type === 'insumo') await deleteInsumo(id);
                 if (type === 'receita') await deleteReceita(id);
-                await loadAllData(); // Reload all data after deletion
+                await loadAllData(); 
                 closeModal(); 
             };
             const closeModal = () => { modal.style.display = 'none'; yesBtn.removeEventListener('click', handleYes); noBtn.removeEventListener('click', closeModal); };
@@ -467,8 +439,7 @@ const firebaseConfig = {
         function generateRecipePDF(id) { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const r = receitasCache.find(i => i.id === id); if (!r) return; const cogs = calculateRecipeCOGS(r); doc.setFontSize(18); doc.text(`Ficha Técnica - ${r.nome}`, 14, 22); doc.setFontSize(11); doc.text(`Versão: ${r.versao || '1.0'}`, 14, 30); const head = [['Ingrediente', 'Qtd (g/un)', 'Custo Unit.', 'Custo Total']]; const body = r.ingredientes.map(ing => { const ins = insumosCache.find(i => i.id === ing.insumoId); const cUnit = calculateCustoPorGrama(ins); return [ ing.nome, ing.quantidade_g, formatCurrency(cUnit), formatCurrency(cUnit * ing.quantidade_g) ]; }); doc.autoTable({ startY: 40, head, body }); doc.autoTable({ startY: doc.lastAutoTable.finalY + 10, head: [['Item de Custo', 'Valor']], body: [ ['Ingredientes', formatCurrency(calculateRecipeIngredientsCost(r.ingredientes))], ['Mão de Obra', formatCurrency(((configCache.custo_hora_mao_de_obra || 0) / 60) * (r.tempo_preparo_min || 0))], ['Embalagem', formatCurrency(r.custo_embalagem_por_unidade)], ['Rateio', formatCurrency(configCache.rateio_por_pizza)] ], theme: 'grid' }); doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text(`CUSTO TOTAL (COGS): ${formatCurrency(cogs)}`, 14, doc.lastAutoTable.finalY + 10); doc.save(`Ficha_${r.nome}.pdf`); }
         document.getElementById('generate-general-report-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(20); doc.text('Relatório Geral', 14, 22); doc.setFontSize(12); doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30); doc.autoTable({ startY: 40, head: [['KPI', 'Valor']], body: [ ['Fornecedores', fornecedoresCache.length], ['Insumos', insumosCache.length], ['Receitas', receitasCache.length], ['Meta CMV', `${configCache.meta_cmv_padrao || 30}%`], ], }); doc.addPage(); doc.setFontSize(16); doc.text('Top 10 Receitas por Custo', 14, 22); const topR = [...receitasCache].sort((a,b) => calculateRecipeCOGS(b) - calculateRecipeCOGS(a)).slice(0,10); doc.autoTable({ startY: 30, head: [['Receita', 'Custo (COGS)']], body: topR.map(r => [r.nome, formatCurrency(calculateRecipeCOGS(r))]), }); doc.save('Relatorio_Geral.pdf'); });
         
-        // VALIDATION TEST
-        document.getElementById('run-validation-button').addEventListener('click', () => { const div = document.getElementById('validation-results'); div.classList.remove('hidden'); div.innerHTML = 'Executando...'; const conf = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80 }; const ins = [{id:'f',n:'F',c:80,q:25000},{id:'m',n:'M',c:12,q:3000},{id:'q',n:'Q',c:28,q:1000},{id:'a',n:'A',c:30,q:1000},{id:'o',n:'O',c:0.1,q:1}]; const rec = {ings:[{i:'f',q:300},{i:'m',q:120},{i:'q',q:150},{i:'a',q:10},{i:'o',q:1}],t:8,e:1.5,p:0}; const cogsCalc = (c, i, r) => (r.ings.reduce((t,ing) => t + ((i.find(x=>x.id===ing.i).c/i.find(x=>x.id===ing.i).q)*ing.q),0) * (1+(r.p/100||0))) + ((c.custo_hora_mao_de_obra/60||0)*(r.t||0)) + (r.e||0) + (c.rateio_por_pizza||0); const cogs = cogsCalc(conf, ins.map(x=>({id:x.id,custo_embalagem:x.c,qtd_embalagem_g:x.q})), {ingredientes:rec.ings.map(y=>({insumoId:y.i,quantidade_g:y.q})),tempo_preparo_min:rec.t,custo_embalagem_por_unidade:rec.e,perda_percentual:rec.p}); const preco = cogs/0.3; const cogsOk = Math.abs(cogs - 11.01)<0.01; const precoOk = Math.abs(preco - 36.70)<0.01; div.innerHTML = `<h4>Resultados</h4><p>COGS: <strong>${formatCurrency(cogs)}</strong> (Esp: R$ 11,01) -> <span style="color:${cogsOk?'green':'red'}">${cogsOk?'OK':'ERRO'}</span></p><p>Preço (CMV 30%): <strong>${formatCurrency(preco)}</strong> (Esp: R$ 36,70) -> <span style="color:${precoOk?'green':'red'}">${precoOk?'OK':'ERRO'}</span></p>`; });
+        document.getElementById('run-validation-button').addEventListener('click', () => { const div = document.getElementById('validation-results'); div.classList.remove('hidden'); div.innerHTML = 'Executando...'; const conf = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80 }; const ins = [{id:'f',n:'F',c:80,q:25000},{id:'m',n:'M',c:12,q:3000},{id:'q',n:'Q',c:28,q:1000},{id:'a',n:'A',c:30,q:1000},{id:'o',n:'O',c:0.1,q:1}]; const rec = {ings:[{i:'f',q:300},{i:'m',q:120},{i:'q',q:150},{i:'a',q:10},{i:'o',q:1}],t:8,e:1.5,p:0}; const cogsCalc = (c, i, r) => (r.ingredientes.reduce((t,ing) => t + ((i.find(x=>x.id===ing.insumoId).custo_embalagem/i.find(x=>x.id===ing.insumoId).qtd_embalagem_g)*ing.quantidade_g),0) * (1+(r.perda_percentual/100||0))) + ((c.custo_hora_mao_de_obra/60||0)*(r.tempo_preparo_min||0)) + (r.custo_embalagem_por_unidade||0) + (c.rateio_por_pizza||0); const cogs = cogsCalc(conf, ins.map(x=>({id:x.id,custo_embalagem:x.c,qtd_embalagem_g:x.q})), {ingredientes:rec.ings.map(y=>({insumoId:y.i,quantidade_g:y.q})),tempo_preparo_min:rec.t,custo_embalagem_por_unidade:rec.e,perda_percentual:rec.p}); const preco = cogs/0.3; const cogsOk = Math.abs(cogs - 11.01)<0.01; const precoOk = Math.abs(preco - 36.70)<0.01; div.innerHTML = `<h4>Resultados</h4><p>COGS: <strong>${formatCurrency(cogs)}</strong> (Esp: R$ 11,01) -> <span style="color:${cogsOk?'green':'red'}">${cogsOk?'OK':'ERRO'}</span></p><p>Preço (CMV 30%): <strong>${formatCurrency(preco)}</strong> (Esp: R$ 36,70) -> <span style="color:${precoOk?'green':'red'}">${precoOk?'OK':'ERRO'}</span></p>`; });
         
         if(isLocalMode) { currentUser = { uid: 'local' }; initApp(); } else { setupAuthListeners(); }
     });
