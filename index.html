@@ -81,101 +81,19 @@
             --border-radius: 8px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--light-gray);
-            color: var(--text-color);
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header {
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow);
-            flex-wrap: wrap;
-        }
-
-        header h1 {
-            font-size: 1.5rem;
-            margin-right: 2rem;
-        }
-
-        #auth-container, #app-container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .auth-form {
-            background: var(--white);
-            padding: 2.5rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            max-width: 450px;
-            margin: 2rem auto;
-        }
-        
-        .auth-form h2 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: var(--primary-dark);
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--medium-gray);
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            text-align: center;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-            width: 100%;
-        }
-        
-        .btn:active {
-            transform: scale(0.98);
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--light-gray); color: var(--text-color); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        header { background-color: var(--primary-color); color: var(--white); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); flex-wrap: wrap; }
+        header h1 { font-size: 1.5rem; margin-right: 2rem; }
+        #auth-container, #app-container { width: 100%; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        .auth-form { background: var(--white); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); max-width: 450px; margin: 2rem auto; }
+        .auth-form h2 { text-align: center; margin-bottom: 1.5rem; color: var(--primary-dark); }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--medium-gray); border-radius: var(--border-radius); font-size: 1rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2); }
+        .btn { display: inline-block; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.3s, transform 0.1s; width: 100%; }
+        .btn:active { transform: scale(0.98); }
         .btn-primary { background-color: var(--primary-color); color: var(--white); }
         .btn-primary:hover { background-color: var(--primary-dark); }
         .btn-secondary { background-color: var(--dark-gray); color: var(--white); }
@@ -183,38 +101,23 @@
         .btn-success { background-color: var(--success-color); color: var(--white); }
         .btn-danger { background-color: var(--error-color); color: var(--white); }
         .btn-info { background-color: var(--info-color); color: var(--white); }
-        
-        .btn-small {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.85rem;
-            width: auto;
-        }
-        
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; width: auto; }
         .auth-link { text-align: center; margin-top: 1rem; }
         .auth-link a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
-
         nav { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-        nav a, nav button {
-            color: var(--white); text-decoration: none; background: none; border: none;
-            cursor: pointer; font-size: 0.95rem; padding: 0.5rem 1rem;
-            border-radius: var(--border-radius); transition: background-color 0.2s;
-        }
+        nav a, nav button { color: var(--white); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 0.5rem 1rem; border-radius: var(--border-radius); transition: background-color 0.2s; }
         nav a:hover, nav button:hover, nav a.active { background-color: rgba(255,255,255,0.2); }
         #logout-button { background-color: var(--secondary-color); color: var(--text-color); font-weight: bold; }
-
         main { flex: 1; }
         .view { display: none; }
         .view.active { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         .card { background: var(--white); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; }
         .grid-container { display: grid; gap: 1.5rem; }
         @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
-
         .kpi-card { text-align: center; }
         .kpi-card h3 { color: var(--dark-gray); font-size: 1rem; margin-bottom: 0.5rem; }
         .kpi-card .value { font-size: 2rem; font-weight: 700; color: var(--primary-dark); }
-
         h2 { margin-bottom: 1rem; color: var(--primary-dark); border-bottom: 2px solid var(--light-gray); padding-bottom: 0.5rem; }
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
         th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--medium-gray); }
@@ -222,41 +125,32 @@
         tr:hover { background-color: #f9f9f9; }
         .actions-cell { text-align: right; white-space: nowrap; }
         .actions-cell .btn { margin-left: 0.5rem; }
-        
         .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
         .form-row .form-group { flex: 1; min-width: 150px; }
-
         #ingredients-list .ingredient-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--medium-gray); }
         #ingredients-list .ingredient-row > * { flex: 1; }
         #ingredients-list .ingredient-row .costo-ingrediente { flex: 0 0 120px; font-weight: bold; text-align: right; }
-
         .total-cost { text-align: right; font-size: 1.5rem; font-weight: bold; margin-top: 1rem; color: var(--primary-dark); }
         .simulator-result { margin-top: 1rem; padding: 1rem; background-color: #e8f5e9; border-left: 5px solid var(--success-color); border-radius: var(--border-radius); }
         .simulator-result p { font-size: 1.2rem; margin-bottom: 0.5rem; }
         .simulator-result strong { color: var(--primary-dark); }
-
         .alert-item { padding: 0.75rem; border-radius: var(--border-radius); margin-bottom: 0.5rem; background-color: #fff3e0; border: 1px solid #ffe0b2; color: #e65100; }
         .cmv-ok { color: var(--success-color); } .cmv-warn { color: #f57c00; } .cmv-danger { color: var(--error-color); }
-        
         .cmv-visualizer { width: 100%; background-color: var(--medium-gray); border-radius: var(--border-radius); height: 25px; overflow: hidden; margin-top: 0.5rem; }
         .cmv-visualizer-bar { height: 100%; transition: width 0.5s; }
         .cmv-visualizer-bar.ok { background-color: var(--success-color); }
         .cmv-visualizer-bar.warn { background-color: var(--secondary-color); }
         .cmv-visualizer-bar.danger { background-color: var(--error-color); }
-
         .filter-container { margin-bottom: 1rem; }
         .filter-container input { padding: 0.5rem; border-radius: var(--border-radius); border: 1px solid var(--medium-gray); width: 100%; max-width: 400px; }
-
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; border-radius: var(--border-radius); color: var(--white); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.5s, visibility 0.5s; }
         .toast.show { opacity: 1; visibility: visible; }
         .toast.success { background-color: var(--success-color); } .toast.error { background-color: var(--error-color); }
-
         footer { text-align: center; padding: 1.5rem; margin-top: 2rem; background-color: #e0e0e0; color: var(--dark-gray); font-size: 0.9rem; }
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
         .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: var(--border-radius); text-align: center; }
         .modal-buttons { margin-top: 20px; }
         .modal-buttons .btn { width: 120px; margin: 0 10px; }
-
         .hidden { display: none; }
     </style>
 </head>
@@ -278,35 +172,9 @@
     <main>
         <!-- Auth Container -->
         <div id="auth-container">
-            <!-- Login View -->
-            <div id="login-view" class="auth-form">
-                <h2>Login</h2>
-                <form id="login-form">
-                    <div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required></div>
-                    <div class="form-group"><label for="login-password">Senha</label><input type="password" id="login-password" required></div>
-                    <button type="submit" class="btn btn-primary">Entrar</button>
-                </form>
-                <div class="auth-link"><p>Não tem uma conta? <a href="#" id="show-register">Cadastre-se</a></p><p><a href="#" id="show-reset-password">Esqueceu a senha?</a></p></div>
-            </div>
-            <!-- Register View -->
-            <div id="register-view" class="auth-form hidden">
-                <h2>Cadastro</h2>
-                <form id="register-form">
-                    <div class="form-group"><label for="register-email">Email</label><input type="email" id="register-email" required></div>
-                    <div class="form-group"><label for="register-password">Senha</label><input type="password" id="register-password" required minlength="6"></div>
-                    <button type="submit" class="btn btn-primary">Cadastrar</button>
-                </form>
-                <div class="auth-link"><p>Já tem uma conta? <a href="#" id="show-login">Faça login</a></p></div>
-            </div>
-            <!-- Password Reset View -->
-            <div id="reset-password-view" class="auth-form hidden">
-                <h2>Recuperar Senha</h2>
-                <form id="reset-password-form">
-                    <div class="form-group"><label for="reset-email">Email</label><input type="email" id="reset-email" required></div>
-                    <button type="submit" class="btn btn-primary">Enviar link de recuperação</button>
-                </form>
-                <div class="auth-link"><p><a href="#" id="back-to-login">Voltar para o login</a></p></div>
-            </div>
+            <div id="login-view" class="auth-form"><h2>Login</h2><form id="login-form"><div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required></div><div class="form-group"><label for="login-password">Senha</label><input type="password" id="login-password" required></div><button type="submit" class="btn btn-primary">Entrar</button></form><div class="auth-link"><p>Não tem conta? <a href="#" id="show-register">Cadastre-se</a></p><p><a href="#" id="show-reset-password">Esqueceu a senha?</a></p></div></div>
+            <div id="register-view" class="auth-form hidden"><h2>Cadastro</h2><form id="register-form"><div class="form-group"><label for="register-email">Email</label><input type="email" id="register-email" required></div><div class="form-group"><label for="register-password">Senha</label><input type="password" id="register-password" required minlength="6"></div><button type="submit" class="btn btn-primary">Cadastrar</button></form><div class="auth-link"><p>Já tem conta? <a href="#" id="show-login">Faça login</a></p></div></div>
+            <div id="reset-password-view" class="auth-form hidden"><h2>Recuperar Senha</h2><form id="reset-password-form"><div class="form-group"><label for="reset-email">Email</label><input type="email" id="reset-email" required></div><button type="submit" class="btn btn-primary">Enviar link</button></form><div class="auth-link"><p><a href="#" id="back-to-login">Voltar</a></p></div></div>
         </div>
 
         <!-- App Container -->
@@ -315,703 +183,294 @@
             <section id="dashboard-view" class="view">
                 <h2>Dashboard</h2>
                 <div class="grid-container grid-4">
-                    <div class="card kpi-card"><h3 title="Custo da Mercadoria Vendida">CMV Médio</h3><div class="value" id="dashboard-cmv-medio">--%</div></div>
+                    <div class="card kpi-card"><h3>CMV Médio</h3><div class="value" id="dashboard-cmv-medio">--%</div></div>
                     <div class="card kpi-card"><h3>Fornecedores</h3><div class="value" id="dashboard-num-fornecedores">--</div></div>
                     <div class="card kpi-card"><h3>Insumos</h3><div class="value" id="dashboard-num-insumos">--</div></div>
                     <div class="card kpi-card"><h3>Receitas</h3><div class="value" id="dashboard-num-receitas">--</div></div>
                 </div>
                 <div class="grid-container grid-2">
-                    <div class="card">
-                        <h3>Alertas de Variação de Preço (> <span id="alert-threshold-display">10</span>%)</h3>
-                        <div id="dashboard-alerts"><p>Nenhum alerta no momento.</p></div>
-                    </div>
-                    <div class="card">
-                        <h3>Top 5 Insumos por Custo</h3>
-                        <table id="dashboard-top-insumos">
-                            <thead><tr><th>Insumo</th><th>Custo/g (ou un)</th></tr></thead>
-                            <tbody><tr><td colspan="2">Nenhum insumo cadastrado.</td></tr></tbody>
-                        </table>
-                    </div>
+                    <div class="card"><h3>Alertas de Variação de Preço (> <span id="alert-threshold-display">10</span>%)</h3><div id="dashboard-alerts"><p>Nenhum alerta.</p></div></div>
+                    <div class="card"><h3>Top 5 Insumos por Custo</h3><table id="dashboard-top-insumos"><thead><tr><th>Insumo</th><th>Custo/g (ou un)</th></tr></thead><tbody><tr><td colspan="2">N/A</td></tr></tbody></table></div>
                 </div>
-                 <div class="card">
-                    <h3>Ações Rápidas</h3>
-                    <button id="run-validation-button" class="btn btn-secondary btn-small">Executar Validação Margherita</button>
-                    <button id="generate-general-report-pdf" class="btn btn-info btn-small" style="margin-left: 1rem;">Gerar Relatório Geral (PDF)</button>
-                    <div id="validation-results" class="hidden" style="margin-top: 1rem; padding: 1rem; background: #eee;"></div>
-                </div>
+                 <div class="card"><h3>Ações Rápidas</h3><button id="run-validation-button" class="btn btn-secondary btn-small">Validar Margherita</button><button id="generate-general-report-pdf" class="btn btn-info btn-small" style="margin-left: 1rem;">Relatório Geral (PDF)</button><div id="validation-results" class="hidden" style="margin-top: 1rem; padding: 1rem; background: #eee;"></div></div>
             </section>
             
             <!-- Fornecedores View -->
             <section id="fornecedores-view" class="view">
-                <div class="card">
-                    <h2 id="fornecedor-form-title">Cadastrar Novo Fornecedor</h2>
-                    <form id="fornecedor-form">
-                        <input type="hidden" id="fornecedor-id">
-                        <div class="form-row">
-                            <div class="form-group"><label for="fornecedor-nome">Nome do Fornecedor</label><input type="text" id="fornecedor-nome" required></div>
-                            <div class="form-group"><label for="fornecedor-contato">Pessoa de Contato</label><input type="text" id="fornecedor-contato"></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label for="fornecedor-telefone">Telefone</label><input type="tel" id="fornecedor-telefone"></div>
-                            <div class="form-group"><label for="fornecedor-email">Email</label><input type="email" id="fornecedor-email"></div>
-                        </div>
-                        <div class="form-group"><label for="fornecedor-endereco">Endereço</label><input type="text" id="fornecedor-endereco"></div>
-                        <button type="submit" class="btn btn-primary">Salvar Fornecedor</button>
-                        <button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
-                    </form>
-                </div>
-                <div class="card">
-                    <h2>Lista de Fornecedores</h2>
-                    <table id="fornecedores-table">
-                        <thead><tr><th>Nome</th><th>Contato</th><th>Telefone</th><th>Insumos</th><th class="actions-cell">Ações</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+                <div class="card"><h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label for="fornecedor-nome">Nome</label><input type="text" id="fornecedor-nome" required></div><div class="form-group"><label for="fornecedor-contato">Contato</label><input type="text" id="fornecedor-contato"></div></div><div class="form-row"><div class="form-group"><label for="fornecedor-telefone">Telefone</label><input type="tel" id="fornecedor-telefone"></div><div class="form-group"><label for="fornecedor-email">Email</label><input type="email" id="fornecedor-email"></div></div><div class="form-group"><label for="fornecedor-endereco">Endereço</label><input type="text" id="fornecedor-endereco"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
+                <div class="card"><h2>Lista de Fornecedores</h2><table id="fornecedores-table"><thead><tr><th>Nome</th><th>Contato</th><th>Telefone</th><th>Insumos</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- Insumos View -->
             <section id="insumos-view" class="view">
-                <div class="card">
-                    <h2 id="insumo-form-title">Cadastrar Novo Insumo</h2>
-                    <form id="insumo-form">
-                        <input type="hidden" id="insumo-id">
-                        <div class="form-row">
-                            <div class="form-group"><label for="insumo-nome">Nome do Insumo</label><input type="text" id="insumo-nome" required></div>
-                            <div class="form-group"><label for="insumo-fornecedor-select">Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label for="insumo-custo-embalagem">Custo Embalagem (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div>
-                            <div class="form-group"><label for="insumo-qtd-embalagem">Qtd. na Embalagem</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div>
-                            <div class="form-group"><label for="insumo-unidade-embalagem">Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">unidade(s)</option></select></div>
-                        </div>
-                         <div class="form-row">
-                             <div class="form-group"><label for="insumo-lote">Lote</label><input type="text" id="insumo-lote"></div>
-                             <div class="form-group"><label for="insumo-validade">Validade</label><input type="date" id="insumo-validade"></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salvar Insumo</button>
-                        <button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
-                    </form>
-                </div>
-                <div class="card">
-                    <h2>Lista de Insumos</h2>
-                    <div class="filter-container"><input type="text" id="insumos-filter" placeholder="🔎 Filtrar por nome ou fornecedor..."></div>
-                    <button id="export-insumos-xlsx" class="btn btn-success btn-small">Exportar XLSX</button>
-                    <table id="insumos-table">
-                        <thead><tr><th>Nome</th><th>Custo/g (un)</th><th>Fornecedor</th><th>Validade</th><th class="actions-cell">Ações</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+                <div class="card"><h2 id="insumo-form-title">Cadastrar Insumo</h2><form id="insumo-form"><input type="hidden" id="insumo-id"><div class="form-row"><div class="form-group"><label for="insumo-nome">Nome</label><input type="text" id="insumo-nome" required></div><div class="form-group"><label for="insumo-fornecedor-select">Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div></div><div class="form-row"><div class="form-group"><label for="insumo-custo-embalagem">Custo Embalagem (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div><div class="form-group"><label for="insumo-qtd-embalagem">Qtd. Embalagem</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div><div class="form-group"><label for="insumo-unidade-embalagem">Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div></div><div class="form-row"><div class="form-group"><label for="insumo-lote">Lote</label><input type="text" id="insumo-lote"></div><div class="form-group"><label for="insumo-validade">Validade</label><input type="date" id="insumo-validade"></div></div><button type="submit" class="btn btn-primary">Salvar Insumo</button><button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
+                <div class="card"><h2>Lista de Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="🔎 Filtrar..."></div><button id="export-insumos-xlsx" class="btn btn-success btn-small">Exportar XLSX</button><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo/g (un)</th><th>Fornecedor</th><th>Validade</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- Receitas View -->
             <section id="receitas-view" class="view">
-                <div class="card">
-                    <h2 id="receita-form-title">Criar Nova Receita (Ficha Técnica)</h2>
-                    <form id="receita-form">
-                        <input type="hidden" id="receita-id">
-                        <div class="form-row"><div class="form-group"><label for="receita-nome">Nome da Pizza</label><input type="text" id="receita-nome" required></div><div class="form-group"><label for="receita-versao">Versão</label><input type="text" id="receita-versao" placeholder="1.0"></div></div>
-                        <h3>Ingredientes</h3>
-                        <div id="ingredients-list"></div>
-                        <button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button>
-                        <div id="custo-total-ingredientes" class="total-cost">Custo Ingredientes: R$ 0,00</div>
-                        <h3>Custos Adicionais</h3>
-                        <div class="form-row">
-                            <div class="form-group"><label for="receita-tempo-preparo">Tempo de Preparo (min)</label><input type="number" id="receita-tempo-preparo" value="0" required></div>
-                            <div class="form-group"><label for="receita-custo-embalagem">Custo Embalagem (R$)</label><input type="number" id="receita-custo-embalagem" step="0.01" value="0"></div>
-                            <div class="form-group"><label for="receita-perda-percentual">Perda/Desperdício (%)</label><input type="number" id="receita-perda-percentual" value="0"></div>
-                        </div>
-                        <div class="form-group"><label for="receita-observacoes">Observações</label><textarea id="receita-observacoes" rows="3"></textarea></div>
-                        <button type="submit" class="btn btn-primary">Salvar Receita</button>
-                        <button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
-                    </form>
-                </div>
-                <div class="card">
-                    <h2>Lista de Receitas</h2>
-                    <div class="filter-container"><input type="text" id="receitas-filter" placeholder="🔎 Filtrar por nome..."></div>
-                    <button id="export-receitas-xlsx" class="btn btn-success btn-small">Exportar Fichas XLSX</button>
-                    <table id="receitas-table">
-                        <thead><tr><th>Nome</th><th>Custo Total (COGS)</th><th>Versão</th><th class="actions-cell">Ações</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+                <div class="card"><h2 id="receita-form-title">Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-row"><div class="form-group"><label for="receita-nome">Nome da Pizza</label><input type="text" id="receita-nome" required></div><div class="form-group"><label for="receita-versao">Versão</label><input type="text" id="receita-versao" placeholder="1.0"></div></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div id="custo-total-ingredientes" class="total-cost">Custo: R$ 0,00</div><h3>Custos Adicionais</h3><div class="form-row"><div class="form-group"><label for="receita-tempo-preparo">Preparo (min)</label><input type="number" id="receita-tempo-preparo" value="0" required></div><div class="form-group"><label for="receita-custo-embalagem">Embalagem (R$)</label><input type="number" id="receita-custo-embalagem" step="0.01" value="0"></div><div class="form-group"><label for="receita-perda-percentual">Perda (%)</label><input type="number" id="receita-perda-percentual" value="0"></div></div><div class="form-group"><label for="receita-observacoes">Observações</label><textarea id="receita-observacoes" rows="3"></textarea></div><button type="submit" class="btn btn-primary">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
+                <div class="card"><h2>Lista de Receitas</h2><div class="filter-container"><input type="text" id="receitas-filter" placeholder="🔎 Filtrar..."></div><button id="export-receitas-xlsx" class="btn btn-success btn-small">Exportar XLSX</button><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Versão</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- Simulador View -->
             <section id="simulador-view" class="view">
-                 <div class="card">
-                    <h2>Simulador de Preço e CMV</h2>
-                    <div class="form-group"><label for="simulador-receita-select">Selecione uma Receita</label><select id="simulador-receita-select"><option value="">-- Escolha uma receita --</option></select></div>
-                    <div id="simulador-detalhes" class="hidden">
-                        <h3>Detalhes de Custo (COGS)</h3>
-                        <table id="simulador-custos-table"><thead><tr><th>Item</th><th>Valor</th></tr></thead><tbody></tbody></table>
-                        <p class="total-cost" id="simulador-cogs-total">COGS Total: R$ 0,00</p>
-                        <div class="grid-container grid-2" style="margin-top: 2rem;">
-                             <div class="card">
-                                <h4>Calcular CMV baseado no Preço</h4>
-                                <div class="form-group"><label for="simulador-preco-venda">Preço de Venda (R$)</label><input type="number" id="simulador-preco-venda" step="0.01"></div>
-                                <div id="simulador-resultado-cmv" class="simulator-result hidden"></div>
-                                <div id="cmv-visualizer-container" class="hidden">
-                                    <div class="cmv-visualizer"><div id="cmv-bar" class="cmv-visualizer-bar"></div></div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <h4>Calcular Preço Sugerido</h4>
-                                <div class="form-group"><label for="simulador-meta-cmv">Meta de CMV (%)</label><input type="number" id="simulador-meta-cmv" step="0.1"></div>
-                                 <div class="form-group"><label for="simulador-margem-desejada">Margem de Lucro Desejada (%)</label><input type="number" id="simulador-margem-desejada" step="0.1"></div>
-                                <div id="simulador-resultado-preco" class="simulator-result hidden"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                 <div class="card"><h2>Simulador de Custo e Preço</h2><div class="form-group"><label for="simulador-receita-select">Selecione uma Receita</label><select id="simulador-receita-select"><option value="">-- Escolha --</option></select></div><div id="simulador-detalhes" class="hidden"><h3>Detalhes de Custo (COGS)</h3><table id="simulador-custos-table"><thead><tr><th>Item</th><th>Valor</th></tr></thead><tbody></tbody></table><p class="total-cost" id="simulador-cogs-total">COGS Total: R$ 0,00</p><div class="grid-container grid-2" style="margin-top: 2rem;"><div class="card"><h4>Calcular CMV por Preço</h4><div class="form-group"><label for="simulador-preco-venda">Preço de Venda (R$)</label><input type="number" id="simulador-preco-venda" step="0.01"></div><div id="simulador-resultado-cmv" class="simulator-result hidden"></div><div id="cmv-visualizer-container" class="hidden"><div class="cmv-visualizer"><div id="cmv-bar" class="cmv-visualizer-bar"></div></div></div></div><div class="card"><h4>Calcular Preço Sugerido</h4><div class="form-group"><label for="simulador-meta-cmv">Meta de CMV (%)</label><input type="number" id="simulador-meta-cmv" step="0.1"></div><div class="form-group"><label for="simulador-margem-desejada">Margem (%)</label><input type="number" id="simulador-margem-desejada" step="0.1"></div><div id="simulador-resultado-preco" class="simulator-result hidden"></div></div></div></div></div>
             </section>
             
             <!-- Configurações View -->
             <section id="configuracoes-view" class="view">
-                <div class="card">
-                    <h2>Configurações Gerais</h2>
-                    <form id="configuracoes-form">
-                        <div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo da Hora de Mão de Obra (R$)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div>
-                        <div class="form-group"><label for="config-rateio-despesas-fixas">Rateio de Despesas Fixas por Pizza (R$)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div>
-                        <div class="form-group"><label for="config-meta-cmv-padrao">Meta de CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div>
-                        <div class="form-group"><label for="config-alerta-variacao">Alertar Variação de Preço acima de (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div>
-                        <button type="submit" class="btn btn-primary">Salvar Configurações</button>
-                    </form>
-                </div>
+                <div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label for="config-rateio-despesas-fixas">Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label for="config-meta-cmv-padrao">Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label for="config-alerta-variacao">Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div>
             </section>
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro &copy; 2025. Uma ferramenta para otimizar sua gestão.</p></footer>
-
-    <!-- Toast Notification -->
+    <footer><p>Pizzaria Cost Control Pro &copy; 2025.</p></footer>
     <div id="toast" class="toast"></div>
+    <div id="confirm-modal" class="modal"><div class="modal-content"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
-    <!-- Confirmation Modal -->
-    <div id="confirm-modal" class="modal">
-        <div class="modal-content">
-            <p id="confirm-modal-text">Você tem certeza?</p>
-            <div class="modal-buttons">
-                <button id="confirm-modal-yes" class="btn btn-danger">Sim</button>
-                <button id="confirm-modal-no" class="btn btn-secondary">Não</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-    <!-- SheetJS (XLSX) and jsPDF for exporting -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
-
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+const firebaseConfig = {
+  apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
+  authDomain: "cmv-pizza.firebaseapp.com",
+  projectId: "cmv-pizza",
+  storageBucket: "cmv-pizza.firebasestorage.app",
+  messagingSenderId: "1022435006716",
+  appId: "1:1022435006716:web:ec39f22702097beca25f79"
+};
 
-        // ============================================================================================
-        // FIREBASE CONFIG - COLE A CONFIGURAÇÃO DO SEU PROJETO AQUI
-        // ============================================================================================
-        const firebaseConfig = {
-            apiKey: "COLE_SUA_API_KEY_AQUI",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJECT_ID",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID"
-        };
-        // ============================================================================================
-
-        // --- App State and Initialization ---
-        let firebaseApp, auth, db;
+        let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
-        let currentUser = null;
-
-        // Local data storage for offline mode
-        let localData = {
-            fornecedores: [],
-            insumos: [],
-            receitas: [],
-            configuracoes: {}
-        };
-        
+        let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {} };
         let localIdCounter = 0;
+        let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {};
 
-        // Check if Firebase config is provided
         if (firebaseConfig.apiKey === "COLE_SUA_API_KEY_AQUI") {
             isLocalMode = true;
-            console.warn("Firebase config não preenchida. Rodando em modo local (memória). Os dados não serão salvos.");
+            console.warn("Firebase não configurado. Rodando em modo local.");
             initApp();
         } else {
-            try {
-                firebaseApp = firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                db = firebase.firestore();
-                console.log("Firebase inicializado com sucesso.");
-            } catch (error) {
-                console.error("Erro ao inicializar Firebase:", error);
-                alert("Não foi possível conectar ao Firebase. Verifique sua configuração e conexão.");
-                isLocalMode = true; // Fallback to local mode
-            }
+            try { firebaseApp = firebase.initializeApp(firebaseConfig); auth = firebase.auth(); db = firebase.firestore(); } 
+            catch (error) { console.error("Erro Firebase:", error); isLocalMode = true; initApp(); }
         }
 
-        // --- DOM Elements ---
         const authContainer = document.getElementById('auth-container');
         const appContainer = document.getElementById('app-container');
         const appNav = document.getElementById('app-nav');
-        
-        const loginView = document.getElementById('login-view');
-        const registerView = document.getElementById('register-view');
-        const resetPasswordView = document.getElementById('reset-password-view');
-        
         const views = document.querySelectorAll('.view');
         const navLinks = document.querySelectorAll('.nav-link');
 
-        // --- Utility Functions ---
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast show ${type}`;
-            setTimeout(() => { toast.className = 'toast'; }, 3000);
-        }
+        function showToast(message, type = 'success') { const toast = document.getElementById('toast'); toast.textContent = message; toast.className = `toast show ${type}`; setTimeout(() => { toast.className = 'toast'; }, 3000); }
+        function formatCurrency(value) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0); }
+        function showView(viewId) { views.forEach(v => v.classList.remove('active')); navLinks.forEach(l => l.classList.remove('active')); document.getElementById(`${viewId}-view`)?.classList.add('active'); document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active'); }
 
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
-        }
-        
-        function showView(viewId) {
-            views.forEach(view => view.classList.remove('active'));
-            navLinks.forEach(link => link.classList.remove('active'));
-            
-            const activeView = document.getElementById(`${viewId}-view`);
-            if(activeView) activeView.classList.add('active');
-            
-            const activeLink = document.querySelector(`.nav-link[data-view="${viewId}"]`);
-            if(activeLink) activeLink.classList.add('active');
-        }
-
-        // ============================================================================================
-        // AUTHENTICATION
-        // ============================================================================================
         function setupAuthListeners() {
             if (isLocalMode) return;
-            
             auth.onAuthStateChanged(user => {
-                if (user) {
-                    currentUser = { uid: user.uid, email: user.email };
-                    authContainer.classList.add('hidden');
-                    appContainer.classList.remove('hidden');
-                    appNav.classList.remove('hidden');
-                    initApp();
-                } else {
-                    currentUser = null;
-                    authContainer.classList.remove('hidden');
-                    appContainer.classList.add('hidden');
-                    appNav.classList.add('hidden');
-                    resetAppState();
-                }
+                if (user) { currentUser = { uid: user.uid, email: user.email }; authContainer.classList.add('hidden'); appContainer.classList.remove('hidden'); appNav.classList.remove('hidden'); initApp(); } 
+                else { currentUser = null; authContainer.classList.remove('hidden'); appContainer.classList.add('hidden'); appNav.classList.add('hidden'); resetAppState(); }
             });
-
-            document.getElementById('login-form').addEventListener('submit', async (e) => { e.preventDefault(); const email = document.getElementById('login-email').value; const password = document.getElementById('login-password').value; try { await auth.signInWithEmailAndPassword(email, password); showToast("Login realizado com sucesso!"); } catch (error) { showToast(`Erro no login: ${error.message}`, 'error'); } });
-            document.getElementById('register-form').addEventListener('submit', async (e) => { e.preventDefault(); const email = document.getElementById('register-email').value; const password = document.getElementById('register-password').value; try { await auth.createUserWithEmailAndPassword(email, password); showToast("Cadastro realizado com sucesso! Faça o login."); toggleAuthViews('login-view'); } catch (error) { showToast(`Erro no cadastro: ${error.message}`, 'error'); } });
-            document.getElementById('logout-button').addEventListener('click', () => { auth.signOut(); showToast("Você saiu da sua conta."); });
-            document.getElementById('reset-password-form').addEventListener('submit', async (e) => { e.preventDefault(); const email = document.getElementById('reset-email').value; try { await auth.sendPasswordResetEmail(email); showToast("Email de recuperação enviado! Verifique sua caixa de entrada."); toggleAuthViews('login-view'); } catch (error) { showToast(`Erro ao enviar email: ${error.message}`, 'error'); } });
+            document.getElementById('login-form').addEventListener('submit', async e => { e.preventDefault(); try { await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value); } catch (err) { showToast(err.message, 'error'); }});
+            document.getElementById('register-form').addEventListener('submit', async e => { e.preventDefault(); try { await auth.createUserWithEmailAndPassword(document.getElementById('register-email').value, document.getElementById('register-password').value); showToast("Cadastro feito!"); toggleAuthViews('login-view'); } catch (err) { showToast(err.message, 'error'); }});
+            document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+            document.getElementById('reset-password-form').addEventListener('submit', async e => { e.preventDefault(); try { await auth.sendPasswordResetEmail(document.getElementById('reset-email').value); showToast("Email enviado!"); toggleAuthViews('login-view'); } catch (err) { showToast(err.message, 'error'); }});
         }
+        function toggleAuthViews(view) { ['login-view', 'register-view', 'reset-password-view'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById(view).classList.remove('hidden'); }
+        ['show-register', 'show-login', 'show-reset-password', 'back-to-login'].forEach(id => document.getElementById(id).addEventListener('click', e => { e.preventDefault(); const map = {'show-register': 'register-view', 'show-login': 'login-view', 'show-reset-password': 'reset-password-view', 'back-to-login': 'login-view'}; toggleAuthViews(map[id]); }));
+
+        async function initApp() { showView('dashboard'); setupNavListeners(); setupFormListeners(); await loadAllData(); }
+        function resetAppState() { fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; ['fornecedores-table', 'insumos-table', 'receitas-table'].forEach(id => document.getElementById(id)?.querySelector('tbody').innerHTML = ''); }
+        async function loadAllData() { await fetchConfiguracoes(); await fetchFornecedores(); await fetchInsumos(); await fetchReceitas(); renderAllTables(); populateAllDropdowns(); updateDashboard(); }
+
+        // ============================================================================================
+        // DATA FETCHING & SAVING (Explicit Functions)
+        // ============================================================================================
+
+        // --- FORNECEDORES ---
+        async function fetchFornecedores() { if (isLocalMode) { fornecedoresCache = [...localData.fornecedores]; } else { try { const snapshot = await db.collection('fornecedores').where('userId', '==', currentUser.uid).orderBy('nome').get(); fornecedoresCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch fornecedores:", error); } } }
+        async function saveFornecedor(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; if (isLocalMode) { if (isEditing) { const index = localData.fornecedores.findIndex(i => i.id === data.id); if (index > -1) localData.fornecedores[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.fornecedores.push(data); } } else { try { if (isEditing) { await db.collection('fornecedores').doc(data.id).update(data); } else { delete data.id; await db.collection('fornecedores').add(data); } } catch (error) { showToast("Erro ao salvar fornecedor.", 'error'); console.error(error); return; } } showToast(`Fornecedor ${isEditing ? 'atualizado' : 'salvo'}!`); }
+        async function deleteFornecedor(id) { if (isLocalMode) { localData.fornecedores = localData.fornecedores.filter(i => i.id !== id); } else { try { await db.collection('fornecedores').doc(id).delete(); } catch (error) { showToast("Erro ao excluir.", 'error'); return; } } showToast("Fornecedor excluído!"); }
+
+        // --- INSUMOS ---
+        async function fetchInsumos() { if (isLocalMode) { insumosCache = [...localData.insumos]; } else { try { const snapshot = await db.collection('insumos').where('userId', '==', currentUser.uid).orderBy('nome').get(); insumosCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch insumos:", error); } } }
+        async function saveInsumo(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; if (isLocalMode) { if (isEditing) { const index = localData.insumos.findIndex(i => i.id === data.id); if (index > -1) localData.insumos[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.insumos.push(data); } } else { try { if (isEditing) { await db.collection('insumos').doc(data.id).update(data); } else { delete data.id; await db.collection('insumos').add(data); } } catch (error) { showToast("Erro ao salvar insumo.", 'error'); console.error(error); return; } } showToast(`Insumo ${isEditing ? 'atualizado' : 'salvo'}!`); }
+        async function deleteInsumo(id) { if (isLocalMode) { localData.insumos = localData.insumos.filter(i => i.id !== id); } else { try { await db.collection('insumos').doc(id).delete(); } catch (error) { showToast("Erro ao excluir.", 'error'); return; } } showToast("Insumo excluído!"); }
+
+        // --- RECEITAS ---
+        async function fetchReceitas() { if (isLocalMode) { receitasCache = [...localData.receitas]; } else { try { const snapshot = await db.collection('receitas').where('userId', '==', currentUser.uid).orderBy('nome').get(); receitasCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error("Erro fetch receitas:", error); } } }
+        async function saveReceita(data) { const isEditing = !!data.id; data.userId = isLocalMode ? 'local' : currentUser.uid; if (isLocalMode) { if (isEditing) { const index = localData.receitas.findIndex(i => i.id === data.id); if (index > -1) localData.receitas[index] = data; } else { data.id = `local_${++localIdCounter}`; localData.receitas.push(data); } } else { try { if (isEditing) { await db.collection('receitas').doc(data.id).update(data); } else { delete data.id; await db.collection('receitas').add(data); } } catch (error) { showToast("Erro ao salvar receita.", 'error'); console.error(error); return; } } showToast(`Receita ${isEditing ? 'atualizada' : 'salva'}!`); }
+        async function deleteReceita(id) { if (isLocalMode) { localData.receitas = localData.receitas.filter(i => i.id !== id); } else { try { await db.collection('receitas').doc(id).delete(); } catch (error) { showToast("Erro ao excluir.", 'error'); return; } } showToast("Receita excluída!"); }
+
+        // --- CONFIGURAÇÕES ---
+        async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } catch(error) { console.error("Erro configs:", error); } } displayConfiguracoes(); }
+        async function saveConfiguracoes(configData) { configData.userId = isLocalMode ? 'local' : currentUser.uid; if(isLocalMode) { localData.configuracoes.default = configData; } else { try { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } catch(error) { showToast("Erro ao salvar.", 'error'); return; } } showToast("Configurações salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); }
         
-        function toggleAuthViews(viewToShow) { [loginView, registerView, resetPasswordView].forEach(v => v.classList.add('hidden')); document.getElementById(viewToShow).classList.remove('hidden'); }
-        document.getElementById('show-register').addEventListener('click', (e) => { e.preventDefault(); toggleAuthViews('register-view'); });
-        document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); toggleAuthViews('login-view'); });
-        document.getElementById('show-reset-password').addEventListener('click', (e) => { e.preventDefault(); toggleAuthViews('reset-password-view'); });
-        document.getElementById('back-to-login').addEventListener('click', (e) => { e.preventDefault(); toggleAuthViews('login-view'); });
-
         // ============================================================================================
-        // APP INITIALIZATION & STATE MANAGEMENT
+        // UI RENDERING & POPULATION
         // ============================================================================================
-        let fornecedoresCache = [];
-        let insumosCache = [];
-        let receitasCache = [];
-        let configCache = {};
+        function renderAllTables() { renderFornecedoresTable(); renderInsumosTable(); renderReceitasTable(); }
+        function populateAllDropdowns() { populateFornecedoresDropdowns(); populateReceitaSelects(); }
+        function renderFornecedoresTable() { const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = ''; if (fornecedoresCache.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; } fornecedoresCache.forEach(f => { const insumosCount = insumosCache.filter(i => i.fornecedorId === f.id).length; const tr = document.createElement('tr'); tr.innerHTML = `<td>${f.nome}</td><td>${f.contato || '--'}</td><td>${f.telefone || '--'}</td><td>${insumosCount}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
+        function renderInsumosTable(filter = '') { const tbody = document.getElementById('insumos-table').querySelector('tbody'); tbody.innerHTML = ''; const data = insumosCache.filter(i => i.nome.toLowerCase().includes(filter) || (i.fornecedorNome && i.fornecedorNome.toLowerCase().includes(filter))); if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum insumo encontrado.</td></tr>'; return; } data.forEach(i => { const custo = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : i.custo_embalagem; const tr = document.createElement('tr'); tr.innerHTML = `<td>${i.nome}</td><td>${formatCurrency(custo)} / ${i.unidade_base || 'g'}</td><td>${i.fornecedorNome || '--'}</td><td>${i.validade ? new Date(i.validade).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : '--'}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-insumo" data-id="${i.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-insumo" data-id="${i.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
+        function renderReceitasTable(filter = '') { const tbody = document.getElementById('receitas-table').querySelector('tbody'); tbody.innerHTML = ''; const data = receitasCache.filter(r => r.nome.toLowerCase().includes(filter)); if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Nenhuma receita encontrada.</td></tr>'; return; } data.forEach(r => { const cogs = calculateRecipeCOGS(r); const tr = document.createElement('tr'); tr.innerHTML = `<td>${r.nome}</td><td>${formatCurrency(cogs)}</td><td>${r.versao || '1.0'}</td><td class="actions-cell"><button class="btn btn-info btn-small btn-view-report" data-id="${r.id}">📄</button> <button class="btn btn-secondary btn-small btn-edit-receita" data-id="${r.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-receita" data-id="${r.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
+        function populateFornecedoresDropdowns() { const select = document.getElementById('insumo-fornecedor-select'); const current = select.value; select.innerHTML = '<option value="">-- Selecione --</option>'; fornecedoresCache.forEach(f => { select.innerHTML += `<option value="${f.id}" data-nome="${f.nome}">${f.nome}</option>`; }); select.value = current; }
+        function populateInsumosDropdowns(selectEl) { if(selectEl){ selectEl.innerHTML = '<option value="">Selecione um insumo</option>'; insumosCache.forEach(i => { const custo = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : i.custo_embalagem; selectEl.innerHTML += `<option value="${i.id}" data-nome="${i.nome}">${i.nome} (${formatCurrency(custo)}/${i.unidade_base || 'g'})</option>`; });}}
+        function populateReceitaSelects() { const select = document.getElementById('simulador-receita-select'); const current = select.value; select.innerHTML = '<option value="">-- Escolha --</option>'; receitasCache.forEach(r => { select.innerHTML += `<option value="${r.id}">${r.nome}</option>`; }); select.value = current; }
         
-        async function initApp() {
-            showView('dashboard');
-            setupNavListeners();
-            setupFormListeners();
-            await loadAllData();
-            updateDashboard();
-        }
-        
-        function resetAppState() { fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; document.getElementById('fornecedores-table').querySelector('tbody').innerHTML = ''; document.getElementById('insumos-table').querySelector('tbody').innerHTML = ''; document.getElementById('receitas-table').querySelector('tbody').innerHTML = ''; }
-        async function loadAllData() { await fetchConfiguracoes(); await fetchFornecedores(); await fetchInsumos(); await fetchReceitas(); populateReceitaSelects(); }
-        
-        // ============================================================================================
-        // DATA MODELS & FIRESTORE/LOCAL Handlers
-        // ============================================================================================
-        
-        const crudHandlers = {
-            fornecedores: createCrudHandlers('fornecedores', 'fornecedores', fornecedoresCache, renderFornecedoresTable, populateFornecedoresDropdowns),
-            insumos: createCrudHandlers('insumos', 'insumos', insumosCache, renderInsumosTable, populateInsumosDropdowns),
-            receitas: createCrudHandlers('receitas', 'receitas', receitasCache, renderReceitasTable)
-        };
-
-        function createCrudHandlers(collectionName, localDataKey, cacheArray, renderTableFunction, populateDropdownsFunction) {
-            return {
-                fetch: async () => {
-                    if (isLocalMode) {
-                        cacheArray.splice(0, cacheArray.length, ...localData[localDataKey]);
-                    } else {
-                        try {
-                            const snapshot = await db.collection(collectionName).where('userId', '==', currentUser.uid).orderBy('nome').get();
-                            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            cacheArray.splice(0, cacheArray.length, ...data);
-                        } catch (error) { console.error(`Erro ao buscar ${collectionName}: `, error); }
-                    }
-                    if(renderTableFunction) renderTableFunction();
-                    if(populateDropdownsFunction) populateDropdownsFunction();
-                    updateDashboard();
-                },
-                save: async (data) => {
-                    const isEditing = data.id;
-                    data.userId = isLocalMode ? 'local' : currentUser.uid;
-                    
-                    if (isLocalMode) {
-                        if (isEditing) {
-                            const index = localData[localDataKey].findIndex(item => item.id === data.id);
-                            if (index > -1) localData[localDataKey][index] = data;
-                        } else {
-                            data.id = `local_${++localIdCounter}`;
-                            localData[localDataKey].push(data);
-                        }
-                    } else {
-                        try {
-                            if (isEditing) {
-                                await db.collection(collectionName).doc(data.id).update(data);
-                            } else {
-                                delete data.id;
-                                await db.collection(collectionName).add(data);
-                            }
-                        } catch (error) { showToast(`Erro ao salvar ${collectionName}.`, 'error'); console.error(`Erro: `, error); return; }
-                    }
-                    showToast(`${collectionName.slice(0, -1)} ${isEditing ? 'atualizado' : 'salvo'} com sucesso!`);
-                    await crudHandlers[collectionName].fetch();
-                },
-                delete: async (id) => {
-                    if (isLocalMode) {
-                        localData[localDataKey] = localData[localDataKey].filter(item => item.id !== id);
-                    } else {
-                        try {
-                            await db.collection(collectionName).doc(id).delete();
-                        } catch (error) { showToast(`Erro ao excluir ${collectionName}.`, 'error'); console.error(`Erro: `, error); return; }
-                    }
-                    showToast(`${collectionName.slice(0, -1)} excluído com sucesso!`);
-                    await crudHandlers[collectionName].fetch();
-                }
-            };
-        }
-
-        const { fetchFornecedores, saveFornecedor, deleteFornecedor } = crudHandlers.fornecedores;
-        const { fetchInsumos, saveInsumo, deleteInsumo } = crudHandlers.insumos;
-        const { fetchReceitas, saveReceita, deleteReceita } = crudHandlers.receitas;
-
-        // CONFIGURAÇÕES (specific logic)
-        async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20.00, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10, }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); if (doc.exists) { configCache = doc.data(); } else { configCache = { custo_hora_mao_de_obra: 20.00, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10, }; } } catch(error) { console.error("Erro ao buscar configurações:", error); } } displayConfiguracoes(); }
-        async function saveConfiguracoes(configData) { configData.userId = isLocalMode ? 'local' : currentUser.uid; if(isLocalMode) { localData.configuracoes.default = configData; showToast("Configurações salvas localmente."); } else { try { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); showToast("Configurações salvas com sucesso!"); } catch(error) { showToast("Erro ao salvar configurações.", 'error'); console.error("Erro:", error); } } configCache = configData; displayConfiguracoes(); updateDashboard(); }
-
-        // ============================================================================================
-        // RENDER & UI FUNCTIONS
-        // ============================================================================================
-        function renderFornecedoresTable() {
-            const tbody = document.getElementById('fornecedores-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            if (fornecedoresCache.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; }
-            fornecedoresCache.forEach(f => {
-                const insumosVinculados = insumosCache.filter(i => i.fornecedorId === f.id).length;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${f.nome}</td><td>${f.contato || '--'}</td><td>${f.telefone || '--'}</td><td>${insumosVinculados}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderInsumosTable(filter = '') {
-            const tbody = document.getElementById('insumos-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            const filteredData = insumosCache.filter(i => i.nome.toLowerCase().includes(filter) || (i.fornecedorNome && i.fornecedorNome.toLowerCase().includes(filter)));
-            if (filteredData.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum insumo encontrado.</td></tr>'; return; }
-            filteredData.forEach(insumo => {
-                const custoPorGrama = insumo.qtd_embalagem_g > 0 ? (insumo.custo_embalagem / insumo.qtd_embalagem_g) : insumo.custo_embalagem;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${insumo.nome}</td><td>${formatCurrency(custoPorGrama)} / ${insumo.unidade_base || 'g'}</td><td>${insumo.fornecedorNome || '--'}</td><td>${insumo.validade ? new Date(insumo.validade).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : '--'}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-insumo" data-id="${insumo.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-insumo" data-id="${insumo.id}">🗑</button></td>`;
-                tbody.appendChild(tr);
-            });
-        }
-        
-        function renderReceitasTable(filter = '') {
-            const tbody = document.getElementById('receitas-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            const filteredData = receitasCache.filter(r => r.nome.toLowerCase().includes(filter));
-            if (filteredData.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Nenhuma receita encontrada.</td></tr>'; return; }
-            filteredData.forEach(receita => {
-                const cogs = calculateRecipeCOGS(receita);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${receita.nome}</td><td>${formatCurrency(cogs)}</td><td>${receita.versao || '1.0'}</td><td class="actions-cell"><button class="btn btn-info btn-small btn-view-report" data-id="${receita.id}">📄</button> <button class="btn btn-secondary btn-small btn-edit-receita" data-id="${receita.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-receita" data-id="${receita.id}">🗑</button></td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function populateFornecedoresDropdowns() {
-            const select = document.getElementById('insumo-fornecedor-select');
-            const currentVal = select.value;
-            select.innerHTML = '<option value="">-- Selecione --</option>';
-            fornecedoresCache.forEach(f => {
-                const option = document.createElement('option');
-                option.value = f.id;
-                option.textContent = f.nome;
-                option.dataset.nome = f.nome;
-                select.appendChild(option);
-            });
-            select.value = currentVal;
-        }
-
-        function populateInsumosDropdowns(selectElement) { if(selectElement){ selectElement.innerHTML = '<option value="">Selecione um insumo</option>'; insumosCache.forEach(insumo => { const custoPorGrama = insumo.qtd_embalagem_g > 0 ? (insumo.custo_embalagem / insumo.qtd_embalagem_g) : insumo.custo_embalagem; const displayUnit = (insumo.unidade_base === 'un') ? 'un' : 'g'; const option = document.createElement('option'); option.value = insumo.id; option.textContent = `${insumo.nome} (${formatCurrency(custoPorGrama)}/${displayUnit})`; option.dataset.nome = insumo.nome; selectElement.appendChild(option); });}}
-        function populateReceitaSelects() { const select = document.getElementById('simulador-receita-select'); const currentVal = select.value; select.innerHTML = '<option value="">-- Escolha uma receita --</option>'; receitasCache.forEach(receita => { const option = document.createElement('option'); option.value = receita.id; option.textContent = receita.nome; select.appendChild(option); }); select.value = currentVal; }
-
-        // ============================================================================================
-        // CORE LOGIC & CALCULATIONS
-        // ============================================================================================
+        // CORE CALCULATIONS
         function calculateCustoPorGrama(insumo) { if (!insumo || !insumo.custo_embalagem || !insumo.qtd_embalagem_g) return 0; return insumo.custo_embalagem / insumo.qtd_embalagem_g; }
         function calculateCustoIngrediente(insumoId, quantidade_g) { const insumo = insumosCache.find(i => i.id === insumoId); if (!insumo) return 0; return calculateCustoPorGrama(insumo) * quantidade_g; }
-        function calculateRecipeIngredientsCost(ingredients) { return ingredients.reduce((total, ing) => total + calculateCustoIngrediente(ing.insumoId, ing.quantidade_g), 0); }
-        function calculateRecipeCOGS(receita) { if (!receita) return 0; const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes || []); const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100); const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0); return custoComPerda + (receita.custo_embalagem_por_unidade || 0) + custoMaoDeObra + (configCache.rateio_por_pizza || 0); }
+        function calculateRecipeIngredientsCost(ingredients = []) { return ingredients.reduce((total, ing) => total + calculateCustoIngrediente(ing.insumoId, ing.quantidade_g), 0); }
+        function calculateRecipeCOGS(receita) { if (!receita) return 0; const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes); const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100); const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0); return custoComPerda + (receita.custo_embalagem_por_unidade || 0) + custoMaoDeObra + (configCache.rateio_por_pizza || 0); }
         
         // ============================================================================================
-        // EVENT LISTENERS & FORM HANDLING
+        // FORM HANDLING & EVENT LISTENERS
         // ============================================================================================
-        function setupNavListeners() { navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const viewId = e.currentTarget.getAttribute('data-view'); showView(viewId); }); }); }
+        function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
         
         function setupFormListeners() {
-            // FORNECEDOR FORM
-            document.getElementById('fornecedor-form').addEventListener('submit', async (e) => { e.preventDefault(); const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null }; await saveFornecedor(data); resetFornecedorForm(); });
+            // --- FORNECEDOR FORM ---
+            document.getElementById('fornecedor-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null };
+                await saveFornecedor(data);
+                await fetchFornecedores();
+                renderFornecedoresTable();
+                populateFornecedoresDropdowns();
+                resetFornecedorForm();
+            });
             document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
-            
-            // INSUMO FORM
-            document.getElementById('insumo-form').addEventListener('submit', async (e) => {
+
+            // --- INSUMO FORM ---
+            document.getElementById('insumo-form').addEventListener('submit', async e => {
                 e.preventDefault();
                 const fornecedorSelect = document.getElementById('insumo-fornecedor-select');
-                if (!fornecedorSelect.value) {
-                    showToast("É obrigatório selecionar um fornecedor.", "error");
-                    return;
-                }
-                const id = document.getElementById('insumo-id').value;
-                const custo_embalagem = parseFloat(document.getElementById('insumo-custo-embalagem').value);
-                const existingInsumo = id ? insumosCache.find(i => i.id === id) : null;
-                const historico_precos = existingInsumo ? (existingInsumo.historico_precos || []) : [];
-                if (existingInsumo && custo_embalagem !== existingInsumo.custo_embalagem) {
-                    historico_precos.push({ data: new Date().toISOString(), preco: existingInsumo.custo_embalagem });
-                }
-                const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value);
-                const unidade = document.getElementById('insumo-unidade-embalagem').value;
-                let qtd_embalagem_g = qtd, unidade_base = 'g';
-                if (unidade === 'kg') qtd_embalagem_g = qtd * 1000;
-                else if (unidade === 'L') { qtd_embalagem_g = qtd * 1000; unidade_base = 'ml'; }
-                else if (unidade === 'un') unidade_base = 'un';
-                
-                const insumoData = {
-                    nome: document.getElementById('insumo-nome').value,
-                    fornecedorId: fornecedorSelect.value,
-                    fornecedorNome: fornecedorSelect.selectedOptions[0].dataset.nome,
-                    custo_embalagem,
-                    quantidade_embalagem: qtd,
-                    unidade_embalagem: unidade,
-                    qtd_embalagem_g,
-                    unidade_base,
-                    lote: document.getElementById('insumo-lote').value,
-                    validade: document.getElementById('insumo-validade').value,
-                    historico_precos
-                };
-                if (id) insumoData.id = id;
-                await saveInsumo(insumoData);
+                if (!fornecedorSelect.value) { showToast("Selecione um fornecedor.", "error"); return; }
+                const id = document.getElementById('insumo-id').value, custo = parseFloat(document.getElementById('insumo-custo-embalagem').value);
+                const existing = id ? insumosCache.find(i => i.id === id) : null;
+                const historico = existing ? (existing.historico_precos || []) : [];
+                if (existing && custo !== existing.custo_embalagem) { historico.push({ data: new Date().toISOString(), preco: existing.custo_embalagem }); }
+                const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unidade = document.getElementById('insumo-unidade-embalagem').value;
+                let qtd_g = qtd, base = 'g';
+                if (unidade === 'kg') qtd_g = qtd * 1000; else if (unidade === 'L') { qtd_g = qtd * 1000; base = 'ml'; } else if (unidade === 'un') base = 'un';
+                const data = { nome: document.getElementById('insumo-nome').value, fornecedorId: fornecedorSelect.value, fornecedorNome: fornecedorSelect.options[fornecedorSelect.selectedIndex].dataset.nome, custo_embalagem: custo, quantidade_embalagem: qtd, unidade_embalagem: unidade, qtd_embalagem_g: qtd_g, unidade_base: base, lote: document.getElementById('insumo-lote').value, validade: document.getElementById('insumo-validade').value, historico_precos: historico, id: id || null };
+                await saveInsumo(data);
+                await fetchInsumos();
+                renderInsumosTable();
                 resetInsumoForm();
             });
             document.getElementById('cancel-edit-insumo').addEventListener('click', resetInsumoForm);
 
-            // RECEITA FORM
+            // --- RECEITA FORM ---
             document.getElementById('add-ingredient-btn').addEventListener('click', () => addIngredientRow());
-            document.getElementById('ingredients-list').addEventListener('change', (e) => { if(e.target.classList.contains('ingredient-select') || e.target.classList.contains('ingredient-qty')) { updateTotalIngredientsCost(); } });
-            document.getElementById('ingredients-list').addEventListener('click', (e) => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
-            document.getElementById('receita-form').addEventListener('submit', async (e) => {
+            document.getElementById('ingredients-list').addEventListener('change', e => { if(e.target.matches('.ingredient-select, .ingredient-qty')) updateTotalIngredientsCost(); });
+            document.getElementById('ingredients-list').addEventListener('click', e => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
+            document.getElementById('receita-form').addEventListener('submit', async e => {
                 e.preventDefault();
-                const ingredients = [];
-                let errorInRows = false;
+                const ingredients = []; let hasError = false;
                 document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
-                    const select = row.querySelector('.ingredient-select');
-                    const insumoId = select.value;
-                    const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value);
-                    if (insumoId && quantidade_g > 0) {
-                        const nome = select.selectedOptions[0].dataset.nome;
-                        ingredients.push({ insumoId, nome, quantidade_g });
-                    } else if ((insumoId && !quantidade_g) || (!insumoId && quantidade_g)) {
-                        errorInRows = true;
-                    }
+                    const select = row.querySelector('.ingredient-select'), id = select.value, qty = parseFloat(row.querySelector('.ingredient-qty').value);
+                    if (id && qty > 0) { ingredients.push({ insumoId: id, nome: select.options[select.selectedIndex].dataset.nome, quantidade_g: qty }); }
+                    else if (id || qty) { hasError = true; }
                 });
-                if (errorInRows) {
-                    showToast("Verifique se todos os ingredientes têm quantidade e estão selecionados corretamente.", "error");
-                    return;
-                }
-                if (ingredients.length === 0) {
-                    showToast("Adicione pelo menos um ingrediente válido à receita.", "error");
-                    return;
-                }
-                const receitaData = {
-                    nome: document.getElementById('receita-nome').value,
-                    versao: document.getElementById('receita-versao').value,
-                    ingredientes: ingredients,
-                    tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0,
-                    custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0,
-                    perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0,
-                    observacoes: document.getElementById('receita-observacoes').value,
-                };
-                const id = document.getElementById('receita-id').value;
-                if(id) receitaData.id = id;
-                await saveReceita(receitaData);
+                if (hasError) { showToast("Preencha todos os campos de ingredientes.", "error"); return; }
+                if (ingredients.length === 0) { showToast("Adicione ao menos um ingrediente.", "error"); return; }
+                const data = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, observacoes: document.getElementById('receita-observacoes').value, id: document.getElementById('receita-id').value || null };
+                await saveReceita(data);
+                await fetchReceitas();
+                renderReceitasTable();
+                populateReceitaSelects();
                 resetReceitaForm();
             });
             document.getElementById('cancel-edit-receita').addEventListener('click', resetReceitaForm);
             
-            // CONFIG FORM
-            document.getElementById('configuracoes-form').addEventListener('submit', async (e) => { e.preventDefault(); const configData = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; await saveConfiguracoes(configData); });
-            
-            // SIMULATOR & FILTERS
+            // --- OTHER LISTENERS ---
+            document.getElementById('configuracoes-form').addEventListener('submit', async e => { e.preventDefault(); const data = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; await saveConfiguracoes(data); });
             document.getElementById('simulador-receita-select').addEventListener('change', updateSimulator);
             ['simulador-preco-venda', 'simulador-meta-cmv', 'simulador-margem-desejada'].forEach(id => document.getElementById(id).addEventListener('input', updateSimulator));
-            document.getElementById('insumos-filter').addEventListener('input', (e) => renderInsumosTable(e.target.value.toLowerCase()));
-            document.getElementById('receitas-filter').addEventListener('input', (e) => renderReceitasTable(e.target.value.toLowerCase()));
-            
-            // TABLE CLICKS (EDIT/DELETE)
+            document.getElementById('insumos-filter').addEventListener('input', e => renderInsumosTable(e.target.value.toLowerCase()));
+            document.getElementById('receitas-filter').addEventListener('input', e => renderReceitasTable(e.target.value.toLowerCase()));
             document.body.addEventListener('click', handleTableButtonClick);
         }
 
-        function handleTableButtonClick(e) { const target = e.target.closest('button'); if (!target) return; if(target.matches('.btn-edit-fornecedor')) editFornecedor(target.dataset.id); else if (target.matches('.btn-delete-fornecedor')) confirmDelete('fornecedor', target.dataset.id); else if(target.matches('.btn-edit-insumo')) editInsumo(target.dataset.id); else if (target.matches('.btn-delete-insumo')) confirmDelete('insumo', target.dataset.id); else if (target.matches('.btn-edit-receita')) editReceita(target.dataset.id); else if (target.matches('.btn-delete-receita')) confirmDelete('receita', target.dataset.id); else if (target.matches('.btn-view-report')) generateRecipePDF(target.dataset.id); }
+        function handleTableButtonClick(e) { const btn = e.target.closest('button'); if (!btn) return; if(btn.matches('.btn-edit-fornecedor')) editFornecedor(btn.dataset.id); else if (btn.matches('.btn-delete-fornecedor')) confirmDelete('fornecedor', btn.dataset.id); else if(btn.matches('.btn-edit-insumo')) editInsumo(btn.dataset.id); else if (btn.matches('.btn-delete-insumo')) confirmDelete('insumo', btn.dataset.id); else if (btn.matches('.btn-edit-receita')) editReceita(btn.dataset.id); else if (btn.matches('.btn-delete-receita')) confirmDelete('receita', btn.dataset.id); else if (btn.matches('.btn-view-report')) generateRecipePDF(btn.dataset.id); }
         
-        // --- Form Helpers ---
-        function resetFornecedorForm() { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value = ''; document.getElementById('fornecedor-form-title').textContent = 'Cadastrar Novo Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); }
-        function editFornecedor(id) { const f = fornecedoresCache.find(item => item.id === id); if (!f) return; showView('fornecedores'); document.getElementById('fornecedor-id').value = f.id; document.getElementById('fornecedor-nome').value = f.nome; document.getElementById('fornecedor-contato').value = f.contato; document.getElementById('fornecedor-telefone').value = f.telefone; document.getElementById('fornecedor-email').value = f.email; document.getElementById('fornecedor-endereco').value = f.endereco; document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.remove('hidden'); window.scrollTo(0, 0); }
-        function resetInsumoForm() { document.getElementById('insumo-form').reset(); document.getElementById('insumo-id').value = ''; document.getElementById('insumo-form-title').textContent = 'Cadastrar Novo Insumo'; document.getElementById('cancel-edit-insumo').classList.add('hidden'); }
+        function resetFornecedorForm() { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value = ''; document.getElementById('fornecedor-form-title').textContent = 'Cadastrar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); }
+        function editFornecedor(id) { const f = fornecedoresCache.find(i => i.id === id); if (!f) return; showView('fornecedores'); Object.keys(f).forEach(key => { const el = document.getElementById(`fornecedor-${key}`); if (el) el.value = f[key]; }); document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.remove('hidden'); window.scrollTo(0, 0); }
+        function resetInsumoForm() { document.getElementById('insumo-form').reset(); document.getElementById('insumo-id').value = ''; document.getElementById('insumo-form-title').textContent = 'Cadastrar Insumo'; document.getElementById('cancel-edit-insumo').classList.add('hidden'); }
         function editInsumo(id) { const i = insumosCache.find(item => item.id === id); if (!i) return; showView('insumos'); document.getElementById('insumo-id').value = i.id; document.getElementById('insumo-nome').value = i.nome; document.getElementById('insumo-fornecedor-select').value = i.fornecedorId; document.getElementById('insumo-custo-embalagem').value = i.custo_embalagem; document.getElementById('insumo-qtd-embalagem').value = i.quantidade_embalagem; document.getElementById('insumo-unidade-embalagem').value = i.unidade_embalagem; document.getElementById('insumo-lote').value = i.lote; document.getElementById('insumo-validade').value = i.validade; document.getElementById('insumo-form-title').textContent = 'Editar Insumo'; document.getElementById('cancel-edit-insumo').classList.remove('hidden'); window.scrollTo(0, 0); }
-        function resetReceitaForm() { document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('custo-total-ingredientes').textContent = 'Custo Ingredientes: R$ 0,00'; document.getElementById('receita-form-title').textContent = 'Criar Nova Receita'; document.getElementById('cancel-edit-receita').classList.add('hidden'); addIngredientRow(); }
-        function addIngredientRow(ingredient = {}) { const div = document.createElement('div'); div.className = 'ingredient-row'; const select = document.createElement('select'); select.className = 'ingredient-select'; populateInsumosDropdowns(select); select.value = ingredient.insumoId || ''; div.innerHTML = `<div style="flex:3;">${select.outerHTML}</div><div style="flex:1;"><input type="number" class="ingredient-qty" placeholder="Qtd (g/un)" value="${ingredient.quantidade_g || ''}" step="0.1"></div><div class="costo-ingrediente">R$ 0,00</div><button type="button" class="btn btn-danger btn-small remove-ingredient-btn" style="flex:0;">X</button>`; document.getElementById('ingredients-list').appendChild(div); }
-        function updateTotalIngredientsCost() { let totalCost = 0; document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { const insumoId = row.querySelector('.ingredient-select').value; const qty = parseFloat(row.querySelector('.ingredient-qty').value) || 0; const cost = calculateCustoIngrediente(insumoId, qty); row.querySelector('.costo-ingrediente').textContent = formatCurrency(cost); totalCost += cost; }); document.getElementById('custo-total-ingredientes').textContent = `Custo Ingredientes: ${formatCurrency(totalCost)}`; }
-        function editReceita(id) { const r = receitasCache.find(item => item.id === id); if (!r) return; showView('receitas'); resetReceitaForm(); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-versao').value = r.versao; document.getElementById('receita-tempo-preparo').value = r.tempo_preparo_min; document.getElementById('receita-custo-embalagem').value = r.custo_embalagem_por_unidade; document.getElementById('receita-perda-percentual').value = r.perda_percentual; document.getElementById('receita-observacoes').value = r.observacoes; const ingredientsList = document.getElementById('ingredients-list'); ingredientsList.innerHTML = ''; r.ingredientes.forEach(ing => addIngredientRow(ing)); updateTotalIngredientsCost(); document.getElementById('receita-form-title').textContent = 'Editar Receita'; document.getElementById('cancel-edit-receita').classList.remove('hidden'); window.scrollTo(0, 0); }
-        function displayConfiguracoes() { document.getElementById('config-custo-hora-mao-de-obra').value = configCache.custo_hora_mao_de_obra || ''; document.getElementById('config-rateio-despesas-fixas').value = configCache.rateio_por_pizza || ''; document.getElementById('config-meta-cmv-padrao').value = configCache.meta_cmv_padrao || ''; document.getElementById('config-alerta-variacao').value = configCache.alerta_variacao || 10; document.getElementById('alert-threshold-display').textContent = configCache.alerta_variacao || 10; }
+        function resetReceitaForm() { document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; document.getElementById('receita-form-title').textContent = 'Criar Receita'; document.getElementById('cancel-edit-receita').classList.add('hidden'); addIngredientRow(); }
+        function addIngredientRow(ing = {}) { const div = document.createElement('div'); div.className = 'ingredient-row'; const select = document.createElement('select'); select.className = 'ingredient-select'; populateInsumosDropdowns(select); select.value = ing.insumoId || ''; div.innerHTML = `<div style="flex:3;">${select.outerHTML}</div><div style="flex:1;"><input type="number" class="ingredient-qty" placeholder="Qtd (g/un)" value="${ing.quantidade_g || ''}" step="0.1"></div><div class="costo-ingrediente">R$ 0,00</div><button type="button" class="btn btn-danger btn-small remove-ingredient-btn">X</button>`; document.getElementById('ingredients-list').appendChild(div); }
+        function updateTotalIngredientsCost() { let total = 0; document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { const id = row.querySelector('.ingredient-select').value, qty = parseFloat(row.querySelector('.ingredient-qty').value) || 0, cost = calculateCustoIngrediente(id, qty); row.querySelector('.costo-ingrediente').textContent = formatCurrency(cost); total += cost; }); document.getElementById('custo-total-ingredientes').textContent = `Custo: ${formatCurrency(total)}`; }
+        function editReceita(id) { const r = receitasCache.find(i => i.id === id); if (!r) return; showView('receitas'); resetReceitaForm(); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-versao').value = r.versao; document.getElementById('receita-tempo-preparo').value = r.tempo_preparo_min; document.getElementById('receita-custo-embalagem').value = r.custo_embalagem_por_unidade; document.getElementById('receita-perda-percentual').value = r.perda_percentual; document.getElementById('receita-observacoes').value = r.observacoes; document.getElementById('ingredients-list').innerHTML = ''; r.ingredientes.forEach(ing => addIngredientRow(ing)); updateTotalIngredientsCost(); document.getElementById('receita-form-title').textContent = 'Editar Receita'; document.getElementById('cancel-edit-receita').classList.remove('hidden'); window.scrollTo(0, 0); }
+        function displayConfiguracoes() { Object.keys(configCache).forEach(key => { const el = document.getElementById(`config-${key.replace(/_/g, '-')}`); if (el) el.value = configCache[key]; }); document.getElementById('alert-threshold-display').textContent = configCache.alerta_variacao || 10; }
 
-        // --- Simulator ---
         function updateSimulator() {
-            const receitaId = document.getElementById('simulador-receita-select').value;
-            const detalhesDiv = document.getElementById('simulador-detalhes');
-            if (!receitaId) { detalhesDiv.classList.add('hidden'); return; }
-            detalhesDiv.classList.remove('hidden');
-
-            const receita = receitasCache.find(r => r.id === receitaId);
-            const cogs = calculateRecipeCOGS(receita);
-            
-            const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes);
-            const perdaValor = custoIngredientes * ((receita.perda_percentual || 0) / 100);
-            const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0);
-
+            const id = document.getElementById('simulador-receita-select').value, div = document.getElementById('simulador-detalhes');
+            if (!id) { div.classList.add('hidden'); return; }
+            div.classList.remove('hidden');
+            const receita = receitasCache.find(r => r.id === id), cogs = calculateRecipeCOGS(receita);
             const tbody = document.getElementById('simulador-custos-table').querySelector('tbody');
-            tbody.innerHTML = `<tr><td>Custo dos Ingredientes</td><td>${formatCurrency(custoIngredientes)}</td></tr><tr><td>Perda/Desperdício (${receita.perda_percentual || 0}%)</td><td>${formatCurrency(perdaValor)}</td></tr><tr><td>Mão de Obra (${receita.tempo_preparo_min} min)</td><td>${formatCurrency(custoMaoDeObra)}</td></tr><tr><td>Embalagem</td><td>${formatCurrency(receita.custo_embalagem_por_unidade)}</td></tr><tr><td>Rateio Despesas Fixas</td><td>${formatCurrency(configCache.rateio_por_pizza)}</td></tr>`;
+            tbody.innerHTML = `<tr><td>Ingredientes</td><td>${formatCurrency(calculateRecipeIngredientsCost(receita.ingredientes))}</td></tr><tr><td>Perda</td><td>${formatCurrency(calculateRecipeIngredientsCost(receita.ingredientes) * (receita.perda_percentual / 100 || 0))}</td></tr><tr><td>Mão de Obra</td><td>${formatCurrency((configCache.custo_hora_mao_de_obra / 60 || 0) * (receita.tempo_preparo_min || 0))}</td></tr><tr><td>Embalagem</td><td>${formatCurrency(receita.custo_embalagem_por_unidade)}</td></tr><tr><td>Rateio</td><td>${formatCurrency(configCache.rateio_por_pizza)}</td></tr>`;
             document.getElementById('simulador-cogs-total').textContent = `COGS Total: ${formatCurrency(cogs)}`;
-
-            // CMV calculation
-            const precoVenda = parseFloat(document.getElementById('simulador-preco-venda').value);
-            const cmvResultDiv = document.getElementById('simulador-resultado-cmv');
-            const visualizerContainer = document.getElementById('cmv-visualizer-container');
-            if (precoVenda > 0) {
-                const cmv = (cogs / precoVenda) * 100;
-                const meta = configCache.meta_cmv_padrao || 30;
-                let statusClass = 'cmv-ok', barClass = 'ok';
-                if (cmv > meta * 1.1) { statusClass = 'cmv-danger'; barClass = 'danger'; }
-                else if (cmv > meta) { statusClass = 'cmv-warn'; barClass = 'warn'; }
-                cmvResultDiv.innerHTML = `<p>CMV: <strong class="${statusClass}">${cmv.toFixed(2)}%</strong> (Meta: ${meta}%)</p>`;
-                cmvResultDiv.classList.remove('hidden');
-                
-                const bar = document.getElementById('cmv-bar');
-                bar.style.width = `${Math.min(cmv, 100)}%`;
-                bar.className = `cmv-visualizer-bar ${barClass}`;
-                visualizerContainer.classList.remove('hidden');
-            } else {
-                cmvResultDiv.classList.add('hidden');
-                visualizerContainer.classList.add('hidden');
-            }
-
-            // Price suggestion
-            const metaCMV = parseFloat(document.getElementById('simulador-meta-cmv').value);
-            const margemDesejada = parseFloat(document.getElementById('simulador-margem-desejada').value);
-            const precoResultDiv = document.getElementById('simulador-resultado-preco');
-            let precoHtml = '';
-            if (metaCMV > 0) { precoHtml += `<p>Preço (Meta CMV): <strong>${formatCurrency(cogs / (metaCMV / 100))}</strong></p>`; }
-            if (margemDesejada > 0 && margemDesejada < 100) { precoHtml += `<p>Preço (Margem ${margemDesejada}%): <strong>${formatCurrency(cogs / (1 - (margemDesejada / 100)))}</strong></p>`; }
-            if(precoHtml) { precoResultDiv.innerHTML = precoHtml; precoResultDiv.classList.remove('hidden'); } else { precoResultDiv.classList.add('hidden'); }
+            const preco = parseFloat(document.getElementById('simulador-preco-venda').value), cmvDiv = document.getElementById('simulador-resultado-cmv'), visDiv = document.getElementById('cmv-visualizer-container');
+            if (preco > 0) { const cmv = (cogs / preco) * 100, meta = configCache.meta_cmv_padrao || 30; let status = 'ok', sClass = 'cmv-ok'; if (cmv > meta * 1.1) { status = 'danger'; sClass = 'cmv-danger'; } else if (cmv > meta) { status = 'warn'; sClass = 'cmv-warn'; } cmvDiv.innerHTML = `<p>CMV: <strong class="${sClass}">${cmv.toFixed(2)}%</strong> (Meta: ${meta}%)</p>`; cmvDiv.classList.remove('hidden'); const bar = document.getElementById('cmv-bar'); bar.style.width = `${Math.min(cmv, 100)}%`; bar.className = `cmv-visualizer-bar ${status}`; visDiv.classList.remove('hidden'); } 
+            else { cmvDiv.classList.add('hidden'); visDiv.classList.add('hidden'); }
+            const metaCMV = parseFloat(document.getElementById('simulador-meta-cmv').value), margem = parseFloat(document.getElementById('simulador-margem-desejada').value), precoDiv = document.getElementById('simulador-resultado-preco');
+            let html = ''; if (metaCMV > 0) html += `<p>Preço (Meta CMV): <strong>${formatCurrency(cogs / (metaCMV / 100))}</strong></p>`; if (margem > 0 && margem < 100) html += `<p>Preço (Margem ${margem}%): <strong>${formatCurrency(cogs / (1 - (margem / 100)))}</strong></p>`;
+            if (html) { precoDiv.innerHTML = html; precoDiv.classList.remove('hidden'); } else { precoDiv.classList.add('hidden'); }
         }
         
-        // --- Dashboard ---
         function updateDashboard() {
             document.getElementById('dashboard-num-fornecedores').textContent = fornecedoresCache.length;
             document.getElementById('dashboard-num-insumos').textContent = insumosCache.length;
             document.getElementById('dashboard-num-receitas').textContent = receitasCache.length;
             document.getElementById('dashboard-cmv-medio').textContent = `${(configCache.meta_cmv_padrao || 30).toFixed(1)}%`;
-            const alertsDiv = document.getElementById('dashboard-alerts');
-            alertsDiv.innerHTML = '';
-            let alertsFound = 0;
-            const alertThreshold = configCache.alerta_variacao || 10;
-            insumosCache.forEach(insumo => { if (insumo.historico_precos && insumo.historico_precos.length > 0) { const latestPrice = insumo.custo_embalagem; const previousPrice = insumo.historico_precos[insumo.historico_precos.length - 1].preco; if (previousPrice > 0) { const variation = ((latestPrice - previousPrice) / previousPrice) * 100; if (Math.abs(variation) > alertThreshold) { alertsFound++; const alertItem = document.createElement('div'); alertItem.className = 'alert-item'; alertItem.textContent = `${insumo.nome} variou ${variation.toFixed(1)}%.`; alertsDiv.appendChild(alertItem); } } } });
-            if (alertsFound === 0) { alertsDiv.innerHTML = '<p>Nenhuma variação de preço significativa.</p>'; }
-            const topInsumosTbody = document.getElementById('dashboard-top-insumos').querySelector('tbody');
-            topInsumosTbody.innerHTML = '';
-            if (insumosCache.length > 0) { const sortedInsumos = [...insumosCache].sort((a, b) => calculateCustoPorGrama(b) - calculateCustoPorGrama(a)); sortedInsumos.slice(0, 5).forEach(insumo => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${insumo.nome}</td><td>${formatCurrency(calculateCustoPorGrama(insumo))} / ${insumo.unidade_base || 'g'}</td>`; topInsumosTbody.appendChild(tr); }); } else { topInsumosTbody.innerHTML = '<tr><td colspan="2">Nenhum insumo cadastrado.</td></tr>'; }
+            const alertsDiv = document.getElementById('dashboard-alerts'); alertsDiv.innerHTML = '';
+            let alerts = 0;
+            insumosCache.forEach(i => { if (i.historico_precos?.length) { const latest = i.custo_embalagem, prev = i.historico_precos[i.historico_precos.length-1].preco; if (prev > 0) { const variation = ((latest - prev) / prev) * 100; if (Math.abs(variation) > (configCache.alerta_variacao || 10)) { alerts++; alertsDiv.innerHTML += `<div class="alert-item">${i.nome} variou ${variation.toFixed(1)}%.</div>`; } } } });
+            if (alerts === 0) alertsDiv.innerHTML = '<p>Nenhuma variação de preço significativa.</p>';
+            const topTbody = document.getElementById('dashboard-top-insumos').querySelector('tbody'); topTbody.innerHTML = '';
+            if (insumosCache.length > 0) { [...insumosCache].sort((a,b) => calculateCustoPorGrama(b) - calculateCustoPorGrama(a)).slice(0, 5).forEach(i => topTbody.innerHTML += `<tr><td>${i.nome}</td><td>${formatCurrency(calculateCustoPorGrama(i))} / ${i.unidade_base || 'g'}</td></tr>`); }
+            else { topTbody.innerHTML = '<tr><td colspan="2">Nenhum insumo.</td></tr>'; }
         }
         
-        // --- Confirmation Modal ---
         function confirmDelete(type, id) {
             const modal = document.getElementById('confirm-modal');
-            const text = document.getElementById('confirm-modal-text');
-            text.textContent = `Tem certeza que deseja excluir este(a) ${type}? Esta ação não pode ser desfeita.`;
+            document.getElementById('confirm-modal-text').textContent = `Tem certeza que deseja excluir este(a) ${type}?`;
             modal.style.display = 'block';
-
             const yesBtn = document.getElementById('confirm-modal-yes');
             const noBtn = document.getElementById('confirm-modal-no');
-
-            const handleYes = async () => {
+            const handleYes = async () => { 
                 if (type === 'fornecedor') await deleteFornecedor(id);
                 if (type === 'insumo') await deleteInsumo(id);
                 if (type === 'receita') await deleteReceita(id);
-                closeModal();
+                await loadAllData(); // Reload all data after deletion
+                closeModal(); 
             };
-
             const closeModal = () => { modal.style.display = 'none'; yesBtn.removeEventListener('click', handleYes); noBtn.removeEventListener('click', closeModal); };
-            yesBtn.addEventListener('click', handleYes);
-            noBtn.addEventListener('click', closeModal);
+            yesBtn.addEventListener('click', handleYes, { once: true });
+            noBtn.addEventListener('click', closeModal, { once: true });
         }
 
-        // ============================================================================================
         // EXPORTING & REPORTING
-        // ============================================================================================
-        document.getElementById('export-insumos-xlsx').addEventListener('click', () => { const data = insumosCache.map(i => ({ Nome: i.nome, Fornecedor: i.fornecedorNome, 'Custo Embalagem (R$)': i.custo_embalagem, 'Qtd Embalagem': i.quantidade_embalagem, 'Unidade': i.unidade_embalagem, 'Custo por g/un (R$)': calculateCustoPorGrama(i) })); const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Insumos"); XLSX.writeFile(wb, "insumos_pizzaria.xlsx"); });
-        document.getElementById('export-receitas-xlsx').addEventListener('click', () => { const wb = XLSX.utils.book_new(); receitasCache.forEach(receita => { const cogs = calculateRecipeCOGS(receita); const data = [ { Item: 'Nome da Receita', Valor: receita.nome }, { Item: 'Versão', Valor: receita.versao }, { Item: 'COGS TOTAL', Valor: cogs }, {}, { Item: 'Ingrediente', 'Qtd (g/un)': 'Custo (R$)'} ]; receita.ingredientes.forEach(ing => { data.push({ Item: ing.nome, 'Qtd (g/un)': ing.quantidade_g, 'Custo (R$)': calculateCustoIngrediente(ing.insumoId, ing.quantidade_g) }); }); const ws = XLSX.utils.json_to_sheet(data, {skipHeader: true}); XLSX.utils.book_append_sheet(wb, ws, receita.nome.substring(0, 30)); }); XLSX.writeFile(wb, "fichas_tecnicas_pizzaria.xlsx"); });
+        document.getElementById('export-insumos-xlsx').addEventListener('click', () => { const data = insumosCache.map(i => ({ Nome: i.nome, Fornecedor: i.fornecedorNome, 'Custo Emb.': i.custo_embalagem, 'Qtd Emb.': i.quantidade_embalagem, Unidade: i.unidade_embalagem, 'Custo/g': calculateCustoPorGrama(i) })); const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Insumos"); XLSX.writeFile(wb, "insumos.xlsx"); });
+        document.getElementById('export-receitas-xlsx').addEventListener('click', () => { const wb = XLSX.utils.book_new(); receitasCache.forEach(r => { const cogs = calculateRecipeCOGS(r); const data = [ { Item: 'Nome', Valor: r.nome }, { Item: 'COGS', Valor: cogs }, {}, { Item: 'Ingrediente', Qtd: 'Custo'} ]; r.ingredientes.forEach(ing => { data.push({ Item: ing.nome, Qtd: ing.quantidade_g, Custo: calculateCustoIngrediente(ing.insumoId, ing.quantidade_g) }); }); const ws = XLSX.utils.json_to_sheet(data, {skipHeader: true}); XLSX.utils.book_append_sheet(wb, ws, r.nome.substring(0, 30)); }); XLSX.writeFile(wb, "fichas_tecnicas.xlsx"); });
+        function generateRecipePDF(id) { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const r = receitasCache.find(i => i.id === id); if (!r) return; const cogs = calculateRecipeCOGS(r); doc.setFontSize(18); doc.text(`Ficha Técnica - ${r.nome}`, 14, 22); doc.setFontSize(11); doc.text(`Versão: ${r.versao || '1.0'}`, 14, 30); const head = [['Ingrediente', 'Qtd (g/un)', 'Custo Unit.', 'Custo Total']]; const body = r.ingredientes.map(ing => { const ins = insumosCache.find(i => i.id === ing.insumoId); const cUnit = calculateCustoPorGrama(ins); return [ ing.nome, ing.quantidade_g, formatCurrency(cUnit), formatCurrency(cUnit * ing.quantidade_g) ]; }); doc.autoTable({ startY: 40, head, body }); doc.autoTable({ startY: doc.lastAutoTable.finalY + 10, head: [['Item de Custo', 'Valor']], body: [ ['Ingredientes', formatCurrency(calculateRecipeIngredientsCost(r.ingredientes))], ['Mão de Obra', formatCurrency(((configCache.custo_hora_mao_de_obra || 0) / 60) * (r.tempo_preparo_min || 0))], ['Embalagem', formatCurrency(r.custo_embalagem_por_unidade)], ['Rateio', formatCurrency(configCache.rateio_por_pizza)] ], theme: 'grid' }); doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text(`CUSTO TOTAL (COGS): ${formatCurrency(cogs)}`, 14, doc.lastAutoTable.finalY + 10); doc.save(`Ficha_${r.nome}.pdf`); }
+        document.getElementById('generate-general-report-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(20); doc.text('Relatório Geral', 14, 22); doc.setFontSize(12); doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30); doc.autoTable({ startY: 40, head: [['KPI', 'Valor']], body: [ ['Fornecedores', fornecedoresCache.length], ['Insumos', insumosCache.length], ['Receitas', receitasCache.length], ['Meta CMV', `${configCache.meta_cmv_padrao || 30}%`], ], }); doc.addPage(); doc.setFontSize(16); doc.text('Top 10 Receitas por Custo', 14, 22); const topR = [...receitasCache].sort((a,b) => calculateRecipeCOGS(b) - calculateRecipeCOGS(a)).slice(0,10); doc.autoTable({ startY: 30, head: [['Receita', 'Custo (COGS)']], body: topR.map(r => [r.nome, formatCurrency(calculateRecipeCOGS(r))]), }); doc.save('Relatorio_Geral.pdf'); });
         
-        function generateRecipePDF(receitaId) { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const receita = receitasCache.find(r => r.id === receitaId); if (!receita) return; const cogs = calculateRecipeCOGS(receita); const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes); doc.setFontSize(18); doc.text(`Ficha Técnica - ${receita.nome}`, 14, 22); doc.setFontSize(11); doc.text(`Versão: ${receita.versao || '1.0'}`, 14, 30); const head = [['Ingrediente', 'Qtd (g/un)', 'Custo Unit (g/un)', 'Custo Total']]; const body = receita.ingredientes.map(ing => { const insumo = insumosCache.find(i => i.id === ing.insumoId); const custoUnit = calculateCustoPorGrama(insumo); return [ ing.nome, ing.quantidade_g, formatCurrency(custoUnit), formatCurrency(custoUnit * ing.quantidade_g) ]; }); doc.autoTable({ startY: 40, head: head, body: body, theme: 'striped' }); doc.autoTable({ startY: doc.lastAutoTable.finalY + 10, head: [['Item de Custo', 'Valor']], body: [ ['Custo Total Ingredientes', formatCurrency(custoIngredientes)], [`Perda (${receita.perda_percentual || 0}%)`, formatCurrency(custoIngredientes * ((receita.perda_percentual || 0) / 100))], ['Mão de Obra', formatCurrency(((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0))], ['Embalagem', formatCurrency(receita.custo_embalagem_por_unidade)], ['Rateio Despesas', formatCurrency(configCache.rateio_por_pizza)] ], theme: 'grid' }); doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text(`CUSTO TOTAL (COGS): ${formatCurrency(cogs)}`, 14, doc.lastAutoTable.finalY + 10); doc.save(`Ficha_Tecnica_${receita.nome}.pdf`); }
-        document.getElementById('generate-general-report-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(20); doc.text('Relatório Geral - Pizzaria Cost Control', 14, 22); doc.setFontSize(12); doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30); doc.autoTable({ startY: 40, head: [['KPI', 'Valor']], body: [ ['Fornecedores', fornecedoresCache.length], ['Insumos Cadastrados', insumosCache.length], ['Receitas Criadas', receitasCache.length], ['Meta CMV Padrão', `${configCache.meta_cmv_padrao || 30}%`], ], }); doc.addPage(); doc.setFontSize(16); doc.text('Receitas e Custos (Top 10)', 14, 22); const topReceitas = [...receitasCache].sort((a,b) => calculateRecipeCOGS(b) - calculateRecipeCOGS(a)).slice(0,10); doc.autoTable({ startY: 30, head: [['Receita', 'Custo (COGS)']], body: topReceitas.map(r => [r.nome, formatCurrency(calculateRecipeCOGS(r))]), }); doc.save('Relatorio_Geral_Pizzaria.pdf'); });
-
-        // ============================================================================================
         // VALIDATION TEST
-        // ============================================================================================
-        document.getElementById('run-validation-button').addEventListener('click', async () => { const resultsDiv = document.getElementById('validation-results'); resultsDiv.classList.remove('hidden'); resultsDiv.innerHTML = 'Executando validação...'; const mockConfig = { custo_hora_mao_de_obra: 20.00, rateio_por_pizza: 0.80 }; const mockInsumos = [ { id: 'val-farinha', nome: 'Farinha', custo_embalagem: 80, qtd_embalagem_g: 25000 }, { id: 'val-molho', nome: 'Molho', custo_embalagem: 12, qtd_embalagem_g: 3000 }, { id: 'val-mussarela', nome: 'Mussarela', custo_embalagem: 28, qtd_embalagem_g: 1000 }, { id: 'val-azeite', nome: 'Azeite', custo_embalagem: 30, qtd_embalagem_g: 1000 }, { id: 'val-outros', nome: 'Outros', custo_embalagem: 0.10, qtd_embalagem_g: 1 } ]; const originalInsumosCache = [...insumosCache]; const originalConfigCache = {...configCache}; insumosCache.length = 0; insumosCache.push(...mockInsumos); Object.assign(configCache, mockConfig); const mockReceita = { nome: 'Margherita Validação', ingredientes: [ { insumoId: 'val-farinha', quantidade_g: 300 }, { insumoId: 'val-molho', quantidade_g: 120 }, { insumoId: 'val-mussarela', quantidade_g: 150 }, { insumoId: 'val-azeite', quantidade_g: 10 }, { insumoId: 'val-outros', quantidade_g: 1 }, ], tempo_preparo_min: 8, custo_embalagem_por_unidade: 1.50, perda_percentual: 0 }; const cogsCalculado = calculateRecipeCOGS(mockReceita); const precoSugerido = cogsCalculado / 0.30; const cogsOk = Math.abs(cogsCalculado - 11.01) < 0.01; const precoOk = Math.abs(precoSugerido - 36.70) < 0.01; resultsDiv.innerHTML = `<h4>Resultados da Validação</h4><p>COGS: <strong>${formatCurrency(cogsCalculado)}</strong> (Esperado: R$ 11,01) -> <span style="color:${cogsOk ? 'green':'red'}">${cogsOk ? 'OK' : 'FALHOU'}</span></p><p>Preço Sugerido (CMV 30%): <strong>${formatCurrency(precoSugerido)}</strong> (Esperado: R$ 36,70) -> <span style="color:${precoOk ? 'green':'red'}">${precoOk ? 'OK' : 'FALHOU'}</span></p>`; insumosCache.length = 0; insumosCache.push(...originalInsumosCache); Object.assign(configCache, originalConfigCache); });
-
-        // Start Auth check
-        setupAuthListeners();
-        // If local mode, bypass auth check and init
-        if(isLocalMode) { currentUser = { uid: 'local', email: 'local@user.com' }; authContainer.classList.add('hidden'); appContainer.classList.remove('hidden'); appNav.classList.remove('hidden'); initApp(); }
-
+        document.getElementById('run-validation-button').addEventListener('click', () => { const div = document.getElementById('validation-results'); div.classList.remove('hidden'); div.innerHTML = 'Executando...'; const conf = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80 }; const ins = [{id:'f',n:'F',c:80,q:25000},{id:'m',n:'M',c:12,q:3000},{id:'q',n:'Q',c:28,q:1000},{id:'a',n:'A',c:30,q:1000},{id:'o',n:'O',c:0.1,q:1}]; const rec = {ings:[{i:'f',q:300},{i:'m',q:120},{i:'q',q:150},{i:'a',q:10},{i:'o',q:1}],t:8,e:1.5,p:0}; const cogsCalc = (c, i, r) => (r.ings.reduce((t,ing) => t + ((i.find(x=>x.id===ing.i).c/i.find(x=>x.id===ing.i).q)*ing.q),0) * (1+(r.p/100||0))) + ((c.custo_hora_mao_de_obra/60||0)*(r.t||0)) + (r.e||0) + (c.rateio_por_pizza||0); const cogs = cogsCalc(conf, ins.map(x=>({id:x.id,custo_embalagem:x.c,qtd_embalagem_g:x.q})), {ingredientes:rec.ings.map(y=>({insumoId:y.i,quantidade_g:y.q})),tempo_preparo_min:rec.t,custo_embalagem_por_unidade:rec.e,perda_percentual:rec.p}); const preco = cogs/0.3; const cogsOk = Math.abs(cogs - 11.01)<0.01; const precoOk = Math.abs(preco - 36.70)<0.01; div.innerHTML = `<h4>Resultados</h4><p>COGS: <strong>${formatCurrency(cogs)}</strong> (Esp: R$ 11,01) -> <span style="color:${cogsOk?'green':'red'}">${cogsOk?'OK':'ERRO'}</span></p><p>Preço (CMV 30%): <strong>${formatCurrency(preco)}</strong> (Esp: R$ 36,70) -> <span style="color:${precoOk?'green':'red'}">${precoOk?'OK':'ERRO'}</span></p>`; });
+        
+        if(isLocalMode) { currentUser = { uid: 'local' }; initApp(); } else { setupAuthListeners(); }
     });
     </script>
 </body>
