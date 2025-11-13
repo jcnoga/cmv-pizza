@@ -311,7 +311,7 @@ const firebaseConfig = {
             } catch (error) {
                 console.error(`Erro ao buscar ${collectionName}:`, error);
                 if (error.code === 'failed-precondition') {
-                    showToast(`Erro: Índice do Firestore ausente para '${collectionName}'. Crie o índice no Firebase.`, 'error');
+                     showToast(`Erro: Índice do Firestore ausente para '${collectionName}'. Crie o índice no Firebase (userId ASC, nome ASC).`, 'error');
                 } else {
                     showToast(`Erro ao carregar ${collectionName}: ${error.message}`, 'error');
                 }
@@ -429,22 +429,35 @@ const firebaseConfig = {
                 const button = receitaForm.querySelector('button[type="submit"]');
                 button.disabled = true; button.textContent = 'Aguarde...';
                 
-                const ingredients = []; let hasError = false; 
-                document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { 
+                const ingredients = [];
+                let hasIncompleteRow = false;
+                document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
                     const select = row.querySelector('.ingredient-select');
-                    const selectedOption = select.options[select.selectedIndex];
                     const insumoId = select.value;
-                    const nome = selectedOption ? selectedOption.dataset.nome : null;
                     const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value) || 0;
 
-                    if (insumoId && nome && quantidade_g > 0) {
+                    if (!insumoId && quantidade_g === 0) return; // Ignora linhas vazias
+
+                    if (!insumoId || quantidade_g <= 0) {
+                        hasIncompleteRow = true; // Marca linha incompleta
+                    } else {
+                        const selectedOption = select.options[select.selectedIndex];
+                        const nome = selectedOption.dataset.nome;
                         ingredients.push({ insumoId, nome, quantidade_g });
-                    } else if (insumoId || quantidade_g > 0) { 
-                        hasError = true;
                     }
-                }); 
-                if (hasError) { showToast("Verifique se todos os ingredientes estão preenchidos corretamente (Insumo + Quantidade).", "error"); button.disabled = false; button.textContent = 'Salvar Receita'; return; } 
-                if (ingredients.length === 0) { showToast("Adicione ao menos um ingrediente válido à receita.", "error"); button.disabled = false; button.textContent = 'Salvar Receita'; return; }
+                });
+
+                if (hasIncompleteRow) {
+                    showToast("Verifique se todos os ingredientes têm Insumo e Quantidade preenchidos.", "error");
+                    button.disabled = false; button.textContent = 'Salvar Receita';
+                    return;
+                }
+                if (ingredients.length === 0) {
+                    showToast("Adicione ao menos um ingrediente válido à receita.", "error");
+                    button.disabled = false; button.textContent = 'Salvar Receita';
+                    return;
+                }
+
                 const data = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, observacoes: document.getElementById('receita-observacoes').value, id: document.getElementById('receita-id').value || null };
 
                 const success = await saveData('receitas', 'receitas', data);
