@@ -208,15 +208,23 @@
 
     <script>
 	
-     const firebaseConfig = {
-       apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
-       authDomain: "cmv-pizza.firebaseapp.com",
-       projectId: "cmv-pizza",
-       storageBucket: "cmv-pizza.firebasestorage.app",
-       messagingSenderId: "1022435006716",
-       appId: "1:1022435006716:web:ec39f22702097beca25f79"
-     };
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
+  authDomain: "cmv-pizza.firebaseapp.com",
+  projectId: "cmv-pizza",
+  storageBucket: "cmv-pizza.firebasestorage.app",
+  messagingSenderId: "1022435006716",
+  appId: "1:1022435006716:web:ec39f22702097beca25f79"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
         let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {} };
