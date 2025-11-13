@@ -166,7 +166,6 @@ const firebaseConfig = {
   messagingSenderId: "1022435006716",
   appId: "1:1022435006716:web:ec39f22702097beca25f79"
 };
-
         let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {} };
@@ -300,21 +299,15 @@ const firebaseConfig = {
         async function loadAllData() { await fetchConfiguracoes(); await fetchFornecedores(); await fetchInsumos(); await fetchReceitas(); renderAllTables(); populateAllDropdowns(); updateDashboard(); }
 
         async function fetchCollection(collectionName, cacheArray, localKey) {
-            if (isLocalMode) {
-                cacheArray.splice(0, cacheArray.length, ...localData[localKey]);
-                return;
-            }
+            if (isLocalMode) { cacheArray.splice(0, cacheArray.length, ...localData[localKey]); return; }
             try {
                 const snapshot = await db.collection(collectionName).where('userId', '==', currentUser.uid).orderBy('nome').get();
                 const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 cacheArray.splice(0, cacheArray.length, ...data);
             } catch (error) {
                 console.error(`Erro ao buscar ${collectionName}:`, error);
-                if (error.code === 'failed-precondition') {
-                     showToast(`Erro: Índice do Firestore ausente para '${collectionName}'. Crie o índice no Firebase (userId ASC, nome ASC).`, 'error');
-                } else {
-                    showToast(`Erro ao carregar ${collectionName}: ${error.message}`, 'error');
-                }
+                if (error.code === 'failed-precondition') { showToast(`Erro: Índice do Firestore ausente para '${collectionName}'. Crie-o no Firebase.`, 'error');
+                } else { showToast(`Erro ao carregar ${collectionName}: ${error.message}`, 'error'); }
             }
         }
         async function saveData(collectionName, localKey, data) {
@@ -322,25 +315,16 @@ const firebaseConfig = {
             data.userId = currentUser.uid;
             try {
                 if (isLocalMode) {
-                    if (isEditing) {
-                        const index = localData[localKey].findIndex(i => i.id === data.id);
-                        if (index > -1) localData[localKey][index] = data;
-                    } else {
-                        data.id = `local_${Date.now()}`;
-                        localData[localKey].push(data);
-                    }
+                    if (isEditing) { const index = localData[localKey].findIndex(i => i.id === data.id); if (index > -1) localData[localKey][index] = data;
+                    } else { data.id = `local_${Date.now()}`; localData[localKey].push(data); }
                 } else {
-                    if (isEditing) {
-                        await db.collection(collectionName).doc(data.id).update(data);
-                    } else {
-                        delete data.id;
-                        await db.collection(collectionName).add(data);
-                    }
+                    if (isEditing) { await db.collection(collectionName).doc(data.id).update(data);
+                    } else { delete data.id; await db.collection(collectionName).add(data); }
                 }
                 showToast(`${collectionName.slice(0, -1)} ${isEditing ? 'atualizado' : 'salvo'}!`);
                 return true;
             } catch (error) {
-                const errorMsg = error.code === 'permission-denied' ? 'Permissão negada. Verifique suas regras de segurança do Firestore.' : error.message;
+                const errorMsg = error.code === 'permission-denied' ? 'Permissão negada. Verifique suas Regras de Segurança do Firestore.' : error.message;
                 showToast(`Erro: ${errorMsg}`, 'error');
                 console.error(`Erro ao salvar em ${collectionName}:`, error);
                 return false;
@@ -348,23 +332,16 @@ const firebaseConfig = {
         }
         async function deleteData(collectionName, localKey, id) {
              try {
-                if (isLocalMode) {
-                    localData[localKey] = localData[localKey].filter(i => i.id !== id);
-                } else {
-                    await db.collection(collectionName).doc(id).delete();
-                }
+                if (isLocalMode) { localData[localKey] = localData[localKey].filter(i => i.id !== id);
+                } else { await db.collection(collectionName).doc(id).delete(); }
                 showToast(`${collectionName.slice(0, -1)} excluído!`);
                 return true;
-            } catch (error) {
-                showToast("Erro ao excluir.", 'error');
-                return false;
-            }
+            } catch (error) { showToast("Erro ao excluir.", 'error'); return false; }
         }
 
         async function fetchFornecedores() { await fetchCollection('fornecedores', fornecedoresCache, 'fornecedores'); }
         async function fetchInsumos() { await fetchCollection('insumos', insumosCache, 'insumos'); }
         async function fetchReceitas() { await fetchCollection('receitas', receitasCache, 'receitas'); }
-
         async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } catch(error) { console.error("Erro configs:", error); } } displayConfiguracoes(); }
         async function saveConfiguracoes(configData) { configData.userId = currentUser.uid; try { if(isLocalMode) { localData.configuracoes.default = configData; } else { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } showToast("Configurações salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); } catch(error) { showToast("Erro ao salvar.", 'error'); } }
         
@@ -385,59 +362,68 @@ const firebaseConfig = {
         function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
         
         function setupFormListeners() {
-            document.getElementById('fornecedor-form').addEventListener('submit', async e => { e.preventDefault(); const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null }; await saveData('fornecedores', 'fornecedores', data); await fetchFornecedores(); renderFornecedoresTable(); populateFornecedoresDropdowns(); resetFornecedorForm(); });
+            const fornecedorForm = document.getElementById('fornecedor-form');
+            fornecedorForm.addEventListener('submit', async e => { e.preventDefault(); const button = fornecedorForm.querySelector('button[type="submit"]'); button.disabled = true; button.textContent = 'Aguarde...'; const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null }; const success = await saveData('fornecedores', 'fornecedores', data); if (success) { await fetchFornecedores(); renderFornecedoresTable(); populateFornecedoresDropdowns(); resetFornecedorForm(); } button.disabled = false; button.textContent = 'Salvar Fornecedor'; });
             document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
-            document.getElementById('insumo-form').addEventListener('submit', async e => { e.preventDefault(); const fornecedorSelect = document.getElementById('insumo-fornecedor-select'); if (!fornecedorSelect.value) { showToast("Selecione um fornecedor.", "error"); return; } const id = document.getElementById('insumo-id').value, custo = parseFloat(document.getElementById('insumo-custo-embalagem').value); const existing = id ? insumosCache.find(i => i.id === id) : null; const historico = existing ? (existing.historico_precos || []) : []; if (existing && custo !== existing.custo_embalagem) { historico.push({ data: new Date().toISOString(), preco: existing.custo_embalagem }); } const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unidade = document.getElementById('insumo-unidade-embalagem').value; let qtd_g = qtd, base = 'g'; if (unidade === 'kg') qtd_g = qtd * 1000; else if (unidade === 'L') { qtd_g = qtd * 1000; base = 'ml'; } else if (unidade === 'un') base = 'un'; const data = { nome: document.getElementById('insumo-nome').value, fornecedorId: fornecedorSelect.value, fornecedorNome: fornecedorSelect.options[fornecedorSelect.selectedIndex].dataset.nome, custo_embalagem: custo, quantidade_embalagem: qtd, unidade_embalagem: unidade, qtd_embalagem_g: qtd_g, unidade_base: base, lote: document.getElementById('insumo-lote').value, validade: document.getElementById('insumo-validade').value, historico_precos: historico, id: id || null }; await saveData('insumos', 'insumos', data); await fetchInsumos(); renderInsumosTable(); resetInsumoForm(); });
-            document.getElementById('cancel-edit-insumo').addEventListener('click', resetInsumoForm);
 
+            const insumoForm = document.getElementById('insumo-form');
+            insumoForm.addEventListener('submit', async e => { e.preventDefault(); const button = insumoForm.querySelector('button[type="submit"]'); button.disabled = true; button.textContent = 'Aguarde...'; const fornecedorSelect = document.getElementById('insumo-fornecedor-select'); if (!fornecedorSelect.value) { showToast("Selecione um fornecedor.", "error"); button.disabled = false; button.textContent = 'Salvar Insumo'; return; } const id = document.getElementById('insumo-id').value, custo = parseFloat(document.getElementById('insumo-custo-embalagem').value); const existing = id ? insumosCache.find(i => i.id === id) : null; const historico = existing ? (existing.historico_precos || []) : []; if (existing && custo !== existing.custo_embalagem) { historico.push({ data: new Date().toISOString(), preco: existing.custo_embalagem }); } const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unidade = document.getElementById('insumo-unidade-embalagem').value; let qtd_g = qtd, base = 'g'; if (unidade === 'kg') qtd_g = qtd * 1000; else if (unidade === 'L') { qtd_g = qtd * 1000; base = 'ml'; } else if (unidade === 'un') base = 'un'; const data = { nome: document.getElementById('insumo-nome').value, fornecedorId: fornecedorSelect.value, fornecedorNome: fornecedorSelect.options[fornecedorSelect.selectedIndex].dataset.nome, custo_embalagem: custo, quantidade_embalagem: qtd, unidade_embalagem: unidade, qtd_embalagem_g: qtd_g, unidade_base: base, lote: document.getElementById('insumo-lote').value, validade: document.getElementById('insumo-validade').value, historico_precos: historico, id: id || null }; const success = await saveData('insumos', 'insumos', data); if (success) { await fetchInsumos(); renderInsumosTable(); resetInsumoForm(); } button.disabled = false; button.textContent = 'Salvar Insumo'; });
+            document.getElementById('cancel-edit-insumo').addEventListener('click', resetInsumoForm);
+            
             const ingredientsList = document.getElementById('ingredients-list');
             ingredientsList.addEventListener('keydown', e => {
                 if (e.key === 'Enter' && e.target.classList.contains('ingredient-qty')) {
                     e.preventDefault();
-                    document.getElementById('add-ingredient-btn').click();
+                    addIngredientRow();
                     const newRow = ingredientsList.querySelector('.ingredient-row:last-child .ingredient-select');
                     if(newRow) newRow.focus();
                 }
             });
-            
+
             const receitaForm = document.getElementById('receita-form');
             receitaForm.addEventListener('submit', async e => {
                 e.preventDefault();
                 const button = receitaForm.querySelector('button[type="submit"]');
                 button.disabled = true; button.textContent = 'Aguarde...';
                 
-                const ingredients = [];
-                let hasIncompleteRow = false;
-                document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
-                    const select = row.querySelector('.ingredient-select');
-                    const insumoId = select.value;
-                    const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value) || 0;
+                try {
+                    const ingredients = [];
+                    let hasIncompleteRow = false;
+                    document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
+                        const select = row.querySelector('.ingredient-select');
+                        const insumoId = select.value;
+                        const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value) || 0;
 
-                    if (!insumoId && quantidade_g === 0) return;
+                        if (!insumoId && quantidade_g === 0) return; 
 
-                    if (!insumoId || quantidade_g <= 0) {
-                        hasIncompleteRow = true;
-                    } else {
-                        const selectedOption = select.options[select.selectedIndex];
-                        const nome = selectedOption.dataset.nome;
-                        ingredients.push({ insumoId, nome, quantidade_g });
+                        if (!insumoId || quantidade_g <= 0) {
+                            hasIncompleteRow = true;
+                        } else {
+                            const selectedOption = select.options[select.selectedIndex];
+                            const nome = selectedOption.dataset.nome;
+                            ingredients.push({ insumoId, nome, quantidade_g });
+                        }
+                    });
+
+                    if (hasIncompleteRow) { throw new Error("Verifique se todos os ingredientes têm Insumo e Quantidade preenchidos."); } 
+                    if (ingredients.length === 0) { throw new Error("Adicione ao menos um ingrediente válido à receita."); }
+                    
+                    const data = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, observacoes: document.getElementById('receita-observacoes').value, id: document.getElementById('receita-id').value || null };
+
+                    const success = await saveData('receitas', 'receitas', data);
+                    if (success) {
+                        await fetchReceitas();
+                        renderReceitasTable();
+                        populateReceitaSelects();
+                        resetReceitaForm();
                     }
-                });
-
-                if (hasIncompleteRow) { showToast("Verifique se todos os ingredientes têm Insumo e Quantidade preenchidos.", "error"); button.disabled = false; button.textContent = 'Salvar Receita'; return; } 
-                if (ingredients.length === 0) { showToast("Adicione ao menos um ingrediente válido à receita.", "error"); button.disabled = false; button.textContent = 'Salvar Receita'; return; }
-                const data = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, observacoes: document.getElementById('receita-observacoes').value, id: document.getElementById('receita-id').value || null };
-
-                const success = await saveData('receitas', 'receitas', data);
-                if (success) {
-                    await fetchReceitas();
-                    renderReceitasTable();
-                    populateReceitaSelects();
-                    resetReceitaForm();
+                } catch (error) {
+                    showToast(error.message, 'error');
+                } finally {
+                    button.disabled = false; button.textContent = 'Salvar Receita';
                 }
-                button.disabled = false; button.textContent = 'Salvar Receita';
             });
-            document.getElementById('add-ingredient-btn').addEventListener('click', () => addIngredientRow());
+            document.getElementById('add-ingredient-btn').addEventListener('click', addIngredientRow);
             ingredientsList.addEventListener('change', e => { if(e.target.matches('.ingredient-select, .ingredient-qty')) updateTotalIngredientsCost(); });
             ingredientsList.addEventListener('click', e => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
             document.getElementById('cancel-edit-receita').addEventListener('click', resetReceitaForm);
