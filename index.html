@@ -12,7 +12,7 @@
     1.  COLE SUA CONFIGURAÇÃO `firebaseConfig` NA SEÇÃO <script> ABAIXO.
     2.  ATIVE "E-mail/senha" NA ABA "AUTHENTICATION" DO FIREBASE.
     3.  CRIE O "FIRESTORE DATABASE" EM MODO DE PRODUÇÃO.
-    4.  COPIE E COLE AS REGRAS DE SEGURANÇA FORNECIDAS NA ABA "REGRAS" DO SEU FIRESTORE.
+    4.  CRIE OS ÍNDICES COMPOSTOS NA ABA "ÍNDICES" DO SEU FIRESTORE CONFORME AS INSTRUÇÕES.
     ====================================================================================================
     -->
 
@@ -311,7 +311,11 @@ const firebaseConfig = {
                     cacheArray.splice(0, cacheArray.length, ...data);
                 } catch (error) {
                     console.error(`Erro ao buscar ${collectionName}:`, error);
-                    showToast(`Erro ao carregar ${collectionName}. Verifique o console.`, 'error');
+                    if (error.code === 'failed-precondition') {
+                         showToast(`Erro: Índice do Firestore ausente para '${collectionName}'. Crie o índice no seu console do Firebase.`, 'error');
+                    } else {
+                        showToast(`Erro ao carregar ${collectionName}. Verifique o console.`, 'error');
+                    }
                 }
             }
         }
@@ -338,7 +342,7 @@ const firebaseConfig = {
                 showToast(`${collectionName.slice(0, -1)} ${isEditing ? 'atualizado' : 'salvo'}!`);
                 return true;
             } catch (error) {
-                const errorMsg = error.code ? `${error.code}: ${error.message}` : error.message;
+                const errorMsg = error.code === 'permission-denied' ? 'Permissão negada. Verifique suas regras de segurança do Firestore.' : error.message;
                 showToast(`Erro: ${errorMsg}`, 'error');
                 console.error(`Erro ao salvar em ${collectionName}:`, error);
                 return false;
