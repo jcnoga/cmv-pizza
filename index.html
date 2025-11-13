@@ -649,7 +649,12 @@
         // DATA MODELS & FIRESTORE/LOCAL Handlers
         // ============================================================================================
         
-        // --- Generic CRUD Factory (to reduce code duplication) ---
+        const crudHandlers = {
+            fornecedores: createCrudHandlers('fornecedores', 'fornecedores', fornecedoresCache, renderFornecedoresTable, populateFornecedoresDropdowns),
+            insumos: createCrudHandlers('insumos', 'insumos', insumosCache, renderInsumosTable, populateInsumosDropdowns),
+            receitas: createCrudHandlers('receitas', 'receitas', receitasCache, renderReceitasTable)
+        };
+
         function createCrudHandlers(collectionName, localDataKey, cacheArray, renderTableFunction, populateDropdownsFunction) {
             return {
                 fetch: async () => {
@@ -689,7 +694,7 @@
                         } catch (error) { showToast(`Erro ao salvar ${collectionName}.`, 'error'); console.error(`Erro: `, error); return; }
                     }
                     showToast(`${collectionName.slice(0, -1)} ${isEditing ? 'atualizado' : 'salvo'} com sucesso!`);
-                    await handlers[collectionName].fetch();
+                    await crudHandlers[collectionName].fetch();
                 },
                 delete: async (id) => {
                     if (isLocalMode) {
@@ -700,19 +705,14 @@
                         } catch (error) { showToast(`Erro ao excluir ${collectionName}.`, 'error'); console.error(`Erro: `, error); return; }
                     }
                     showToast(`${collectionName.slice(0, -1)} excluído com sucesso!`);
-                    await handlers[collectionName].fetch();
+                    await crudHandlers[collectionName].fetch();
                 }
             };
         }
 
-        const handlers = {
-            fornecedores: createCrudHandlers('fornecedores', 'fornecedores', fornecedoresCache, renderFornecedoresTable, populateFornecedoresDropdowns),
-            insumos: createCrudHandlers('insumos', 'insumos', insumosCache, renderInsumosTable, populateInsumosDropdowns),
-            receitas: createCrudHandlers('receitas', 'receitas', receitasCache, renderReceitasTable)
-        };
-        const { fetchFornecedores, saveFornecedor, deleteFornecedor } = handlers.fornecedores;
-        const { fetchInsumos, saveInsumo, deleteInsumo } = handlers.insumos;
-        const { fetchReceitas, saveReceita, deleteReceita } = handlers.receitas;
+        const { fetchFornecedores, saveFornecedor, deleteFornecedor } = crudHandlers.fornecedores;
+        const { fetchInsumos, saveInsumo, deleteInsumo } = crudHandlers.insumos;
+        const { fetchReceitas, saveReceita, deleteReceita } = crudHandlers.receitas;
 
         // CONFIGURAÇÕES (specific logic)
         async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20.00, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10, }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); if (doc.exists) { configCache = doc.data(); } else { configCache = { custo_hora_mao_de_obra: 20.00, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10, }; } } catch(error) { console.error("Erro ao buscar configurações:", error); } } displayConfiguracoes(); }
@@ -788,20 +788,94 @@
         // EVENT LISTENERS & FORM HANDLING
         // ============================================================================================
         function setupNavListeners() { navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const viewId = e.currentTarget.getAttribute('data-view'); showView(viewId); }); }); }
+        
         function setupFormListeners() {
             // FORNECEDOR FORM
             document.getElementById('fornecedor-form').addEventListener('submit', async (e) => { e.preventDefault(); const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null }; await saveFornecedor(data); resetFornecedorForm(); });
             document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
             
             // INSUMO FORM
-            document.getElementById('insumo-form').addEventListener('submit', async (e) => { e.preventDefault(); const id = document.getElementById('insumo-id').value; const custo_embalagem = parseFloat(document.getElementById('insumo-custo-embalagem').value); const existingInsumo = id ? insumosCache.find(i => i.id === id) : null; const historico_precos = existingInsumo ? (existingInsumo.historico_precos || []) : []; if (existingInsumo && custo_embalagem !== existingInsumo.custo_embalagem) { historico_precos.push({ data: new Date().toISOString(), preco: existingInsumo.custo_embalagem }); } const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value); const unidade = document.getElementById('insumo-unidade-embalagem').value; let qtd_embalagem_g = qtd, unidade_base = 'g'; if (unidade === 'kg') qtd_embalagem_g = qtd * 1000; else if (unidade === 'L') { qtd_embalagem_g = qtd * 1000; unidade_base = 'ml'; } else if (unidade === 'un') unidade_base = 'un'; const fornecedorSelect = document.getElementById('insumo-fornecedor-select'); const insumoData = { nome: document.getElementById('insumo-nome').value, fornecedorId: fornecedorSelect.value, fornecedorNome: fornecedorSelect.selectedOptions[0].dataset.nome, custo_embalagem, quantidade_embalagem: qtd, unidade_embalagem: unidade, qtd_embalagem_g, unidade_base, lote: document.getElementById('insumo-lote').value, validade: document.getElementById('insumo-validade').value, historico_precos }; if (id) insumoData.id = id; await saveInsumo(insumoData); resetInsumoForm(); });
+            document.getElementById('insumo-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fornecedorSelect = document.getElementById('insumo-fornecedor-select');
+                if (!fornecedorSelect.value) {
+                    showToast("É obrigatório selecionar um fornecedor.", "error");
+                    return;
+                }
+                const id = document.getElementById('insumo-id').value;
+                const custo_embalagem = parseFloat(document.getElementById('insumo-custo-embalagem').value);
+                const existingInsumo = id ? insumosCache.find(i => i.id === id) : null;
+                const historico_precos = existingInsumo ? (existingInsumo.historico_precos || []) : [];
+                if (existingInsumo && custo_embalagem !== existingInsumo.custo_embalagem) {
+                    historico_precos.push({ data: new Date().toISOString(), preco: existingInsumo.custo_embalagem });
+                }
+                const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value);
+                const unidade = document.getElementById('insumo-unidade-embalagem').value;
+                let qtd_embalagem_g = qtd, unidade_base = 'g';
+                if (unidade === 'kg') qtd_embalagem_g = qtd * 1000;
+                else if (unidade === 'L') { qtd_embalagem_g = qtd * 1000; unidade_base = 'ml'; }
+                else if (unidade === 'un') unidade_base = 'un';
+                
+                const insumoData = {
+                    nome: document.getElementById('insumo-nome').value,
+                    fornecedorId: fornecedorSelect.value,
+                    fornecedorNome: fornecedorSelect.selectedOptions[0].dataset.nome,
+                    custo_embalagem,
+                    quantidade_embalagem: qtd,
+                    unidade_embalagem: unidade,
+                    qtd_embalagem_g,
+                    unidade_base,
+                    lote: document.getElementById('insumo-lote').value,
+                    validade: document.getElementById('insumo-validade').value,
+                    historico_precos
+                };
+                if (id) insumoData.id = id;
+                await saveInsumo(insumoData);
+                resetInsumoForm();
+            });
             document.getElementById('cancel-edit-insumo').addEventListener('click', resetInsumoForm);
 
             // RECEITA FORM
             document.getElementById('add-ingredient-btn').addEventListener('click', () => addIngredientRow());
             document.getElementById('ingredients-list').addEventListener('change', (e) => { if(e.target.classList.contains('ingredient-select') || e.target.classList.contains('ingredient-qty')) { updateTotalIngredientsCost(); } });
             document.getElementById('ingredients-list').addEventListener('click', (e) => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
-            document.getElementById('receita-form').addEventListener('submit', async (e) => { e.preventDefault(); const ingredients = []; document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { const insumoId = row.querySelector('.ingredient-select').value; const nome = row.querySelector('.ingredient-select').selectedOptions[0].dataset.nome; const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value); if(insumoId && quantidade_g > 0) { ingredients.push({ insumoId, nome, quantidade_g }); } }); if (ingredients.length === 0) { showToast("Adicione pelo menos um ingrediente.", "error"); return; } const receitaData = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes: ingredients, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value), custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value), perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value), observacoes: document.getElementById('receita-observacoes').value, }; const id = document.getElementById('receita-id').value; if(id) receitaData.id = id; await saveReceita(receitaData); resetReceitaForm(); });
+            document.getElementById('receita-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const ingredients = [];
+                let errorInRows = false;
+                document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => {
+                    const select = row.querySelector('.ingredient-select');
+                    const insumoId = select.value;
+                    const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value);
+                    if (insumoId && quantidade_g > 0) {
+                        const nome = select.selectedOptions[0].dataset.nome;
+                        ingredients.push({ insumoId, nome, quantidade_g });
+                    } else if ((insumoId && !quantidade_g) || (!insumoId && quantidade_g)) {
+                        errorInRows = true;
+                    }
+                });
+                if (errorInRows) {
+                    showToast("Verifique se todos os ingredientes têm quantidade e estão selecionados corretamente.", "error");
+                    return;
+                }
+                if (ingredients.length === 0) {
+                    showToast("Adicione pelo menos um ingrediente válido à receita.", "error");
+                    return;
+                }
+                const receitaData = {
+                    nome: document.getElementById('receita-nome').value,
+                    versao: document.getElementById('receita-versao').value,
+                    ingredientes: ingredients,
+                    tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0,
+                    custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0,
+                    perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0,
+                    observacoes: document.getElementById('receita-observacoes').value,
+                };
+                const id = document.getElementById('receita-id').value;
+                if(id) receitaData.id = id;
+                await saveReceita(receitaData);
+                resetReceitaForm();
+            });
             document.getElementById('cancel-edit-receita').addEventListener('click', resetReceitaForm);
             
             // CONFIG FORM
