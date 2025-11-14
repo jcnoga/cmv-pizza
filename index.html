@@ -213,25 +213,21 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Cole sua configuração do Firebase aqui
-const firebaseConfig = {
-  apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
-  authDomain: "cmv-pizza.firebaseapp.com",
-  projectId: "cmv-pizza",
-  storageBucket: "cmv-pizza.firebasestorage.app",
-  messagingSenderId: "1022435006716",
-  appId: "1:1022435006716:web:ec39f22702097beca25f79"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
+            authDomain: "cmv-pizza.firebaseapp.com",
+            projectId: "cmv-pizza",
+            storageBucket: "cmv-pizza.firebasestorage.app",
+            messagingSenderId: "1022435006716",
+            appId: "1:1022435006716:web:ec39f22702097beca25f79"
+        };
 
         let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {}, custosMensais: [] };
         let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {}, custosMensaisCache = [];
 
-        if (firebaseConfig.apiKey.startsWith("YOUR_")) {
-            isLocalMode = true;
-            console.warn("Firebase não configurado. Rodando em modo local.");
-            initApp();
-        } else {
+        if (firebaseConfig.apiKey.startsWith("AIzaSy")) { // Verificação para chaves reais
             try { 
                 firebaseApp = firebase.initializeApp(firebaseConfig); 
                 auth = firebase.auth(); 
@@ -240,10 +236,14 @@ const firebaseConfig = {
             } 
             catch (error) { 
                 console.error("Erro ao inicializar Firebase:", error);
-                alert("Erro na configuração do Firebase. Verifique o console. O app rodará em modo local.");
+                alert("Erro na configuração do Firebase. Verifique o console.");
                 isLocalMode = true; 
                 initApp(); 
             }
+        } else {
+            isLocalMode = true;
+            console.warn("Firebase não configurado. Rodando em modo local.");
+            initApp();
         }
 
         const authContainer = document.getElementById('auth-container');
@@ -416,7 +416,7 @@ const firebaseConfig = {
         function calculateCustoPorGrama(insumo) { if (!insumo || !insumo.custo_embalagem || !insumo.qtd_embalagem_g) return 0; return insumo.custo_embalagem / insumo.qtd_embalagem_g; }
         function calculateCustoIngrediente(insumoId, quantidade_g) { const insumo = insumosCache.find(i => i.id === insumoId); if (!insumo) return 0; return calculateCustoPorGrama(insumo) * quantidade_g; }
         function calculateRecipeIngredientsCost(ingredients = []) { return ingredients.reduce((total, ing) => total + calculateCustoIngrediente(ing.insumoId, ing.quantidade_g), 0); }
-        function calculateRecipeCOGS(receita) { if (!receita) return 0; const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes); const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100); const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0); return custoComPerda + (receita.custo_embalagem_por_unidade || 0) + custoMaoDeObra + (configCache.rateio_por_pizza || 0); }
+        function calculateRecipeCOGS(receita) { if (!receita || !receita.ingredientes) return 0; const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes); const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100); const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0); return custoComPerda + (receita.custo_embalagem_por_unidade || 0) + custoMaoDeObra + (configCache.rateio_por_pizza || 0); }
         function calculateLucroLiquido(custoMensal) { if (!custoMensal) return 0; return (custoMensal.faturamento || 0) + (custoMensal.outrasReceitasDespesas || 0) - (custoMensal.custosVariaveis || 0) - (custoMensal.custosFixos || 0) - (custoMensal.despesasOperacionais || 0) - (custoMensal.impostos || 0); }
         
         function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
@@ -441,7 +441,21 @@ const firebaseConfig = {
                     document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { const select = row.querySelector('.ingredient-select'); const insumoId = select.value; const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value) || 0; if (!insumoId && quantidade_g === 0) return; if (!insumoId || quantidade_g <= 0) { hasIncompleteRow = true; } else { const selectedOption = select.options[select.selectedIndex]; const nome = selectedOption ? selectedOption.dataset.nome : null; if (nome) { ingredients.push({ insumoId, nome, quantidade_g }); } else { hasIncompleteRow = true; } } });
                     if (hasIncompleteRow) { throw new Error("Verifique se todos os ingredientes têm Insumo e Quantidade preenchidos."); } 
                     if (ingredients.length === 0) { throw new Error("Adicione ao menos um ingrediente válido à receita."); }
-                    const data = { nome: document.getElementById('receita-nome').value, versao: document.getElementById('receita-versao').value, ingredientes, tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, observacoes: document.getElementById('receita-observacoes').value, id: document.getElementById('receita-id').value || null };
+                    
+                    // CORREÇÃO APLICADA AQUI:
+                    // A variável se chama 'ingredients', mas o campo no Firebase é 'ingredientes'.
+                    // A linha foi ajustada para fazer a atribuição correta.
+                    const data = { 
+                        nome: document.getElementById('receita-nome').value, 
+                        versao: document.getElementById('receita-versao').value, 
+                        ingredientes: ingredients, // Correção: de 'ingredientes' para 'ingredientes: ingredients'
+                        tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, 
+                        custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, 
+                        perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, 
+                        observacoes: document.getElementById('receita-observacoes').value, 
+                        id: document.getElementById('receita-id').value || null 
+                    };
+
                     const success = await saveData('receitas', 'receitas', data);
                     if (success) { await fetchReceitas(); renderReceitasTable(); populateReceitaSelects(); resetReceitaForm(); }
                 } catch (error) { showToast(error.message, 'error');
@@ -479,7 +493,7 @@ const firebaseConfig = {
         function resetInsumoForm() { document.getElementById('insumo-form').reset(); document.getElementById('insumo-id').value = ''; document.getElementById('insumo-form-title').textContent = 'Cadastrar Insumo'; document.getElementById('cancel-edit-insumo').classList.add('hidden'); }
         function editInsumo(id) { const i = insumosCache.find(item => item.id === id); if (!i) return; showView('insumos'); document.getElementById('insumo-id').value = i.id; document.getElementById('insumo-nome').value = i.nome; document.getElementById('insumo-fornecedor-select').value = i.fornecedorId; document.getElementById('insumo-custo-embalagem').value = i.custo_embalagem; document.getElementById('insumo-qtd-embalagem').value = i.quantidade_embalagem; document.getElementById('insumo-unidade-embalagem').value = i.unidade_embalagem; document.getElementById('insumo-lote').value = i.lote; document.getElementById('insumo-validade').value = i.validade; document.getElementById('insumo-form-title').textContent = 'Editar Insumo'; document.getElementById('cancel-edit-insumo').classList.remove('hidden'); window.scrollTo(0, 0); }
         function resetReceitaForm() { document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; document.getElementById('receita-form-title').textContent = 'Criar Receita'; document.getElementById('cancel-edit-receita').classList.add('hidden'); addIngredientRow(); }
-        async function editReceita(id) { const r = receitasCache.find(i => i.id === id); if (!r) return; showView('receitas'); resetReceitaForm(); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-versao').value = r.versao; document.getElementById('receita-tempo-preparo').value = r.tempo_preparo_min; document.getElementById('receita-custo-embalagem').value = r.custo_embalagem_por_unidade; document.getElementById('receita-perda-percentual').value = r.perda_percentual; document.getElementById('receita-observacoes').value = r.observacoes; const ingredientsList = document.getElementById('ingredients-list'); ingredientsList.innerHTML = ''; await new Promise(resolve => setTimeout(resolve, 50)); r.ingredientes.forEach(ing => addIngredientRow(ing)); updateTotalIngredientsCost(); document.getElementById('receita-form-title').textContent = 'Editar Receita'; document.getElementById('cancel-edit-receita').classList.remove('hidden'); window.scrollTo(0, 0); }
+        async function editReceita(id) { const r = receitasCache.find(i => i.id === id); if (!r) return; showView('receitas'); resetReceitaForm(); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-versao').value = r.versao; document.getElementById('receita-tempo-preparo').value = r.tempo_preparo_min; document.getElementById('receita-custo-embalagem').value = r.custo_embalagem_por_unidade; document.getElementById('receita-perda-percentual').value = r.perda_percentual; document.getElementById('receita-observacoes').value = r.observacoes; const ingredientsList = document.getElementById('ingredients-list'); ingredientsList.innerHTML = ''; await new Promise(resolve => setTimeout(resolve, 50)); if (r.ingredientes) { r.ingredientes.forEach(ing => addIngredientRow(ing)); } updateTotalIngredientsCost(); document.getElementById('receita-form-title').textContent = 'Editar Receita'; document.getElementById('cancel-edit-receita').classList.remove('hidden'); window.scrollTo(0, 0); }
         function resetCustoMensalForm() { document.getElementById('custo-mensal-form').reset(); document.getElementById('custo-mensal-id').value = ''; document.getElementById('custo-mensal-form-title').textContent = 'Lançar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.add('hidden'); }
         function editCustoMensal(id) { const c = custosMensaisCache.find(i => i.id === id); if (!c) return; showView('custos-mensais'); document.getElementById('custo-mensal-id').value = c.id; document.getElementById('custo-mensal-mes').value = c.mes; document.getElementById('custo-mensal-faturamento').value = c.faturamento; document.getElementById('custo-mensal-custosVariaveis').value = c.custosVariaveis; document.getElementById('custo-mensal-custosFixos').value = c.custosFixos; document.getElementById('custo-mensal-despesasOperacionais').value = c.despesasOperacionais; document.getElementById('custo-mensal-outrasReceitasDespesas').value = c.outrasReceitasDespesas; document.getElementById('custo-mensal-numeroVendas').value = c.numeroVendas; document.getElementById('custo-mensal-impostos').value = c.impostos; document.getElementById('custo-mensal-form-title').textContent = 'Editar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.remove('hidden'); window.scrollTo(0, 0); }
         function addIngredientRow(ing = {}) { const div = document.createElement('div'); div.className = 'ingredient-row'; const select = document.createElement('select'); select.className = 'ingredient-select'; populateInsumosDropdowns(select); select.value = ing.insumoId || ''; div.innerHTML = `<div style="flex:3;">${select.outerHTML}</div><div style="flex:1;"><input type="number" class="ingredient-qty" placeholder="Qtd (g/un)" value="${ing.quantidade_g || ''}" step="0.1"></div><div class="costo-ingrediente">R$ 0,00</div><button type="button" class="btn btn-danger btn-small remove-ingredient-btn">X</button>`; document.getElementById('ingredients-list').appendChild(div); }
@@ -494,7 +508,7 @@ const firebaseConfig = {
         document.getElementById('list-ingredients-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(18); doc.text('Lista de Ingredientes por Receita', 14, 22); doc.setFontSize(11); let finalY = 30; receitasCache.forEach(r => { if (finalY > 260) { doc.addPage(); finalY = 20; } doc.setFont('helvetica', 'bold'); doc.text(`${r.nome}`, 14, finalY); finalY += 7; doc.setFont('helvetica', 'normal'); r.ingredientes.forEach(ing => { doc.text(`- ${ing.nome}: ${ing.quantidade_g} g`, 18, finalY); finalY += 7; }); finalY += 5; }); doc.save('Lista_Ingredientes.pdf'); });
         function generateRecipePDF(id) { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const r = receitasCache.find(i => i.id === id); if (!r) return; const cogs = calculateRecipeCOGS(r); doc.setFontSize(18); doc.text(`Ficha Técnica - ${r.nome}`, 14, 22); doc.setFontSize(11); doc.text(`Versão: ${r.versao || '1.0'}`, 14, 30); const head = [['Ingrediente', 'Qtd (g/un)', 'Custo Unit.', 'Custo Total']]; const body = r.ingredientes.map(ing => { const ins = insumosCache.find(i => i.id === ing.insumoId); const cUnit = calculateCustoPorGrama(ins); return [ ing.nome, ing.quantidade_g, formatCurrency(cUnit), formatCurrency(cUnit * ing.quantidade_g) ]; }); doc.autoTable({ startY: 40, head, body }); doc.autoTable({ startY: doc.lastAutoTable.finalY + 10, head: [['Item de Custo', 'Valor']], body: [ ['Ingredientes', formatCurrency(calculateRecipeIngredientsCost(r.ingredientes))], ['Mão de Obra', formatCurrency(((configCache.custo_hora_mao_de_obra || 0) / 60) * (r.tempo_preparo_min || 0))], ['Embalagem', formatCurrency(r.custo_embalagem_por_unidade)], ['Rateio', formatCurrency(configCache.rateio_por_pizza)] ], theme: 'grid' }); doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text(`CUSTO TOTAL (COGS): ${formatCurrency(cogs)}`, 14, doc.lastAutoTable.finalY + 10); doc.save(`Ficha_${r.nome}.pdf`); }
         document.getElementById('generate-general-report-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(20); doc.text('Relatório Geral', 14, 22); doc.setFontSize(12); doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30); doc.autoTable({ startY: 40, head: [['KPI', 'Valor']], body: [ ['Fornecedores', fornecedoresCache.length], ['Insumos', insumosCache.length], ['Receitas', receitasCache.length], ['Meta CMV', `${configCache.meta_cmv_padrao || 30}%`], ], }); doc.addPage(); doc.setFontSize(16); doc.text('Top 10 Receitas por Custo', 14, 22); const topR = [...receitasCache].sort((a,b) => calculateRecipeCOGS(b) - calculateRecipeCOGS(a)).slice(0,10); doc.autoTable({ startY: 30, head: [['Receita', 'Custo (COGS)']], body: topR.map(r => [r.nome, formatCurrency(calculateRecipeCOGS(r))]), }); doc.save('Relatorio_Geral.pdf'); });
-        document.getElementById('run-validation-button').addEventListener('click', () => { const div = document.getElementById('validation-results'); div.classList.remove('hidden'); div.innerHTML = 'Executando...'; const conf = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80 }; const ins = [{id:'f',c:80,q:25000},{id:'m',c:12,q:3000},{id:'q',c:28,q:1000},{id:'a',c:30,q:1000},{id:'o',c:0.1,q:1}]; const rec = {ings:[{i:'f',q:300},{i:'m',q:120},{i:'q',q:150},{i:'a',q:10},{i:'o',q:1}],t:8,e:1.5,p:0}; const cogsCalc = (c, i, r) => (r.ingredientes.reduce((t,ing) => t + ((i.find(x=>x.id===ing.insumoId).c/i.find(x=>x.id===ing.insumoId).q)*ing.quantidade_g),0)) + ((c.custo_hora_mao_de_obra/60||0)*(r.tempo_preparo_min||0)) + (r.custo_embalagem_por_unidade||0) + (c.rateio_por_pizza||0); const cogs = cogsCalc(conf, ins.map(x=>({id:x.id,c:x.c,q:x.q})), {ingredientes:rec.ings.map(y=>({insumoId:y.i,quantidade_g:y.q})),tempo_preparo_min:rec.t,custo_embalagem_por_unidade:rec.e}); const preco = cogs/0.3; const cogsOk = Math.abs(cogs - 11.01)<0.01; const precoOk = Math.abs(preco - 36.70)<0.01; div.innerHTML = `<h4>Resultados</h4><p>COGS: <strong>${formatCurrency(cogs)}</strong> (Esp: R$ 11,01) -> <span style="color:${cogsOk?'green':'red'}">${cogsOk?'OK':'ERRO'}</span></p><p>Preço (CMV 30%): <strong>${formatCurrency(preco)}</strong> (Esp: R$ 36,70) -> <span style="color:${precoOk?'green':'red'}">${precoOk?'OK':'ERRO'}</span></p>`; });
+        document.getElementById('run-validation-button').addEventListener('click', () => { const div = document.getElementById('validation-results'); div.classList.remove('hidden'); div.innerHTML = 'Executando...'; const conf = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80 }; const ins = [{id:'f',c:80,q:25000},{id:'m',c:12,q:3000},{id:'q',c:28,q:1000},{id:'a',c:30,q:1000},{id:'o',c:0.1,q:1}]; const rec = {ings:[{i:'f',q:300},{i:'m',q:120},{i:'q',q:150},{i:'a',q:10},{i:'o',q:1}],t:8,e:1.5,p:0}; const cogsCalc = (c, i, r) => (r.ingredientes.reduce((t,ing) => t + ((i.find(x=>x.id===ing.insumoId).c/i.find(x=>x.id===ing.insumoId).q)*ing.quantidade_g),0)) * (1 + (r.perda_percentual || 0) / 100) + ((c.custo_hora_mao_de_obra/60||0)*(r.tempo_preparo_min||0)) + (r.custo_embalagem_por_unidade||0) + (c.rateio_por_pizza||0); const cogs = cogsCalc(conf, ins.map(x=>({id:x.id,c:x.c,q:x.q})), {ingredientes:rec.ings.map(y=>({insumoId:y.i,quantidade_g:y.q})),tempo_preparo_min:rec.t,custo_embalagem_por_unidade:rec.e,perda_percentual:rec.p}); const preco = cogs/0.3; const cogsOk = Math.abs(cogs - 11.01)<0.01; const precoOk = Math.abs(preco - 36.70)<0.01; div.innerHTML = `<h4>Resultados</h4><p>COGS: <strong>${formatCurrency(cogs)}</strong> (Esp: R$ 11,01) -> <span style="color:${cogsOk?'green':'red'}">${cogsOk?'OK':'ERRO'}</span></p><p>Preço (CMV 30%): <strong>${formatCurrency(preco)}</strong> (Esp: R$ 36,70) -> <span style="color:${precoOk?'green':'red'}">${precoOk?'OK':'ERRO'}</span></p>`; });
         
         if(isLocalMode) { 
             currentUser = { uid: 'local' }; 
