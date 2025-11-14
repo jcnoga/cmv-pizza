@@ -118,9 +118,54 @@
 
     <main>
         <div id="auth-container">
-            <div id="login-view" class="auth-form"><h2>Login</h2><form id="login-form"><div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required></div><div class="form-group"><label for="login-password">Senha</label><input type="password" id="login-password" required></div><button type="submit" class="btn btn-primary">Entrar</button></form><div class="auth-link"><p>Não tem conta? <a href="#" id="show-register">Cadastre-se</a></p><p><a href="#" id="show-reset-password">Esqueceu a senha?</a></p></div></div>
-            <div id="register-view" class="auth-form hidden"><h2>Cadastro</h2><form id="register-form"><div class="form-group"><label for="register-email">Email</label><input type="email" id="register-email" required></div><div class="form-group"><label for="register-password">Senha</label><input type="password" id="register-password" required minlength="6"></div><button type="submit" class="btn btn-primary">Cadastrar</button></form><div class="auth-link"><p>Já tem conta? <a href="#" id="show-login">Faça login</a></p></div></div>
-            <div id="reset-password-view" class="auth-form hidden"><h2>Recuperar Senha</h2><form id="reset-password-form"><div class="form-group"><label for="reset-email">Email</label><input type="email" id="reset-email" required></div><button type="submit" class="btn btn-primary">Enviar link</button></form><div class="auth-link"><p><a href="#" id="back-to-login">Voltar</a></p></div></div>
+            <div id="login-view" class="auth-form">
+                <h2>Login</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Senha</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </form>
+                <div class="auth-link">
+                    <p>Não tem conta? <a href="#" id="show-register">Cadastre-se</a></p>
+                    <p><a href="#" id="show-reset-password">Esqueci minha senha</a></p>
+                </div>
+            </div>
+            <div id="register-view" class="auth-form hidden">
+                <h2>Cadastro</h2>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Senha (mínimo 6 caracteres)</label>
+                        <input type="password" id="register-password" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </form>
+                <div class="auth-link">
+                    <p>Já tem conta? <a href="#" id="show-login">Faça login</a></p>
+                </div>
+            </div>
+            <div id="reset-password-view" class="auth-form hidden">
+                <h2>Recuperar Senha</h2>
+                <form id="reset-password-form">
+                    <div class="form-group">
+                        <label for="reset-email">Email</label>
+                        <input type="email" id="reset-email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar link de recuperação</button>
+                </form>
+                <div class="auth-link">
+                    <p><a href="#" id="back-to-login">Voltar para o Login</a></p>
+                </div>
+            </div>
         </div>
 
         <div id="app-container" class="hidden">
@@ -222,7 +267,6 @@
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
     
-    <!-- NOVO MODAL DE AJUDA -->
     <div id="help-modal" class="modal">
         <div id="help-modal-content" class="modal-content">
             <h3 id="help-modal-title"></h3>
@@ -256,41 +300,34 @@
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {}, custosMensais: [] };
         let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {}, custosMensaisCache = [];
 
-        // NOVO: Objeto com todos os textos de ajuda
         const helpTexts = {
-            // Fornecedores
             fornecedorNome: { title: 'Nome do Fornecedor', text: 'Nome fantasia ou razão social da empresa que fornece os insumos. Ex: "Distribuidora de Frios S.A.".' },
             fornecedorContato: { title: 'Nome do Contato', text: 'Nome do vendedor ou pessoa principal com quem você fala na empresa. Ex: "Carlos Andrade".' },
-            // Insumos
             insumoNome: { title: 'Nome do Insumo', text: 'Descrição clara e única para o ingrediente. Ex: "Queijo Mussarela Peça", "Tomate Italiano", "Farinha de Trigo Tipo 1".' },
             insumoCustoEmbalagem: { title: 'Custo da Embalagem (R$)', text: 'O valor total que você pagou pela embalagem fechada do insumo (saco, caixa, peça, etc.). Ex: R$ 85,90.' },
             insumoQtdEmbalagem: { title: 'Quantidade na Embalagem', text: 'A quantidade total de produto que vem na embalagem que você comprou. Use a unidade correspondente (kg, L, un).' },
             insumoLote: { title: 'Lote', text: 'Código de lote do produto, geralmente impresso na embalagem. Ajuda no rastreamento em caso de problemas.' },
-            // Receitas
             receitaVersao: { title: 'Versão da Receita', text: 'Use para controlar alterações na receita. Comece com 1.0 e aumente a cada modificação (ex: 1.1, 2.0). Ajuda a manter o histórico.' },
             receitaTempoPreparo: { title: 'Tempo de Preparo (min)', text: 'Tempo total em minutos que um funcionário leva para montar a pizza, desde separar os ingredientes até ela estar pronta para ir ao forno. Este tempo será usado para calcular o custo da mão de obra por pizza.' },
             receitaEmbalagem: { title: 'Custo da Embalagem (R$)', text: 'Custo da caixa da pizza, lacre, e qualquer outro item de embalagem usado para o delivery deste produto específico.' },
             receitaPerda: { title: 'Percentual de Perda (%)', text: 'Estimativa de perda de ingredientes durante o preparo (ex: aparas, produto que cai no chão). Um valor comum é entre 3% e 5%. Este percentual será acrescido ao custo dos ingredientes.' },
-            // Custos Mensais
-            faturamento: { title: 'Faturamento (Receita Bruta)', formula: 'Preço de Venda × Unidades Vendidas', text: 'Valor total arrecadado com as vendas antes de qualquer dedução.' },
-            custosVariaveis: { title: 'Custos Variáveis (CV)', text: 'Soma de todos os custos que só existem quando há venda, como o custo total dos ingredientes usados no mês, embalagens e taxas de cartão/delivery.' },
-            custosFixos: { title: 'Custos Fixos (CF)', text: 'Soma dos custos que você tem todo mês, vendendo ou não: aluguel, salários, contador, internet, etc.' },
-            despesasOperacionais: { title: 'Despesas Operacionais', text: 'Gastos necessários para manter a operação funcionando, mas que não estão diretamente ligados à produção. Ex: material de limpeza, marketing, uniformes.' },
-            impostos: { title: 'Impostos', text: 'Valor total de impostos pagos no mês, como o Simples Nacional.' },
-            outrasReceitasDespesas: { title: 'Outras Receitas/Despesas', text: 'Qualquer entrada ou saída de dinheiro que não seja da operação principal. Use um valor negativo para despesas (ex: -150.00 para um conserto emergencial).' },
-            numeroVendas: { title: 'Número de Vendas', text: 'Quantidade total de pedidos ou pizzas vendidas no mês. Ajuda a calcular o ticket médio.' },
-            // Indicadores e Simulador
-            lucroLiquido: { title: 'Lucro Líquido (LL)', formula: 'Faturamento - Todos os Custos e Despesas', text: 'Dinheiro que efetivamente sobra no caixa após pagar absolutamente tudo. É o indicador mais importante da saúde financeira.' },
-            margemLiquida: { title: 'Margem Líquida (ML)', formula: '(Lucro Líquido / Faturamento) × 100', text: 'Indica a porcentagem de lucro que a empresa obtém para cada real de faturamento. Mostra a eficiência da operação.' },
-            markup: { title: 'Markup', formula: '((Preço de Venda - Custo) / Custo) × 100', text: 'Índice que mostra o quanto seu preço de venda está acima do custo do produto.' },
-            precoVenda: { title: 'Preço de Venda (R$)', text: 'O preço final que o cliente paga pelo produto. Use este campo para simular o CMV com base em um preço.' },
-            metaCMV: { title: 'Meta de CMV (%)', text: 'Qual o Custo da Mercadoria Vendida (CMV) máximo que você aceita ter para este produto, em percentual. Um valor comum para pizzarias é entre 25% e 35%. O sistema usará este valor para sugerir um preço de venda.' },
-            margemDesejada: { title: 'Margem Desejada (%)', text: 'Qual a margem de lucro bruta que você deseja ter sobre o preço de venda. Se você quer que 50% do preço de venda seja lucro (sobre o custo direto), insira 50 aqui. O sistema sugerirá o preço para atingir essa margem.' },
-            // Configurações
-            configMaoDeObra: { title: 'Custo da Mão de Obra (R$/hora)', text: 'Some o salário bruto + encargos de todos os funcionários da cozinha e divida pelo total de horas trabalhadas por eles no mês. Este valor será usado para calcular o custo do tempo de preparo de cada pizza.' },
-            configRateio: { title: 'Rateio Fixo (R$/pizza)', text: 'Um pequeno valor a ser adicionado ao custo de cada pizza para ajudar a cobrir custos fixos indiretos (gás, energia, etc.). Ex: R$ 0,50 por pizza.' },
-            configMetaCMV: { title: 'Meta CMV Padrão (%)', text: 'A meta de Custo da Mercadoria Vendida (CMV) que será usada como padrão no simulador e em outros cálculos. Geralmente entre 25-35%.' },
-            configAlerta: { title: 'Alerta de Variação de Preço (%)', text: 'O sistema irá gerar um alerta no Dashboard se o preço de compra de um insumo variar mais do que este percentual (para cima ou para baixo).' }
+            faturamento: { title: 'Faturamento (Receita Bruta)', formula: '<strong>Fórmula:</strong> Preço de Venda × Unidades Vendidas', text: '<strong>Significado:</strong> Valor total arrecadado com as vendas antes de qualquer dedução.' },
+            custosVariaveis: { title: 'Custos Variáveis (CV)', text: '<strong>Significado:</strong> Soma de todos os custos que só existem quando há venda, como o custo total dos ingredientes usados no mês, embalagens e taxas de cartão/delivery.' },
+            custosFixos: { title: 'Custos Fixos (CF)', text: '<strong>Significado:</strong> Soma dos custos que você tem todo mês, vendendo ou não: aluguel, salários, contador, internet, etc.' },
+            despesasOperacionais: { title: 'Despesas Operacionais', text: '<strong>Significado:</strong> Gastos necessários para manter a operação funcionando, mas que não estão diretamente ligados à produção. Ex: material de limpeza, marketing, uniformes.' },
+            impostos: { title: 'Impostos', text: '<strong>Significado:</strong> Valor total de impostos pagos no mês, como o Simples Nacional.' },
+            outrasReceitasDespesas: { title: 'Outras Receitas/Despesas', text: '<strong>Significado:</strong> Qualquer entrada ou saída de dinheiro que não seja da operação principal. Use um valor negativo para despesas (ex: -150.00 para um conserto emergencial).' },
+            numeroVendas: { title: 'Número de Vendas', text: '<strong>Significado:</strong> Quantidade total de pedidos ou pizzas vendidas no mês. Ajuda a calcular o ticket médio.' },
+            lucroLiquido: { title: 'Lucro Líquido (LL)', formula: '<strong>Fórmula:</strong> Faturamento - Todos os Custos e Despesas', text: '<strong>Significado:</strong> Dinheiro que efetivamente sobra no caixa após pagar absolutamente tudo. É o indicador mais importante da saúde financeira.' },
+            margemLiquida: { title: 'Margem Líquida (ML)', formula: '<strong>Fórmula:</strong> (Lucro Líquido / Faturamento) × 100', text: '<strong>Significado:</strong> Indica a porcentagem de lucro que a empresa obtém para cada real de faturamento. Mostra a eficiência da operação.' },
+            markup: { title: 'Markup', formula: '<strong>Fórmula:</strong> ((Preço de Venda - Custo) / Custo) × 100', text: '<strong>Significado:</strong> Índice que mostra o quanto seu preço de venda está acima do custo do produto.' },
+            precoVenda: { title: 'Preço de Venda (R$)', text: '<strong>Significado:</strong> O preço final que o cliente paga pelo produto. Use este campo para simular o CMV com base em um preço.' },
+            metaCMV: { title: 'Meta de CMV (%)', text: '<strong>Significado:</strong> Qual o Custo da Mercadoria Vendida (CMV) máximo que você aceita ter para este produto, em percentual. Um valor comum para pizzarias é entre 25% e 35%. O sistema usará este valor para sugerir um preço de venda.' },
+            margemDesejada: { title: 'Margem Desejada (%)', text: '<strong>Significado:</strong> Qual a margem de lucro bruta que você deseja ter sobre o preço de venda. Se você quer que 50% do preço de venda seja lucro (sobre o custo direto), insira 50 aqui. O sistema sugerirá o preço para atingir essa margem.' },
+            configMaoDeObra: { title: 'Custo da Mão de Obra (R$/hora)', text: '<strong>Significado:</strong> Some o salário bruto + encargos de todos os funcionários da cozinha e divida pelo total de horas trabalhadas por eles no mês. Este valor será usado para calcular o custo do tempo de preparo de cada pizza.' },
+            configRateio: { title: 'Rateio Fixo (R$/pizza)', text: '<strong>Significado:</strong> Um pequeno valor a ser adicionado ao custo de cada pizza para ajudar a cobrir custos fixos indiretos (gás, energia, etc.). Ex: R$ 0,50 por pizza.' },
+            configMetaCMV: { title: 'Meta CMV Padrão (%)', text: '<strong>Significado:</strong> A meta de Custo da Mercadoria Vendida (CMV) que será usada como padrão no simulador e em outros cálculos. Geralmente entre 25-35%.' },
+            configAlerta: { title: 'Alerta de Variação de Preço (%)', text: '<strong>Significado:</strong> O sistema irá gerar um alerta no Dashboard se o preço de compra de um insumo variar mais do que este percentual (para cima ou para baixo).' }
         };
 
         if (firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_")) {
@@ -387,7 +424,7 @@
                 } catch (err) {
                     showToast(err.message, 'error');
                 } finally {
-                    button.disabled = false; button.textContent = 'Enviar link';
+                    button.disabled = false; button.textContent = 'Enviar link de recuperação';
                 }
             });
 
@@ -568,7 +605,6 @@
             document.body.addEventListener('click', handleTableButtonClick);
         }
 
-        // NOVA FUNÇÃO para configurar os modais de ajuda
         function setupHelpModals() {
             const helpModal = document.getElementById('help-modal');
             const helpModalTitle = document.getElementById('help-modal-title');
@@ -583,7 +619,7 @@
                         helpModalTitle.textContent = content.title;
                         let html = `<p>${content.text}</p>`;
                         if (content.formula) {
-                            html += `<p><strong>Fórmula:</strong> ${content.formula}</p>`;
+                            html += `<p>${content.formula}</p>`;
                         }
                         helpModalText.innerHTML = html;
                         helpModal.style.display = 'block';
