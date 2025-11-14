@@ -86,12 +86,16 @@
         .toast.success { background-color: var(--success-color); } .toast.error { background-color: var(--error-color); }
         footer { text-align: center; padding: 1.5rem; margin-top: 2rem; background-color: #e0e0e0; color: var(--dark-gray); font-size: 0.9rem; }
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: var(--border-radius); text-align: center; }
-        .modal-buttons { margin-top: 20px; } .modal-buttons .btn { width: 120px; margin: 0 10px; }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 600px; border-radius: var(--border-radius); }
+        .modal-buttons { margin-top: 20px; text-align: center; } .modal-buttons .btn { width: 120px; margin: 0 10px; }
         .hidden { display: none; }
         #ajuda-view .card { margin-bottom: 1.5rem; } 
         #ajuda-view h3 { color: var(--primary-dark); margin-bottom: 1rem; } 
         #ajuda-view p { margin-bottom: 0.75rem; }
+        .help-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-color: var(--info-color); color: white; text-align: center; font-weight: bold; line-height: 20px; cursor: pointer; margin-left: 8px; font-style: normal; user-select: none; }
+        #help-modal-content h3 { color: var(--primary-dark); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        #help-modal-content p { margin-bottom: 10px; line-height: 1.7; }
+        #help-modal-content strong { color: #333; }
     </style>
 </head>
 <body>
@@ -128,17 +132,17 @@
             </section>
             
             <section id="fornecedores-view" class="view">
-                <div class="card"><h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label for="fornecedor-nome">Nome</label><input type="text" id="fornecedor-nome" required></div><div class="form-group"><label for="fornecedor-contato">Contato</label><input type="text" id="fornecedor-contato"></div></div><div class="form-row"><div class="form-group"><label for="fornecedor-telefone">Telefone</label><input type="tel" id="fornecedor-telefone"></div><div class="form-group"><label for="fornecedor-email">Email</label><input type="email" id="fornecedor-email"></div></div><div class="form-group"><label for="fornecedor-endereco">Endereço</label><input type="text" id="fornecedor-endereco"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
+                <div class="card"><h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label for="fornecedor-nome">Nome <i class="help-icon" data-help-key="fornecedorNome">ℹ️</i></label><input type="text" id="fornecedor-nome" required></div><div class="form-group"><label for="fornecedor-contato">Contato <i class="help-icon" data-help-key="fornecedorContato">ℹ️</i></label><input type="text" id="fornecedor-contato"></div></div><div class="form-row"><div class="form-group"><label for="fornecedor-telefone">Telefone</label><input type="tel" id="fornecedor-telefone"></div><div class="form-group"><label for="fornecedor-email">Email</label><input type="email" id="fornecedor-email"></div></div><div class="form-group"><label for="fornecedor-endereco">Endereço</label><input type="text" id="fornecedor-endereco"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
                 <div class="card"><h2>Lista de Fornecedores</h2><table id="fornecedores-table"><thead><tr><th>Nome</th><th>Contato</th><th>Telefone</th><th>Insumos</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <section id="insumos-view" class="view">
-                <div class="card"><h2 id="insumo-form-title">Cadastrar Insumo</h2><form id="insumo-form"><input type="hidden" id="insumo-id"><div class="form-row"><div class="form-group"><label for="insumo-nome">Nome</label><input type="text" id="insumo-nome" required></div><div class="form-group"><label for="insumo-fornecedor-select">Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div></div><div class="form-row"><div class="form-group"><label for="insumo-custo-embalagem">Custo Embalagem (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div><div class="form-group"><label for="insumo-qtd-embalagem">Qtd. Embalagem</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div><div class="form-group"><label for="insumo-unidade-embalagem">Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div></div><div class="form-row"><div class="form-group"><label for="insumo-lote">Lote</label><input type="text" id="insumo-lote"></div><div class="form-group"><label for="insumo-validade">Validade</label><input type="date" id="insumo-validade"></div></div><button type="submit" class="btn btn-primary">Salvar Insumo</button><button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
+                <div class="card"><h2 id="insumo-form-title">Cadastrar Insumo</h2><form id="insumo-form"><input type="hidden" id="insumo-id"><div class="form-row"><div class="form-group"><label for="insumo-nome">Nome <i class="help-icon" data-help-key="insumoNome">ℹ️</i></label><input type="text" id="insumo-nome" required></div><div class="form-group"><label for="insumo-fornecedor-select">Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div></div><div class="form-row"><div class="form-group"><label for="insumo-custo-embalagem">Custo Embalagem (R$) <i class="help-icon" data-help-key="insumoCustoEmbalagem">ℹ️</i></label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div><div class="form-group"><label for="insumo-qtd-embalagem">Qtd. Embalagem <i class="help-icon" data-help-key="insumoQtdEmbalagem">ℹ️</i></label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div><div class="form-group"><label for="insumo-unidade-embalagem">Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div></div><div class="form-row"><div class="form-group"><label for="insumo-lote">Lote <i class="help-icon" data-help-key="insumoLote">ℹ️</i></label><input type="text" id="insumo-lote"></div><div class="form-group"><label for="insumo-validade">Validade</label><input type="date" id="insumo-validade"></div></div><button type="submit" class="btn btn-primary">Salvar Insumo</button><button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
                 <div class="card"><h2>Lista de Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="🔎 Filtrar..."></div><button id="export-insumos-xlsx" class="btn btn-success btn-small">Exportar XLSX</button><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo/g (un)</th><th>Fornecedor</th><th>Validade</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <section id="receitas-view" class="view">
-                <div class="card"><h2 id="receita-form-title">Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-row"><div class="form-group"><label for="receita-nome">Nome da Pizza</label><input type="text" id="receita-nome" required></div><div class="form-group"><label for="receita-versao">Versão</label><input type="text" id="receita-versao" placeholder="1.0"></div></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div id="custo-total-ingredientes" class="total-cost">Custo: R$ 0,00</div><h3>Custos Adicionais</h3><div class="form-row"><div class="form-group"><label for="receita-tempo-preparo">Preparo (min)</label><input type="number" id="receita-tempo-preparo" value="0" required></div><div class="form-group"><label for="receita-custo-embalagem">Embalagem (R$)</label><input type="number" id="receita-custo-embalagem" step="0.01" value="0"></div><div class="form-group"><label for="receita-perda-percentual">Perda (%)</label><input type="number" id="receita-perda-percentual" value="0"></div></div><div class="form-group"><label for="receita-observacoes">Observações</label><textarea id="receita-observacoes" rows="3"></textarea></div><button type="submit" class="btn btn-primary">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
+                <div class="card"><h2 id="receita-form-title">Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-row"><div class="form-group"><label for="receita-nome">Nome da Pizza</label><input type="text" id="receita-nome" required></div><div class="form-group"><label for="receita-versao">Versão <i class="help-icon" data-help-key="receitaVersao">ℹ️</i></label><input type="text" id="receita-versao" placeholder="1.0"></div></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div id="custo-total-ingredientes" class="total-cost">Custo: R$ 0,00</div><h3>Custos Adicionais</h3><div class="form-row"><div class="form-group"><label for="receita-tempo-preparo">Preparo (min) <i class="help-icon" data-help-key="receitaTempoPreparo">ℹ️</i></label><input type="number" id="receita-tempo-preparo" value="0" required></div><div class="form-group"><label for="receita-custo-embalagem">Embalagem (R$) <i class="help-icon" data-help-key="receitaEmbalagem">ℹ️</i></label><input type="number" id="receita-custo-embalagem" step="0.01" value="0"></div><div class="form-group"><label for="receita-perda-percentual">Perda (%) <i class="help-icon" data-help-key="receitaPerda">ℹ️</i></label><input type="number" id="receita-perda-percentual" value="0"></div></div><div class="form-group"><label for="receita-observacoes">Observações</label><textarea id="receita-observacoes" rows="3"></textarea></div><button type="submit" class="btn btn-primary">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar</button></form></div>
                 <div class="card"><h2>Lista de Receitas</h2><div class="filter-container"><input type="text" id="receitas-filter" placeholder="🔎 Filtrar..."><button id="export-receitas-xlsx" class="btn btn-success btn-small">Exportar Fichas (XLSX)</button><button id="list-ingredients-pdf" class="btn btn-info btn-small">🖨️ Listar Ingredientes (PDF)</button></div><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Versão</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
@@ -149,19 +153,19 @@
                         <input type="hidden" id="custo-mensal-id">
                         <div class="form-row">
                             <div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div>
-                            <div class="form-group"><label for="custo-mensal-faturamento">Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required></div>
+                            <div class="form-group"><label for="custo-mensal-faturamento">Faturamento (R$) <i class="help-icon" data-help-key="faturamento">ℹ️</i></label><input type="number" id="custo-mensal-faturamento" step="0.01" required></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label for="custo-mensal-custosVariaveis">Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01"></div>
-                            <div class="form-group"><label for="custo-mensal-custosFixos">Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01"></div>
+                            <div class="form-group"><label for="custo-mensal-custosVariaveis">Custos Variáveis (R$) <i class="help-icon" data-help-key="custosVariaveis">ℹ️</i></label><input type="number" id="custo-mensal-custosVariaveis" step="0.01"></div>
+                            <div class="form-group"><label for="custo-mensal-custosFixos">Custos Fixos (R$) <i class="help-icon" data-help-key="custosFixos">ℹ️</i></label><input type="number" id="custo-mensal-custosFixos" step="0.01"></div>
                         </div>
                         <div class="form-row">
-                             <div class="form-group"><label for="custo-mensal-despesasOperacionais">Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01"></div>
-                             <div class="form-group"><label for="custo-mensal-impostos">Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01"></div>
+                             <div class="form-group"><label for="custo-mensal-despesasOperacionais">Desp. Operacionais (R$) <i class="help-icon" data-help-key="despesasOperacionais">ℹ️</i></label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01"></div>
+                             <div class="form-group"><label for="custo-mensal-impostos">Impostos (R$) <i class="help-icon" data-help-key="impostos">ℹ️</i></label><input type="number" id="custo-mensal-impostos" step="0.01"></div>
                         </div>
                         <div class="form-row">
-                           <div class="form-group"><label for="custo-mensal-outrasReceitasDespesas">Outras Receitas/Desp. (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" placeholder="Use valor negativo para despesa"></div>
-                           <div class="form-group"><label for="custo-mensal-numeroVendas">Número de Vendas</label><input type="number" id="custo-mensal-numeroVendas" step="1"></div>
+                           <div class="form-group"><label for="custo-mensal-outrasReceitasDespesas">Outras Receitas/Desp. (R$) <i class="help-icon" data-help-key="outrasReceitasDespesas">ℹ️</i></label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" placeholder="Use valor negativo para despesa"></div>
+                           <div class="form-group"><label for="custo-mensal-numeroVendas">Número de Vendas <i class="help-icon" data-help-key="numeroVendas">ℹ️</i></label><input type="number" id="custo-mensal-numeroVendas" step="1"></div>
                         </div>
                         <button type="submit" class="btn btn-primary">Salvar Mês</button>
                         <button type="button" id="cancel-edit-custo-mensal" class="btn btn-secondary hidden" style="margin-top:0.5rem">Cancelar Edição</button>
@@ -185,89 +189,49 @@
                     </div>
                     <div id="indicadores-results" class="hidden">
                         <div class="grid-container grid-3">
-                            <div class="card kpi-card"><h3>Lucro Líquido</h3><div class="value" id="indicador-lucro-liquido">R$ 0,00</div></div>
-                            <div class="card kpi-card"><h3>Margem Líquida</h3><div class="value" id="indicador-margem-liquida">0,00%</div></div>
-                            <div class="card kpi-card"><h3>Markup</h3><div class="value" id="indicador-markup">0,00%</div></div>
+                            <div class="card kpi-card"><h3>Lucro Líquido <i class="help-icon" data-help-key="lucroLiquido">ℹ️</i></h3><div class="value" id="indicador-lucro-liquido">R$ 0,00</div></div>
+                            <div class="card kpi-card"><h3>Margem Líquida <i class="help-icon" data-help-key="margemLiquida">ℹ️</i></h3><div class="value" id="indicador-margem-liquida">0,00%</div></div>
+                            <div class="card kpi-card"><h3>Markup <i class="help-icon" data-help-key="markup">ℹ️</i></h3><div class="value" id="indicador-markup">0,00%</div></div>
                         </div>
                     </div>
                 </div>
             </section>
 
             <section id="simulador-view" class="view">
-                 <div class="card"><h2>Simulador de Custo e Preço</h2><div class="form-group"><label for="simulador-receita-select">Selecione uma Receita</label><select id="simulador-receita-select"><option value="">-- Escolha --</option></select></div><div id="simulador-detalhes" class="hidden"><h3>Detalhes de Custo (COGS)</h3><table id="simulador-custos-table"><thead><tr><th>Item</th><th>Valor</th></tr></thead><tbody></tbody></table><p class="total-cost" id="simulador-cogs-total">COGS Total: R$ 0,00</p><div class="grid-container grid-2" style="margin-top: 2rem;"><div class="card"><h4>Calcular CMV por Preço</h4><div class="form-group"><label for="simulador-preco-venda">Preço de Venda (R$)</label><input type="number" id="simulador-preco-venda" step="0.01"></div><div id="simulador-resultado-cmv" class="simulator-result hidden"></div><div id="cmv-visualizer-container" class="hidden"><div class="cmv-visualizer"><div id="cmv-bar" class="cmv-visualizer-bar"></div></div></div></div><div class="card"><h4>Calcular Preço Sugerido</h4><div class="form-group"><label for="simulador-meta-cmv">Meta de CMV (%)</label><input type="number" id="simulador-meta-cmv" step="0.1"></div><div class="form-group"><label for="simulador-margem-desejada">Margem (%)</label><input type="number" id="simulador-margem-desejada" step="0.1"></div><div id="simulador-resultado-preco" class="simulator-result hidden"></div></div></div></div></div>
+                 <div class="card"><h2>Simulador de Custo e Preço</h2><div class="form-group"><label for="simulador-receita-select">Selecione uma Receita</label><select id="simulador-receita-select"><option value="">-- Escolha --</option></select></div><div id="simulador-detalhes" class="hidden"><h3>Detalhes de Custo (COGS)</h3><table id="simulador-custos-table"><thead><tr><th>Item</th><th>Valor</th></tr></thead><tbody></tbody></table><p class="total-cost" id="simulador-cogs-total">COGS Total: R$ 0,00</p><div class="grid-container grid-2" style="margin-top: 2rem;"><div class="card"><h4>Calcular CMV por Preço</h4><div class="form-group"><label for="simulador-preco-venda">Preço de Venda (R$) <i class="help-icon" data-help-key="precoVenda">ℹ️</i></label><input type="number" id="simulador-preco-venda" step="0.01"></div><div id="simulador-resultado-cmv" class="simulator-result hidden"></div><div id="cmv-visualizer-container" class="hidden"><div class="cmv-visualizer"><div id="cmv-bar" class="cmv-visualizer-bar"></div></div></div></div><div class="card"><h4>Calcular Preço Sugerido</h4><div class="form-group"><label for="simulador-meta-cmv">Meta de CMV (%) <i class="help-icon" data-help-key="metaCMV">ℹ️</i></label><input type="number" id="simulador-meta-cmv" step="0.1"></div><div class="form-group"><label for="simulador-margem-desejada">Margem (%) <i class="help-icon" data-help-key="margemDesejada">ℹ️</i></label><input type="number" id="simulador-margem-desejada" step="0.1"></div><div id="simulador-resultado-preco" class="simulator-result hidden"></div></div></div></div></div>
             </section>
             
             <section id="configuracoes-view" class="view">
-                <div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label for="config-rateio-despesas-fixas">Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label for="config-meta-cmv-padrao">Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label for="config-alerta-variacao">Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div>
+                <div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo Mão de Obra (R$/hora) <i class="help-icon" data-help-key="configMaoDeObra">ℹ️</i></label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label for="config-rateio-despesas-fixas">Rateio Fixo (R$/pizza) <i class="help-icon" data-help-key="configRateio">ℹ️</i></label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label for="config-meta-cmv-padrao">Meta CMV Padrão (%) <i class="help-icon" data-help-key="configMetaCMV">ℹ️</i></label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label for="config-alerta-variacao">Alerta Variação Preço (%) <i class="help-icon" data-help-key="configAlerta">ℹ️</i></label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div>
             </section>
 
-            <!-- NOVA SEÇÃO DE AJUDA -->
             <section id="ajuda-view" class="view">
                 <h2>Glossário de Ajuda</h2>
-
-                <div class="card">
-                    <h3>Faturamento (Receita Bruta)</h3>
-                    <p><strong>Fórmula:</strong> Preço de Venda × Número de Unidades Vendidas.</p>
-                    <p><strong>Significado:</strong> É o valor total arrecadado com as vendas de produtos ou serviços antes de deduzir qualquer custo ou despesa. Representa toda a entrada de dinheiro gerada pela atividade principal do negócio.</p>
-                    <p><strong>Exemplo:</strong> Se uma pizzaria vende 100 pizzas a R$ 50,00 cada em um dia, o faturamento desse dia é de R$ 5.000,00.</p>
-                    <p><strong>Dica:</strong> Faturamento alto não significa lucro. É importante analisar os custos e despesas para garantir que a operação seja rentável.</p>
-                </div>
-                
-                <div class="card">
-                    <h3>Custos Fixos (CF)</h3>
-                    <p><strong>Fórmula:</strong> Soma de todos os custos que não variam conforme o volume de produção ou vendas.</p>
-                    <p><strong>Significado:</strong> São despesas que a empresa precisa pagar todos os meses, independente do faturamento — como aluguel, energia mínima, contabilidade ou salários fixos.</p>
-                    <p><strong>Exemplo:</strong> Aluguel do ponto comercial de R$ 2.000 + folha de pagamento de R$ 8.000 = R$ 10.000 de custos fixos mensais.</p>
-                    <p><strong>Dica:</strong> Faça uma revisão periódica dos custos fixos para identificar itens que podem ser reduzidos ou renegociados sem prejudicar a operação.</p>
-                </div>
-
-                <div class="card">
-                    <h3>Custos Variáveis (CV)</h3>
-                    <p><strong>Fórmula:</strong> Soma dos custos que mudam proporcionalmente ao volume de produção ou vendas.</p>
-                    <p><strong>Significado:</strong> São os gastos diretamente ligados à produção e venda de cada produto. Se você não vende nada, esse custo é zero. Inclui ingredientes, embalagens para delivery, etc.</p>
-                    <p><strong>Exemplo:</strong> Se cada pizza consome R$ 8,00 em ingredientes e R$ 1,50 em embalagem, o custo variável por pizza é de R$ 9,50.</p>
-                    <p><strong>Dica:</strong> Negociar preços melhores com fornecedores para compras em maior volume é a principal forma de reduzir seus custos variáveis e aumentar a margem de lucro por produto.</p>
-                </div>
-
-                <div class="card">
-                    <h3>Custo da Mercadoria Vendida (CMV ou COGS)</h3>
-                    <p><strong>Fórmula:</strong> Soma de todos os custos diretos para produzir uma unidade (ingredientes, mão de obra direta, embalagem, rateio de custos fixos por produto).</p>
-                    <p><strong>Significado:</strong> Representa o custo total para produzir cada pizza que você vende. É o principal indicador de custo do seu produto finalizado.</p>
-                    <p><strong>Exemplo:</strong> R$ 8,00 (ingredientes) + R$ 2,00 (mão de obra por pizza) + R$ 1,50 (embalagem) = R$ 11,50 de CMV por pizza.</p>
-                    <p><strong>Dica:</strong> Manter as fichas técnicas das suas receitas sempre atualizadas é fundamental para ter um cálculo de CMV preciso e garantir que seus preços de venda estão corretos.</p>
-                </div>
-
-                <div class="card">
-                    <h3>Lucro Líquido (LL)</h3>
-                    <p><strong>Fórmula:</strong> Faturamento - (Custos Fixos + Custos Variáveis + Impostos + Despesas Operacionais).</p>
-                    <p><strong>Significado:</strong> É o resultado final da empresa, ou seja, o dinheiro que efetivamente sobra no caixa após o pagamento de todas as contas, custos e impostos. É o indicador mais importante da saúde financeira do negócio.</p>
-                    <p><strong>Exemplo:</strong> Faturamento de R$ 50.000 - Total de Custos e Despesas de R$ 42.000 = R$ 8.000 de Lucro Líquido.</p>
-                    <p><strong>Dica:</strong> Um negócio só é sustentável a longo prazo se gerar Lucro Líquido de forma consistente. Acompanhe este indicador mensalmente.</p>
-                </div>
-
-                <div class="card">
-                    <h3>Margem Líquida (ML)</h3>
-                    <p><strong>Fórmula:</strong> (Lucro Líquido / Faturamento) × 100.</p>
-                    <p><strong>Significado:</strong> Indica a porcentagem de lucro que a empresa obtém para cada real de faturamento. Mostra o quão eficiente é a sua operação em transformar vendas em lucro real.</p>
-                    <p><strong>Exemplo:</strong> (R$ 8.000 de Lucro Líquido / R$ 50.000 de Faturamento) × 100 = 16%. Isso significa que 16% de tudo que você vende se torna lucro.</p>
-                    <p><strong>Dica:</strong> Uma margem líquida maior indica uma empresa mais saudável e rentável. Compare sua margem com a de outros negócios no mesmo setor para avaliar sua competitividade.</p>
-                </div>
-
-                <div class="card">
-                    <h3>Markup</h3>
-                    <p><strong>Fórmula:</strong> ((Preço de Venda - Custo Total Unitário) / Custo Total Unitário) × 100.</p>
-                    <p><strong>Significado:</strong> É um índice aplicado sobre o custo do produto para formar o preço de venda. Ele mostra o quanto o seu preço está acima do seu custo.</p>
-                    <p><strong>Exemplo:</strong> Uma pizza custa R$ 10,00 para ser feita e é vendida por R$ 45,00. O Markup é ((45 - 10) / 10) × 100 = 350%.</p>
-                    <p><strong>Dica:</strong> O Markup é uma ferramenta útil para a precificação inicial, mas não deve ser confundido com a margem de lucro. A Margem Líquida é um indicador mais preciso da rentabilidade geral do negócio.</p>
-                </div>
-
+                <div class="card"><h3>Faturamento (Receita Bruta)</h3><p><strong>Fórmula:</strong> Preço de Venda × Número de Unidades Vendidas.</p><p><strong>Significado:</strong> É o valor total arrecadado com as vendas de produtos ou serviços antes de deduzir qualquer custo ou despesa. Representa toda a entrada de dinheiro gerada pela atividade principal do negócio.</p><p><strong>Exemplo:</strong> Se uma pizzaria vende 100 pizzas a R$ 50,00 cada em um dia, o faturamento desse dia é de R$ 5.000,00.</p><p><strong>Dica:</strong> Faturamento alto não significa lucro. É importante analisar os custos e despesas para garantir que a operação seja rentável.</p></div>
+                <div class="card"><h3>Custos Fixos (CF)</h3><p><strong>Fórmula:</strong> Soma de todos os custos que não variam conforme o volume de produção ou vendas.</p><p><strong>Significado:</strong> São despesas que a empresa precisa pagar todos os meses, independente do faturamento — como aluguel, energia mínima, contabilidade ou salários fixos.</p><p><strong>Exemplo:</strong> Aluguel do ponto comercial de R$ 2.000 + folha de pagamento de R$ 8.000 = R$ 10.000 de custos fixos mensais.</p><p><strong>Dica:</strong> Faça uma revisão periódica dos custos fixos para identificar itens que podem ser reduzidos ou renegociados sem prejudicar a operação.</p></div>
+                <div class="card"><h3>Custos Variáveis (CV)</h3><p><strong>Fórmula:</strong> Soma dos custos que mudam proporcionalmente ao volume de produção ou vendas.</p><p><strong>Significado:</strong> São os gastos diretamente ligados à produção e venda de cada produto. Se você não vende nada, esse custo é zero. Inclui ingredientes, embalagens para delivery, etc.</p><p><strong>Exemplo:</strong> Se cada pizza consome R$ 8,00 em ingredientes e R$ 1,50 em embalagem, o custo variável por pizza é de R$ 9,50.</p><p><strong>Dica:</strong> Negociar preços melhores com fornecedores para compras em maior volume é a principal forma de reduzir seus custos variáveis e aumentar a margem de lucro por produto.</p></div>
+                <div class="card"><h3>Custo da Mercadoria Vendida (CMV ou COGS)</h3><p><strong>Fórmula:</strong> Soma de todos os custos diretos para produzir uma unidade (ingredientes, mão de obra direta, embalagem, rateio de custos fixos por produto).</p><p><strong>Significado:</strong> Representa o custo total para produzir cada pizza que você vende. É o principal indicador de custo do seu produto finalizado.</p><p><strong>Exemplo:</strong> R$ 8,00 (ingredientes) + R$ 2,00 (mão de obra por pizza) + R$ 1,50 (embalagem) = R$ 11,50 de CMV por pizza.</p><p><strong>Dica:</strong> Manter as fichas técnicas das suas receitas sempre atualizadas é fundamental para ter um cálculo de CMV preciso e garantir que seus preços de venda estão corretos.</p></div>
+                <div class="card"><h3>Lucro Líquido (LL)</h3><p><strong>Fórmula:</strong> Faturamento - (Custos Fixos + Custos Variáveis + Impostos + Despesas Operacionais).</p><p><strong>Significado:</strong> É o resultado final da empresa, ou seja, o dinheiro que efetivamente sobra no caixa após o pagamento de todas as contas, custos e impostos. É o indicador mais importante da saúde financeira do negócio.</p><p><strong>Exemplo:</strong> Faturamento de R$ 50.000 - Total de Custos e Despesas de R$ 42.000 = R$ 8.000 de Lucro Líquido.</p><p><strong>Dica:</strong> Um negócio só é sustentável a longo prazo se gerar Lucro Líquido de forma consistente. Acompanhe este indicador mensalmente.</p></div>
+                <div class="card"><h3>Margem Líquida (ML)</h3><p><strong>Fórmula:</strong> (Lucro Líquido / Faturamento) × 100.</p><p><strong>Significado:</strong> Indica a porcentagem de lucro que a empresa obtém para cada real de faturamento. Mostra o quão eficiente é a sua operação em transformar vendas em lucro real.</p><p><strong>Exemplo:</strong> (R$ 8.000 de Lucro Líquido / R$ 50.000 de Faturamento) × 100 = 16%. Isso significa que 16% de tudo que você vende se torna lucro.</p><p><strong>Dica:</strong> Uma margem líquida maior indica uma empresa mais saudável e rentável. Compare sua margem com a de outros negócios no mesmo setor para avaliar sua competitividade.</p></div>
+                <div class="card"><h3>Markup</h3><p><strong>Fórmula:</strong> ((Preço de Venda - Custo Total Unitário) / Custo Total Unitário) × 100.</p><p><strong>Significado:</strong> É um índice aplicado sobre o custo do produto para formar o preço de venda. Ele mostra o quanto o seu preço está acima do seu custo.</p><p><strong>Exemplo:</strong> Uma pizza custa R$ 10,00 para ser feita e é vendida por R$ 45,00. O Markup é ((45 - 10) / 10) × 100 = 350%.</p><p><strong>Dica:</strong> O Markup é uma ferramenta útil para a precificação inicial, mas não deve ser confundido com a margem de lucro. A Margem Líquida é um indicador mais preciso da rentabilidade geral do negócio.</p></div>
             </section>
         </div>
     </main>
 
     <footer><p>Pizzaria Cost Control Pro &copy; 2025.</p></footer>
     <div id="toast" class="toast"></div>
-    <div id="confirm-modal" class="modal"><div class="modal-content"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
+    <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
+    
+    <!-- NOVO MODAL DE AJUDA -->
+    <div id="help-modal" class="modal">
+        <div id="help-modal-content" class="modal-content">
+            <h3 id="help-modal-title"></h3>
+            <div id="help-modal-text"></div>
+            <div class="modal-buttons">
+                <button id="help-modal-close" class="btn btn-primary">Fechar</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -291,6 +255,43 @@
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {}, custosMensais: [] };
         let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {}, custosMensaisCache = [];
+
+        // NOVO: Objeto com todos os textos de ajuda
+        const helpTexts = {
+            // Fornecedores
+            fornecedorNome: { title: 'Nome do Fornecedor', text: 'Nome fantasia ou razão social da empresa que fornece os insumos. Ex: "Distribuidora de Frios S.A.".' },
+            fornecedorContato: { title: 'Nome do Contato', text: 'Nome do vendedor ou pessoa principal com quem você fala na empresa. Ex: "Carlos Andrade".' },
+            // Insumos
+            insumoNome: { title: 'Nome do Insumo', text: 'Descrição clara e única para o ingrediente. Ex: "Queijo Mussarela Peça", "Tomate Italiano", "Farinha de Trigo Tipo 1".' },
+            insumoCustoEmbalagem: { title: 'Custo da Embalagem (R$)', text: 'O valor total que você pagou pela embalagem fechada do insumo (saco, caixa, peça, etc.). Ex: R$ 85,90.' },
+            insumoQtdEmbalagem: { title: 'Quantidade na Embalagem', text: 'A quantidade total de produto que vem na embalagem que você comprou. Use a unidade correspondente (kg, L, un).' },
+            insumoLote: { title: 'Lote', text: 'Código de lote do produto, geralmente impresso na embalagem. Ajuda no rastreamento em caso de problemas.' },
+            // Receitas
+            receitaVersao: { title: 'Versão da Receita', text: 'Use para controlar alterações na receita. Comece com 1.0 e aumente a cada modificação (ex: 1.1, 2.0). Ajuda a manter o histórico.' },
+            receitaTempoPreparo: { title: 'Tempo de Preparo (min)', text: 'Tempo total em minutos que um funcionário leva para montar a pizza, desde separar os ingredientes até ela estar pronta para ir ao forno. Este tempo será usado para calcular o custo da mão de obra por pizza.' },
+            receitaEmbalagem: { title: 'Custo da Embalagem (R$)', text: 'Custo da caixa da pizza, lacre, e qualquer outro item de embalagem usado para o delivery deste produto específico.' },
+            receitaPerda: { title: 'Percentual de Perda (%)', text: 'Estimativa de perda de ingredientes durante o preparo (ex: aparas, produto que cai no chão). Um valor comum é entre 3% e 5%. Este percentual será acrescido ao custo dos ingredientes.' },
+            // Custos Mensais
+            faturamento: { title: 'Faturamento (Receita Bruta)', formula: 'Preço de Venda × Unidades Vendidas', text: 'Valor total arrecadado com as vendas antes de qualquer dedução.' },
+            custosVariaveis: { title: 'Custos Variáveis (CV)', text: 'Soma de todos os custos que só existem quando há venda, como o custo total dos ingredientes usados no mês, embalagens e taxas de cartão/delivery.' },
+            custosFixos: { title: 'Custos Fixos (CF)', text: 'Soma dos custos que você tem todo mês, vendendo ou não: aluguel, salários, contador, internet, etc.' },
+            despesasOperacionais: { title: 'Despesas Operacionais', text: 'Gastos necessários para manter a operação funcionando, mas que não estão diretamente ligados à produção. Ex: material de limpeza, marketing, uniformes.' },
+            impostos: { title: 'Impostos', text: 'Valor total de impostos pagos no mês, como o Simples Nacional.' },
+            outrasReceitasDespesas: { title: 'Outras Receitas/Despesas', text: 'Qualquer entrada ou saída de dinheiro que não seja da operação principal. Use um valor negativo para despesas (ex: -150.00 para um conserto emergencial).' },
+            numeroVendas: { title: 'Número de Vendas', text: 'Quantidade total de pedidos ou pizzas vendidas no mês. Ajuda a calcular o ticket médio.' },
+            // Indicadores e Simulador
+            lucroLiquido: { title: 'Lucro Líquido (LL)', formula: 'Faturamento - Todos os Custos e Despesas', text: 'Dinheiro que efetivamente sobra no caixa após pagar absolutamente tudo. É o indicador mais importante da saúde financeira.' },
+            margemLiquida: { title: 'Margem Líquida (ML)', formula: '(Lucro Líquido / Faturamento) × 100', text: 'Indica a porcentagem de lucro que a empresa obtém para cada real de faturamento. Mostra a eficiência da operação.' },
+            markup: { title: 'Markup', formula: '((Preço de Venda - Custo) / Custo) × 100', text: 'Índice que mostra o quanto seu preço de venda está acima do custo do produto.' },
+            precoVenda: { title: 'Preço de Venda (R$)', text: 'O preço final que o cliente paga pelo produto. Use este campo para simular o CMV com base em um preço.' },
+            metaCMV: { title: 'Meta de CMV (%)', text: 'Qual o Custo da Mercadoria Vendida (CMV) máximo que você aceita ter para este produto, em percentual. Um valor comum para pizzarias é entre 25% e 35%. O sistema usará este valor para sugerir um preço de venda.' },
+            margemDesejada: { title: 'Margem Desejada (%)', text: 'Qual a margem de lucro bruta que você deseja ter sobre o preço de venda. Se você quer que 50% do preço de venda seja lucro (sobre o custo direto), insira 50 aqui. O sistema sugerirá o preço para atingir essa margem.' },
+            // Configurações
+            configMaoDeObra: { title: 'Custo da Mão de Obra (R$/hora)', text: 'Some o salário bruto + encargos de todos os funcionários da cozinha e divida pelo total de horas trabalhadas por eles no mês. Este valor será usado para calcular o custo do tempo de preparo de cada pizza.' },
+            configRateio: { title: 'Rateio Fixo (R$/pizza)', text: 'Um pequeno valor a ser adicionado ao custo de cada pizza para ajudar a cobrir custos fixos indiretos (gás, energia, etc.). Ex: R$ 0,50 por pizza.' },
+            configMetaCMV: { title: 'Meta CMV Padrão (%)', text: 'A meta de Custo da Mercadoria Vendida (CMV) que será usada como padrão no simulador e em outros cálculos. Geralmente entre 25-35%.' },
+            configAlerta: { title: 'Alerta de Variação de Preço (%)', text: 'O sistema irá gerar um alerta no Dashboard se o preço de compra de um insumo variar mais do que este percentual (para cima ou para baixo).' }
+        };
 
         if (firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_")) {
             try { 
@@ -413,7 +414,8 @@
             }
             showView('dashboard'); 
             setupNavListeners(); 
-            setupFormListeners(); 
+            setupFormListeners();
+            setupHelpModals();
             await loadAllData(); 
         }
         function resetAppState() { fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; custosMensaisCache = []; ['fornecedores-table', 'insumos-table', 'receitas-table', 'custos-mensais-table'].forEach(id => { const table = document.getElementById(id); if (table) table.querySelector('tbody').innerHTML = '' }); }
@@ -564,6 +566,41 @@
             document.getElementById('insumos-filter').addEventListener('input', e => renderInsumosTable(e.target.value.toLowerCase()));
             document.getElementById('receitas-filter').addEventListener('input', e => renderReceitasTable(e.target.value.toLowerCase()));
             document.body.addEventListener('click', handleTableButtonClick);
+        }
+
+        // NOVA FUNÇÃO para configurar os modais de ajuda
+        function setupHelpModals() {
+            const helpModal = document.getElementById('help-modal');
+            const helpModalTitle = document.getElementById('help-modal-title');
+            const helpModalText = document.getElementById('help-modal-text');
+            const closeModalBtn = document.getElementById('help-modal-close');
+
+            document.body.addEventListener('click', (e) => {
+                if (e.target.classList.contains('help-icon')) {
+                    const key = e.target.dataset.helpKey;
+                    const content = helpTexts[key];
+                    if (content) {
+                        helpModalTitle.textContent = content.title;
+                        let html = `<p>${content.text}</p>`;
+                        if (content.formula) {
+                            html += `<p><strong>Fórmula:</strong> ${content.formula}</p>`;
+                        }
+                        helpModalText.innerHTML = html;
+                        helpModal.style.display = 'block';
+                    }
+                }
+            });
+
+            const closeModal = () => {
+                helpModal.style.display = 'none';
+            };
+
+            closeModalBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', (e) => {
+                if (e.target === helpModal) {
+                    closeModal();
+                }
+            });
         }
 
         function handleTableButtonClick(e) { const btn = e.target.closest('button'); if (!btn) return; if(btn.matches('.btn-edit-fornecedor')) editFornecedor(btn.dataset.id); else if (btn.matches('.btn-delete-fornecedor')) confirmDelete('fornecedor', btn.dataset.id); else if(btn.matches('.btn-edit-insumo')) editInsumo(btn.dataset.id); else if (btn.matches('.btn-delete-insumo')) confirmDelete('insumo', btn.dataset.id); else if (btn.matches('.btn-edit-receita')) editReceita(btn.dataset.id); else if (btn.matches('.btn-delete-receita')) confirmDelete('receita', btn.dataset.id); else if(btn.matches('.btn-edit-custo-mensal')) editCustoMensal(btn.dataset.id); else if(btn.matches('.btn-delete-custo-mensal')) confirmDelete('custoMensal', btn.dataset.id); else if (btn.matches('.btn-view-report')) generateRecipePDF(btn.dataset.id); }
