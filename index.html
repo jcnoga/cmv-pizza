@@ -11,10 +11,9 @@
     ====================================================================================================
     1.  COLE SUA CONFIGURAÇÃO `firebaseConfig` NA SEÇÃO <script> ABAIXO.
     2.  ATIVE "E-mail/senha" NA ABA "AUTHENTICATION" DO FIREBASE.
-    3.  ATIVE O "STORAGE" NO SEU PROJETO FIREBASE.
-    4.  CRIE O "FIRESTORE DATABASE" EM MODO DE PRODUÇÃO.
-    5.  CRIE OS ÍNDICES COMPOSTOS (userId ASC, nome ASC) PARA 'fornecedores', 'insumos', 'receitas'.
-    6.  CRIE O ÍNDICE COMPOSTO (userId ASC, mes DESC) PARA A NOVA COLEÇÃO 'custosMensais'.
+    3.  CRIE O "FIRESTORE DATABASE" EM MODO DE PRODUÇÃO.
+    4.  CRIE OS ÍNDICES COMPOSTOS (userId ASC, nome ASC) PARA 'fornecedores', 'insumos', 'receitas'.
+    5.  CRIE O ÍNDICE COMPOSTO (userId ASC, mes DESC) PARA A NOVA COLEÇÃO 'custosMensais'.
     ====================================================================================================
     -->
 
@@ -29,16 +28,13 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--light-gray); color: var(--text-color); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
         header { background-color: var(--primary-color); color: var(--white); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); flex-wrap: wrap; }
-        header h1 { font-size: 1.5rem; margin-right: 2rem; display: flex; align-items: center;}
-        #header-logo { height: 35px; width: 35px; object-fit: cover; margin-right: 15px; border-radius: 5px; }
-        #header-logo-default { font-size: 1.8rem; margin-right: 15px; }
+        header h1 { font-size: 1.5rem; margin-right: 2rem; }
         #auth-container, #app-container { width: 100%; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
         .auth-form { background: var(--white); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); max-width: 450px; margin: 2rem auto; }
         .auth-form h2 { text-align: center; margin-bottom: 1.5rem; color: var(--primary-dark); }
         .form-group { margin-bottom: 1.25rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--medium-gray); border-radius: var(--border-radius); font-size: 1rem; }
-        .form-group input[type="file"] { padding: 0.5rem; }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2); }
         .btn { display: inline-block; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.3s, transform 0.1s; width: 100%; }
         .btn:disabled { background-color: var(--medium-gray); cursor: not-allowed; }
@@ -100,17 +96,12 @@
         #help-modal-content h3 { color: var(--primary-dark); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
         #help-modal-content p { margin-bottom: 10px; line-height: 1.7; }
         #help-modal-content strong { color: #333; }
-        #config-logo-preview { max-height: 80px; border-radius: var(--border-radius); margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>
-            <span id="header-logo-default">🍕</span>
-            <img id="header-logo" src="" alt="Logo da Empresa" class="hidden">
-            <span id="header-title">Pizzaria Cost Control Pro</span>
-        </h1>
+        <h1>🍕 Pizzaria Cost Control Pro</h1>
         <nav id="app-nav" class="hidden">
             <a href="#" class="nav-link" data-view="dashboard">Dashboard</a>
             <a href="#" class="nav-link" data-view="fornecedores">Fornecedores</a>
@@ -127,67 +118,13 @@
 
     <main>
         <div id="auth-container">
-            <div id="login-view" class="auth-form">
-                <h2>Login</h2>
-                <form id="login-form">
-                    <div class="form-group">
-                        <label for="login-email">Email</label>
-                        <input type="email" id="login-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="login-password">Senha</label>
-                        <input type="password" id="login-password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Entrar</button>
-                </form>
-                <div class="auth-link">
-                    <p>Não tem conta? <a href="#" id="show-register">Cadastre-se</a></p>
-                    <p><a href="#" id="show-reset-password">Esqueci minha senha</a></p>
-                </div>
-            </div>
-            <div id="register-view" class="auth-form hidden">
-                <h2>Cadastro</h2>
-                <form id="register-form">
-                    <div class="form-group">
-                        <label for="register-company-name">Nome da empresa</label>
-                        <input type="text" id="register-company-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-email">Email de acesso</label>
-                        <input type="email" id="register-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-password">Senha (mínimo 6 caracteres)</label>
-                        <input type="password" id="register-password" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="register-logo">Logo da empresa (opcional)</label>
-                        <input type="file" id="register-logo" accept="image/*">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Cadastrar</button>
-                </form>
-                <div class="auth-link">
-                    <p>Já tem conta? <a href="#" id="show-login">Faça login</a></p>
-                </div>
-            </div>
-            <div id="reset-password-view" class="auth-form hidden">
-                <h2>Recuperar Senha</h2>
-                <form id="reset-password-form">
-                    <div class="form-group">
-                        <label for="reset-email">Email</label>
-                        <input type="email" id="reset-email" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Enviar link de recuperação</button>
-                </form>
-                <div class="auth-link">
-                    <p><a href="#" id="back-to-login">Voltar para o Login</a></p>
-                </div>
-            </div>
+            <div id="login-view" class="auth-form"><h2>Login</h2><form id="login-form"><div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required></div><div class="form-group"><label for="login-password">Senha</label><input type="password" id="login-password" required></div><button type="submit" class="btn btn-primary">Entrar</button></form><div class="auth-link"><p>Não tem conta? <a href="#" id="show-register">Cadastre-se</a></p><p><a href="#" id="show-reset-password">Esqueceu a senha?</a></p></div></div>
+            <div id="register-view" class="auth-form hidden"><h2>Cadastro</h2><form id="register-form"><div class="form-group"><label for="register-email">Email</label><input type="email" id="register-email" required></div><div class="form-group"><label for="register-password">Senha</label><input type="password" id="register-password" required minlength="6"></div><button type="submit" class="btn btn-primary">Cadastrar</button></form><div class="auth-link"><p>Já tem conta? <a href="#" id="show-login">Faça login</a></p></div></div>
+            <div id="reset-password-view" class="auth-form hidden"><h2>Recuperar Senha</h2><form id="reset-password-form"><div class="form-group"><label for="reset-email">Email</label><input type="email" id="reset-email" required></div><button type="submit" class="btn btn-primary">Enviar link</button></form><div class="auth-link"><p><a href="#" id="back-to-login">Voltar</a></p></div></div>
         </div>
 
         <div id="app-container" class="hidden">
-            <!-- O restante das seções (dashboard, fornecedores, etc.) permanece o mesmo -->
-             <section id="dashboard-view" class="view">
+            <section id="dashboard-view" class="view">
                 <h2>Dashboard</h2>
                 <div class="grid-container grid-4"><div class="card kpi-card"><h3>CMV Médio</h3><div class="value" id="dashboard-cmv-medio">--%</div></div><div class="card kpi-card"><h3>Fornecedores</h3><div class="value" id="dashboard-num-fornecedores">--</div></div><div class="card kpi-card"><h3>Insumos</h3><div class="value" id="dashboard-num-insumos">--</div></div><div class="card kpi-card"><h3>Receitas</h3><div class="value" id="dashboard-num-receitas">--</div></div></div>
                 <div class="grid-container grid-2"><div class="card"><h3>Alertas de Variação (> <span id="alert-threshold-display">10</span>%)</h3><div id="dashboard-alerts"><p>Nenhum alerta.</p></div></div><div class="card"><h3>Top 5 Insumos por Custo</h3><table id="dashboard-top-insumos"><thead><tr><th>Insumo</th><th>Custo/g (ou un)</th></tr></thead><tbody><tr><td colspan="2">N/A</td></tr></tbody></table></div></div>
@@ -265,26 +202,7 @@
             </section>
             
             <section id="configuracoes-view" class="view">
-                <div class="card">
-                    <h2>Configurações Gerais</h2>
-                    <form id="configuracoes-form">
-                        <div class="form-group">
-                            <label for="config-company-name">Nome da Empresa</label>
-                            <input type="text" id="config-company-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="config-logo-upload">Alterar Logo</label>
-                            <input type="file" id="config-logo-upload" accept="image/*">
-                            <img id="config-logo-preview" src="" alt="Pré-visualização do logo" class="hidden">
-                        </div>
-                        <hr style="margin: 2rem 0;">
-                        <div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo Mão de Obra (R$/hora) <i class="help-icon" data-help-key="configMaoDeObra">ℹ️</i></label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div>
-                        <div class="form-group"><label for="config-rateio-despesas-fixas">Rateio Fixo (R$/pizza) <i class="help-icon" data-help-key="configRateio">ℹ️</i></label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div>
-                        <div class="form-group"><label for="config-meta-cmv-padrao">Meta CMV Padrão (%) <i class="help-icon" data-help-key="configMetaCMV">ℹ️</i></label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div>
-                        <div class="form-group"><label for="config-alerta-variacao">Alerta Variação Preço (%) <i class="help-icon" data-help-key="configAlerta">ℹ️</i></label><input type="number" id="config-alerta-variacao" step="1"></div>
-                        <button type="submit" class="btn btn-primary">Salvar Configurações</button>
-                    </form>
-                </div>
+                <div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo Mão de Obra (R$/hora) <i class="help-icon" data-help-key="configMaoDeObra">ℹ️</i></label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label for="config-rateio-despesas-fixas">Rateio Fixo (R$/pizza) <i class="help-icon" data-help-key="configRateio">ℹ️</i></label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label for="config-meta-cmv-padrao">Meta CMV Padrão (%) <i class="help-icon" data-help-key="configMetaCMV">ℹ️</i></label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label for="config-alerta-variacao">Alerta Variação Preço (%) <i class="help-icon" data-help-key="configAlerta">ℹ️</i></label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div>
             </section>
 
             <section id="ajuda-view" class="view">
@@ -304,6 +222,7 @@
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
     
+    <!-- NOVO MODAL DE AJUDA -->
     <div id="help-modal" class="modal">
         <div id="help-modal-content" class="modal-content">
             <h3 id="help-modal-title"></h3>
@@ -317,8 +236,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <!-- SCRIPT DO FIREBASE STORAGE -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -329,24 +246,58 @@
             apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
             authDomain: "cmv-pizza.firebaseapp.com",
             projectId: "cmv-pizza",
-            storageBucket: "cmv-pizza.appspot.com",
+            storageBucket: "cmv-pizza.firebasestorage.app",
             messagingSenderId: "1022435006716",
             appId: "1:1022435006716:web:ec39f22702097beca25f79"
         };
 
-        let firebaseApp, auth, db, storage, currentUser;
+        let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {}, custosMensais: [] };
         let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {}, custosMensaisCache = [];
-        
-        // ... (o objeto helpTexts continua o mesmo) ...
+
+        // NOVO: Objeto com todos os textos de ajuda
+        const helpTexts = {
+            // Fornecedores
+            fornecedorNome: { title: 'Nome do Fornecedor', text: 'Nome fantasia ou razão social da empresa que fornece os insumos. Ex: "Distribuidora de Frios S.A.".' },
+            fornecedorContato: { title: 'Nome do Contato', text: 'Nome do vendedor ou pessoa principal com quem você fala na empresa. Ex: "Carlos Andrade".' },
+            // Insumos
+            insumoNome: { title: 'Nome do Insumo', text: 'Descrição clara e única para o ingrediente. Ex: "Queijo Mussarela Peça", "Tomate Italiano", "Farinha de Trigo Tipo 1".' },
+            insumoCustoEmbalagem: { title: 'Custo da Embalagem (R$)', text: 'O valor total que você pagou pela embalagem fechada do insumo (saco, caixa, peça, etc.). Ex: R$ 85,90.' },
+            insumoQtdEmbalagem: { title: 'Quantidade na Embalagem', text: 'A quantidade total de produto que vem na embalagem que você comprou. Use a unidade correspondente (kg, L, un).' },
+            insumoLote: { title: 'Lote', text: 'Código de lote do produto, geralmente impresso na embalagem. Ajuda no rastreamento em caso de problemas.' },
+            // Receitas
+            receitaVersao: { title: 'Versão da Receita', text: 'Use para controlar alterações na receita. Comece com 1.0 e aumente a cada modificação (ex: 1.1, 2.0). Ajuda a manter o histórico.' },
+            receitaTempoPreparo: { title: 'Tempo de Preparo (min)', text: 'Tempo total em minutos que um funcionário leva para montar a pizza, desde separar os ingredientes até ela estar pronta para ir ao forno. Este tempo será usado para calcular o custo da mão de obra por pizza.' },
+            receitaEmbalagem: { title: 'Custo da Embalagem (R$)', text: 'Custo da caixa da pizza, lacre, e qualquer outro item de embalagem usado para o delivery deste produto específico.' },
+            receitaPerda: { title: 'Percentual de Perda (%)', text: 'Estimativa de perda de ingredientes durante o preparo (ex: aparas, produto que cai no chão). Um valor comum é entre 3% e 5%. Este percentual será acrescido ao custo dos ingredientes.' },
+            // Custos Mensais
+            faturamento: { title: 'Faturamento (Receita Bruta)', formula: 'Preço de Venda × Unidades Vendidas', text: 'Valor total arrecadado com as vendas antes de qualquer dedução.' },
+            custosVariaveis: { title: 'Custos Variáveis (CV)', text: 'Soma de todos os custos que só existem quando há venda, como o custo total dos ingredientes usados no mês, embalagens e taxas de cartão/delivery.' },
+            custosFixos: { title: 'Custos Fixos (CF)', text: 'Soma dos custos que você tem todo mês, vendendo ou não: aluguel, salários, contador, internet, etc.' },
+            despesasOperacionais: { title: 'Despesas Operacionais', text: 'Gastos necessários para manter a operação funcionando, mas que não estão diretamente ligados à produção. Ex: material de limpeza, marketing, uniformes.' },
+            impostos: { title: 'Impostos', text: 'Valor total de impostos pagos no mês, como o Simples Nacional.' },
+            outrasReceitasDespesas: { title: 'Outras Receitas/Despesas', text: 'Qualquer entrada ou saída de dinheiro que não seja da operação principal. Use um valor negativo para despesas (ex: -150.00 para um conserto emergencial).' },
+            numeroVendas: { title: 'Número de Vendas', text: 'Quantidade total de pedidos ou pizzas vendidas no mês. Ajuda a calcular o ticket médio.' },
+            // Indicadores e Simulador
+            lucroLiquido: { title: 'Lucro Líquido (LL)', formula: 'Faturamento - Todos os Custos e Despesas', text: 'Dinheiro que efetivamente sobra no caixa após pagar absolutamente tudo. É o indicador mais importante da saúde financeira.' },
+            margemLiquida: { title: 'Margem Líquida (ML)', formula: '(Lucro Líquido / Faturamento) × 100', text: 'Indica a porcentagem de lucro que a empresa obtém para cada real de faturamento. Mostra a eficiência da operação.' },
+            markup: { title: 'Markup', formula: '((Preço de Venda - Custo) / Custo) × 100', text: 'Índice que mostra o quanto seu preço de venda está acima do custo do produto.' },
+            precoVenda: { title: 'Preço de Venda (R$)', text: 'O preço final que o cliente paga pelo produto. Use este campo para simular o CMV com base em um preço.' },
+            metaCMV: { title: 'Meta de CMV (%)', text: 'Qual o Custo da Mercadoria Vendida (CMV) máximo que você aceita ter para este produto, em percentual. Um valor comum para pizzarias é entre 25% e 35%. O sistema usará este valor para sugerir um preço de venda.' },
+            margemDesejada: { title: 'Margem Desejada (%)', text: 'Qual a margem de lucro bruta que você deseja ter sobre o preço de venda. Se você quer que 50% do preço de venda seja lucro (sobre o custo direto), insira 50 aqui. O sistema sugerirá o preço para atingir essa margem.' },
+            // Configurações
+            configMaoDeObra: { title: 'Custo da Mão de Obra (R$/hora)', text: 'Some o salário bruto + encargos de todos os funcionários da cozinha e divida pelo total de horas trabalhadas por eles no mês. Este valor será usado para calcular o custo do tempo de preparo de cada pizza.' },
+            configRateio: { title: 'Rateio Fixo (R$/pizza)', text: 'Um pequeno valor a ser adicionado ao custo de cada pizza para ajudar a cobrir custos fixos indiretos (gás, energia, etc.). Ex: R$ 0,50 por pizza.' },
+            configMetaCMV: { title: 'Meta CMV Padrão (%)', text: 'A meta de Custo da Mercadoria Vendida (CMV) que será usada como padrão no simulador e em outros cálculos. Geralmente entre 25-35%.' },
+            configAlerta: { title: 'Alerta de Variação de Preço (%)', text: 'O sistema irá gerar um alerta no Dashboard se o preço de compra de um insumo variar mais do que este percentual (para cima ou para baixo).' }
+        };
 
         if (firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_")) {
             try { 
                 firebaseApp = firebase.initializeApp(firebaseConfig); 
                 auth = firebase.auth(); 
-                db = firebase.firestore();
-                storage = firebase.storage();
+                db = firebase.firestore(); 
                 setupAuthListeners();
             } 
             catch (error) { 
@@ -367,7 +318,9 @@
         const views = document.querySelectorAll('.view');
         const navLinks = document.querySelectorAll('.nav-link');
 
-        // ... (funções showToast, formatCurrency, showView) ...
+        function showToast(message, type = 'success') { const toast = document.getElementById('toast'); toast.textContent = message; toast.className = `toast show ${type}`; setTimeout(() => { toast.className = 'toast'; }, 3000); }
+        function formatCurrency(value) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0); }
+        function showView(viewId) { views.forEach(v => v.classList.remove('active')); navLinks.forEach(l => l.classList.remove('active')); document.getElementById(`${viewId}-view`)?.classList.add('active'); document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active'); }
 
         function setupAuthListeners() {
             auth.onAuthStateChanged(user => {
@@ -386,126 +339,320 @@
                 }
             });
 
-            // Formulário de Login
-            document.getElementById('login-form').addEventListener('submit', async e => { /* ... (código existente) ... */ });
-
-            // Formulário de Cadastro
-            document.getElementById('register-form').addEventListener('submit', async e => {
+            const loginForm = document.getElementById('login-form');
+            loginForm.addEventListener('submit', async e => {
                 e.preventDefault();
-                const button = e.currentTarget.querySelector('button[type="submit"]');
-                button.disabled = true;
-                button.textContent = 'Aguarde...';
-                
-                const companyName = document.getElementById('register-company-name').value;
-                const email = document.getElementById('register-email').value;
-                const password = document.getElementById('register-password').value;
-                const logoFile = document.getElementById('register-logo').files[0];
-
+                const button = loginForm.querySelector('button[type="submit"]');
+                button.disabled = true; button.textContent = 'Aguarde...';
                 try {
-                    const { user } = await auth.createUserWithEmailAndPassword(email, password);
-                    
-                    let logoUrl = '';
-                    if (logoFile && storage) {
-                        showToast('Enviando logo...', 'info');
-                        const filePath = `logos/${user.uid}/${logoFile.name}`;
-                        const fileRef = storage.ref().child(filePath);
-                        await fileRef.put(logoFile);
-                        logoUrl = await fileRef.getDownloadURL();
-                    }
+                    await auth.signInWithEmailAndPassword(
+                        document.getElementById('login-email').value,
+                        document.getElementById('login-password').value
+                    );
+                } catch (err) {
+                    showToast(err.message, 'error');
+                } finally {
+                    button.disabled = false; button.textContent = 'Entrar';
+                }
+            });
 
-                    const configData = {
-                        companyName,
-                        logoUrl,
-                        custo_hora_mao_de_obra: 20, 
-                        rateio_por_pizza: 0.80, 
-                        meta_cmv_padrao: 30, 
-                        alerta_variacao: 10
-                    };
-                    await db.collection('configuracoes').doc(user.uid).set(configData);
-
+            const registerForm = document.getElementById('register-form');
+            registerForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const button = registerForm.querySelector('button[type="submit"]');
+                button.disabled = true; button.textContent = 'Aguarde...';
+                try {
+                    await auth.createUserWithEmailAndPassword(
+                        document.getElementById('register-email').value,
+                        document.getElementById('register-password').value
+                    );
                     showToast("Cadastro realizado com sucesso! Faça o login.");
                     toggleAuthViews('login-view');
                 } catch (err) {
                     showToast(err.message, 'error');
                 } finally {
-                    button.disabled = false;
-                    button.textContent = 'Cadastrar';
+                    button.disabled = false; button.textContent = 'Cadastrar';
                 }
             });
             
-            // ... (restante do setupAuthListeners)
-        }
-        
-        // ... (outras funções principais)
-
-        async function fetchConfiguracoes() { 
-            // ...
-            // Adicionar a chamada para updateHeader() após buscar as configurações
-            updateHeader();
-            displayConfiguracoes(); 
-        }
-
-        function displayConfiguracoes() {
-            // Preenche todos os campos, incluindo os novos
-            document.getElementById('config-company-name').value = configCache.companyName || '';
-            const logoPreview = document.getElementById('config-logo-preview');
-            if (configCache.logoUrl) {
-                logoPreview.src = configCache.logoUrl;
-                logoPreview.classList.remove('hidden');
-            } else {
-                logoPreview.classList.add('hidden');
-            }
-            // ... (restante dos campos)
-        }
-
-        async function saveConfiguracoes(configData) { 
-            configData.userId = currentUser.uid;
-            
-            const logoFile = document.getElementById('config-logo-upload').files[0];
-
-            const button = document.querySelector('#configuracoes-form button[type="submit"]');
-            button.disabled = true;
-            button.textContent = "Salvando...";
-
-            try {
-                if (logoFile && storage) {
-                    showToast('Enviando novo logo...', 'info');
-                    // Apaga o logo antigo se existir
-                    if (configCache.logoUrl) {
-                        try {
-                           const oldLogoRef = storage.refFromURL(configCache.logoUrl);
-                           await oldLogoRef.delete();
-                        } catch (error) {
-                           console.warn("Não foi possível apagar o logo antigo:", error.code);
-                        }
-                    }
-                    const filePath = `logos/${currentUser.uid}/${logoFile.name}`;
-                    const fileRef = storage.ref().child(filePath);
-                    await fileRef.put(logoFile);
-                    configData.logoUrl = await fileRef.getDownloadURL();
+            const resetForm = document.getElementById('reset-password-form');
+            resetForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const button = resetForm.querySelector('button[type="submit"]');
+                button.disabled = true; button.textContent = 'Aguarde...';
+                try {
+                    await auth.sendPasswordResetEmail(document.getElementById('reset-email').value);
+                    showToast("Email de recuperação enviado! Verifique sua caixa de entrada.");
+                    toggleAuthViews('login-view');
+                } catch (err) {
+                    showToast(err.message, 'error');
+                } finally {
+                    button.disabled = false; button.textContent = 'Enviar link';
                 }
+            });
 
-                if (isLocalMode) { 
-                    localData.configuracoes.default = { ...localData.configuracoes.default, ...configData }; 
-                } else { 
-                    await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); 
-                } 
-                showToast("Configurações salvas!"); 
-                configCache = { ...configCache, ...configData}; 
-                
-                updateHeader(); // Atualiza o cabeçalho imediatamente
-                displayConfiguracoes(); 
-                updateDashboard(); 
-            } catch(error) { 
-                showToast("Erro ao salvar: " + error.message, 'error'); 
-            } finally {
-                button.disabled = false;
-                button.textContent = "Salvar Configurações";
+            document.getElementById('logout-button').addEventListener('click', () => {
+                if (auth) auth.signOut();
+            });
+            
+            ['show-register', 'show-login', 'show-reset-password', 'back-to-login'].forEach(id => {
+                document.getElementById(id).addEventListener('click', e => {
+                    e.preventDefault();
+                    const viewMap = { 'show-register': 'register-view', 'show-login': 'login-view', 'show-reset-password': 'reset-password-view', 'back-to-login': 'login-view' };
+                    toggleAuthViews(viewMap[id]);
+                });
+            });
+        }
+        function toggleAuthViews(view) { ['login-view', 'register-view', 'reset-password-view'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById(view).classList.remove('hidden'); }
+
+        async function initApp() { 
+            if (isLocalMode) {
+                currentUser = { uid: 'local', email: 'local@app.com' };
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                appNav.classList.remove('hidden');
+            }
+            showView('dashboard'); 
+            setupNavListeners(); 
+            setupFormListeners();
+            setupHelpModals();
+            await loadAllData(); 
+        }
+        function resetAppState() { fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; custosMensaisCache = []; ['fornecedores-table', 'insumos-table', 'receitas-table', 'custos-mensais-table'].forEach(id => { const table = document.getElementById(id); if (table) table.querySelector('tbody').innerHTML = '' }); }
+        async function loadAllData() { await fetchConfiguracoes(); await Promise.all([fetchFornecedores(), fetchInsumos(), fetchReceitas(), fetchCustosMensais()]); renderAllTables(); populateAllDropdowns(); updateDashboard(); }
+
+        async function fetchCollection(collectionName, cacheArray, localKey, orderByField = 'nome', orderDirection = 'asc') {
+            if (isLocalMode) { cacheArray.splice(0, cacheArray.length, ...localData[localKey]); return; }
+            try {
+                const snapshot = await db.collection(collectionName).where('userId', '==', currentUser.uid).orderBy(orderByField, orderDirection).get();
+                const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                cacheArray.splice(0, cacheArray.length, ...data);
+            } catch (error) {
+                console.error(`Erro ao buscar ${collectionName}:`, error);
+                if (error.code === 'failed-precondition') { showToast(`Erro: Índice do Firestore ausente para '${collectionName}'. Crie-o no Firebase.`, 'error');
+                } else { showToast(`Erro ao carregar ${collectionName}: ${error.message}`, 'error'); }
             }
         }
-        
-        // ... (O resto do seu código JavaScript permanece o mesmo)
+        async function saveData(collectionName, localKey, data) {
+            const isEditing = !!data.id;
+            data.userId = currentUser.uid;
+            try {
+                if (isLocalMode) {
+                    if (isEditing) { const index = localData[localKey].findIndex(i => i.id === data.id); if (index > -1) localData[localKey][index] = data;
+                    } else { data.id = `local_${Date.now()}`; localData[localKey].push(data); }
+                } else {
+                    if (isEditing) { await db.collection(collectionName).doc(data.id).update(data);
+                    } else { delete data.id; await db.collection(collectionName).add(data); }
+                }
+                showToast(`${collectionName.replace('sMensais', '').slice(0, -1)} ${isEditing ? 'atualizado' : 'salvo'}!`);
+                return true;
+            } catch (error) {
+                const errorMsg = error.code === 'permission-denied' ? 'Permissão negada. Verifique suas Regras de Segurança do Firestore.' : error.message;
+                showToast(`Erro: ${errorMsg}`, 'error');
+                console.error(`Erro ao salvar em ${collectionName}:`, error);
+                return false;
+            }
+        }
+        async function deleteData(collectionName, localKey, id) {
+             try {
+                if (isLocalMode) { localData[localKey] = localData[localKey].filter(i => i.id !== id);
+                } else { await db.collection(collectionName).doc(id).delete(); }
+                showToast(`${collectionName.replace('sMensais', '').slice(0, -1)} excluído!`);
+                return true;
+            } catch (error) { showToast("Erro ao excluir.", 'error'); return false; }
+        }
 
+        async function fetchFornecedores() { await fetchCollection('fornecedores', fornecedoresCache, 'fornecedores'); }
+        async function fetchInsumos() { await fetchCollection('insumos', insumosCache, 'insumos'); }
+        async function fetchReceitas() { await fetchCollection('receitas', receitasCache, 'receitas'); }
+        async function fetchCustosMensais() { await fetchCollection('custosMensais', custosMensaisCache, 'custosMensais', 'mes', 'desc'); }
+        async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } catch(error) { console.error("Erro configs:", error); } } displayConfiguracoes(); }
+        async function saveConfiguracoes(configData) { configData.userId = currentUser.uid; try { if(isLocalMode) { localData.configuracoes.default = configData; } else { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } showToast("Configurações salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); } catch(error) { showToast("Erro ao salvar.", 'error'); } }
+        
+        function renderAllTables() { renderFornecedoresTable(); renderInsumosTable(); renderReceitasTable(); renderCustosMensaisTable(); }
+        function populateAllDropdowns() { populateFornecedoresDropdowns(); populateReceitaSelects(); populateIndicadoresMesSelect(); }
+        function renderFornecedoresTable() { const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = ''; if (fornecedoresCache.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; } fornecedoresCache.forEach(f => { const insumosCount = insumosCache.filter(i => i.fornecedorId === f.id).length; const tr = document.createElement('tr'); tr.innerHTML = `<td>${f.nome}</td><td>${f.contato || '--'}</td><td>${f.telefone || '--'}</td><td>${insumosCount}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
+        function renderInsumosTable(filter = '') { const tbody = document.getElementById('insumos-table').querySelector('tbody'); tbody.innerHTML = ''; const data = insumosCache.filter(i => i.nome.toLowerCase().includes(filter) || (i.fornecedorNome && i.fornecedorNome.toLowerCase().includes(filter))); if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum insumo encontrado.</td></tr>'; return; } data.forEach(i => { const custo = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : i.custo_embalagem; const tr = document.createElement('tr'); tr.innerHTML = `<td>${i.nome}</td><td>${formatCurrency(custo)} / ${i.unidade_base || 'g'}</td><td>${i.fornecedorNome || '--'}</td><td>${i.validade ? new Date(i.validade).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : '--'}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-insumo" data-id="${i.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-insumo" data-id="${i.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
+        function renderReceitasTable(filter = '') { const tbody = document.getElementById('receitas-table').querySelector('tbody'); tbody.innerHTML = ''; const data = receitasCache.filter(r => r.nome.toLowerCase().includes(filter)); if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Nenhuma receita encontrada.</td></tr>'; return; } data.forEach(r => { const cogs = calculateRecipeCOGS(r); const tr = document.createElement('tr'); tr.innerHTML = `<td>${r.nome}</td><td>${formatCurrency(cogs)}</td><td>${r.versao || '1.0'}</td><td class="actions-cell"><button class="btn btn-info btn-small btn-view-report" data-id="${r.id}">📄</button> <button class="btn btn-secondary btn-small btn-edit-receita" data-id="${r.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-receita" data-id="${r.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
+        function renderCustosMensaisTable() { const tbody = document.getElementById('custos-mensais-table').querySelector('tbody'); tbody.innerHTML = ''; if (custosMensaisCache.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Nenhum custo mensal lançado.</td></tr>'; return; } custosMensaisCache.forEach(c => { const [year, month] = c.mes.split('-'); const lucro = calculateLucroLiquido(c); const tr = document.createElement('tr'); tr.innerHTML = `<td>${month}/${year}</td><td>${formatCurrency(c.faturamento)}</td><td>${formatCurrency(lucro)}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-custo-mensal" data-id="${c.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-custo-mensal" data-id="${c.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
+        function populateFornecedoresDropdowns() { const select = document.getElementById('insumo-fornecedor-select'); const current = select.value; select.innerHTML = '<option value="">-- Selecione --</option>'; fornecedoresCache.forEach(f => { select.innerHTML += `<option value="${f.id}" data-nome="${f.nome}">${f.nome}</option>`; }); select.value = current; }
+        
+        function populateInsumosDropdowns(selectEl) { 
+            if(selectEl){ 
+                let html = '<option value="">Selecione um insumo</option>'; 
+                insumosCache.forEach(i => { 
+                    const custo = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : i.custo_embalagem; 
+                    const nomeInsumo = i.nome || 'NOME INDEFINIDO';
+                    html += `<option value="${i.id}" data-nome="${nomeInsumo}">${nomeInsumo} (${formatCurrency(custo)}/${i.unidade_base || 'g'})</option>`; 
+                }); 
+                selectEl.innerHTML = html;
+            }
+        }
+
+        function populateReceitaSelects() { const select = document.getElementById('simulador-receita-select'); const current = select.value; select.innerHTML = '<option value="">-- Escolha --</option>'; receitasCache.forEach(r => { select.innerHTML += `<option value="${r.id}">${r.nome}</option>`; }); select.value = current; }
+        function populateIndicadoresMesSelect() { const select = document.getElementById('indicadores-mes-select'); const current = select.value; select.innerHTML = '<option value="">-- Escolha um mês --</option>'; custosMensaisCache.forEach(c => { const [year, month] = c.mes.split('-'); select.innerHTML += `<option value="${c.id}">${month}/${year}</option>`; }); select.value = current; updateIndicadores(); }
+        
+        function calculateCustoPorGrama(insumo) { if (!insumo || !insumo.custo_embalagem || !insumo.qtd_embalagem_g) return 0; return insumo.custo_embalagem / insumo.qtd_embalagem_g; }
+        function calculateCustoIngrediente(insumoId, quantidade_g) { const insumo = insumosCache.find(i => i.id === insumoId); if (!insumo) return 0; return calculateCustoPorGrama(insumo) * quantidade_g; }
+        function calculateRecipeIngredientsCost(ingredients = []) { return ingredients.reduce((total, ing) => total + calculateCustoIngrediente(ing.insumoId, ing.quantidade_g), 0); }
+        function calculateRecipeCOGS(receita) { if (!receita || !receita.ingredientes) return 0;
+            const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes); 
+            const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100); 
+            const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0); 
+            return custoComPerda + (receita.custo_embalagem_por_unidade || 0) + custoMaoDeObra + (configCache.rateio_por_pizza || 0); 
+        }
+        function calculateLucroLiquido(custoMensal) { if (!custoMensal) return 0; return (custoMensal.faturamento || 0) + (custoMensal.outrasReceitasDespesas || 0) - (custoMensal.custosVariaveis || 0) - (custoMensal.custosFixos || 0) - (custoMensal.despesasOperacionais || 0) - (custoMensal.impostos || 0); }
+        
+        function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
+        
+        function setupFormListeners() {
+            document.getElementById('fornecedor-form').addEventListener('submit', async e => { e.preventDefault(); const button = e.currentTarget.querySelector('button[type="submit"]'); button.disabled = true; button.textContent = 'Aguarde...'; const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null }; const success = await saveData('fornecedores', 'fornecedores', data); if (success) { await fetchFornecedores(); renderFornecedoresTable(); populateFornecedoresDropdowns(); resetFornecedorForm(); } button.disabled = false; button.textContent = 'Salvar Fornecedor'; });
+            document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
+
+            document.getElementById('insumo-form').addEventListener('submit', async e => { e.preventDefault(); const button = e.currentTarget.querySelector('button[type="submit"]'); button.disabled = true; button.textContent = 'Aguarde...'; const fornecedorSelect = document.getElementById('insumo-fornecedor-select'); if (!fornecedorSelect.value) { showToast("Selecione um fornecedor.", "error"); button.disabled = false; button.textContent = 'Salvar Insumo'; return; } const id = document.getElementById('insumo-id').value, custo = parseFloat(document.getElementById('insumo-custo-embalagem').value); const existing = id ? insumosCache.find(i => i.id === id) : null; const historico = existing ? (existing.historico_precos || []) : []; if (existing && custo !== existing.custo_embalagem) { historico.push({ data: new Date().toISOString(), preco: existing.custo_embalagem }); } const qtd = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unidade = document.getElementById('insumo-unidade-embalagem').value; let qtd_g = qtd, base = 'g'; if (unidade === 'kg') qtd_g = qtd * 1000; else if (unidade === 'L') { qtd_g = qtd * 1000; base = 'ml'; } else if (unidade === 'un') base = 'un'; const data = { nome: document.getElementById('insumo-nome').value, fornecedorId: fornecedorSelect.value, fornecedorNome: fornecedorSelect.options[fornecedorSelect.selectedIndex].dataset.nome, custo_embalagem: custo, quantidade_embalagem: qtd, unidade_embalagem: unidade, qtd_embalagem_g: qtd_g, unidade_base: base, lote: document.getElementById('insumo-lote').value, validade: document.getElementById('insumo-validade').value, historico_precos: historico, id: id || null }; const success = await saveData('insumos', 'insumos', data); if (success) { await fetchInsumos(); renderInsumosTable(); resetInsumoForm(); } button.disabled = false; button.textContent = 'Salvar Insumo'; });
+            document.getElementById('cancel-edit-insumo').addEventListener('click', resetInsumoForm);
+            
+            const ingredientsList = document.getElementById('ingredients-list');
+            ingredientsList.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.classList.contains('ingredient-qty')) { e.preventDefault(); addIngredientRow(); const newRow = ingredientsList.querySelector('.ingredient-row:last-child .ingredient-select'); if(newRow) newRow.focus(); } });
+
+            const receitaForm = document.getElementById('receita-form');
+            receitaForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const button = receitaForm.querySelector('button[type="submit"]');
+                button.disabled = true; button.textContent = 'Aguarde...';
+                try {
+                    const ingredients = []; let hasIncompleteRow = false;
+                    document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { const select = row.querySelector('.ingredient-select'); const insumoId = select.value; const quantidade_g = parseFloat(row.querySelector('.ingredient-qty').value) || 0; if (!insumoId && quantidade_g === 0) return; if (!insumoId || quantidade_g <= 0) { hasIncompleteRow = true; } else { const selectedOption = select.options[select.selectedIndex]; const nome = selectedOption ? selectedOption.dataset.nome : null; if (nome) { ingredients.push({ insumoId, nome, quantidade_g }); } else { hasIncompleteRow = true; } } });
+                    if (hasIncompleteRow) { throw new Error("Verifique se todos os ingredientes têm Insumo e Quantidade preenchidos."); } 
+                    if (ingredients.length === 0) { throw new Error("Adicione ao menos um ingrediente válido à receita."); }
+                    
+                    const data = { 
+                        nome: document.getElementById('receita-nome').value, 
+                        versao: document.getElementById('receita-versao').value, 
+                        ingredientes: ingredients,
+                        tempo_preparo_min: parseInt(document.getElementById('receita-tempo-preparo').value) || 0, 
+                        custo_embalagem_por_unidade: parseFloat(document.getElementById('receita-custo-embalagem').value) || 0, 
+                        perda_percentual: parseFloat(document.getElementById('receita-perda-percentual').value) || 0, 
+                        observacoes: document.getElementById('receita-observacoes').value, 
+                        id: document.getElementById('receita-id').value || null 
+                    };
+
+                    const success = await saveData('receitas', 'receitas', data);
+                    if (success) { await fetchReceitas(); renderReceitasTable(); populateReceitaSelects(); resetReceitaForm(); }
+                } catch (error) { showToast(error.message, 'error');
+                } finally { button.disabled = false; button.textContent = 'Salvar Receita'; }
+            });
+            document.getElementById('add-ingredient-btn').addEventListener('click', () => addIngredientRow());
+            ingredientsList.addEventListener('change', e => { if(e.target.matches('.ingredient-select, .ingredient-qty')) updateTotalIngredientsCost(); });
+            ingredientsList.addEventListener('click', e => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
+            document.getElementById('cancel-edit-receita').addEventListener('click', resetReceitaForm);
+
+            const custoMensalForm = document.getElementById('custo-mensal-form');
+            custoMensalForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const button = custoMensalForm.querySelector('button[type="submit"]');
+                button.disabled = true; button.textContent = 'Aguarde...';
+                const data = { mes: document.getElementById('custo-mensal-mes').value, faturamento: parseFloat(document.getElementById('custo-mensal-faturamento').value) || 0, custosVariaveis: parseFloat(document.getElementById('custo-mensal-custosVariaveis').value) || 0, custosFixos: parseFloat(document.getElementById('custo-mensal-custosFixos').value) || 0, despesasOperacionais: parseFloat(document.getElementById('custo-mensal-despesasOperacionais').value) || 0, outrasReceitasDespesas: parseFloat(document.getElementById('custo-mensal-outrasReceitasDespesas').value) || 0, numeroVendas: parseInt(document.getElementById('custo-mensal-numeroVendas').value) || 0, impostos: parseFloat(document.getElementById('custo-mensal-impostos').value) || 0, id: document.getElementById('custo-mensal-id').value || null };
+                const success = await saveData('custosMensais', 'custosMensais', data);
+                if (success) { await fetchCustosMensais(); renderCustosMensaisTable(); populateIndicadoresMesSelect(); resetCustoMensalForm(); }
+                button.disabled = false; button.textContent = 'Salvar Mês';
+            });
+            document.getElementById('cancel-edit-custo-mensal').addEventListener('click', resetCustoMensalForm);
+            
+            document.getElementById('configuracoes-form').addEventListener('submit', async e => { e.preventDefault(); const data = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; await saveConfiguracoes(data); });
+            document.getElementById('simulador-receita-select').addEventListener('change', updateSimulator);
+            ['simulador-preco-venda', 'simulador-meta-cmv', 'simulador-margem-desejada'].forEach(id => document.getElementById(id).addEventListener('input', updateSimulator));
+            document.getElementById('indicadores-mes-select').addEventListener('change', updateIndicadores);
+            document.getElementById('insumos-filter').addEventListener('input', e => renderInsumosTable(e.target.value.toLowerCase()));
+            document.getElementById('receitas-filter').addEventListener('input', e => renderReceitasTable(e.target.value.toLowerCase()));
+            document.body.addEventListener('click', handleTableButtonClick);
+        }
+
+        // NOVA FUNÇÃO para configurar os modais de ajuda
+        function setupHelpModals() {
+            const helpModal = document.getElementById('help-modal');
+            const helpModalTitle = document.getElementById('help-modal-title');
+            const helpModalText = document.getElementById('help-modal-text');
+            const closeModalBtn = document.getElementById('help-modal-close');
+
+            document.body.addEventListener('click', (e) => {
+                if (e.target.classList.contains('help-icon')) {
+                    const key = e.target.dataset.helpKey;
+                    const content = helpTexts[key];
+                    if (content) {
+                        helpModalTitle.textContent = content.title;
+                        let html = `<p>${content.text}</p>`;
+                        if (content.formula) {
+                            html += `<p><strong>Fórmula:</strong> ${content.formula}</p>`;
+                        }
+                        helpModalText.innerHTML = html;
+                        helpModal.style.display = 'block';
+                    }
+                }
+            });
+
+            const closeModal = () => {
+                helpModal.style.display = 'none';
+            };
+
+            closeModalBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', (e) => {
+                if (e.target === helpModal) {
+                    closeModal();
+                }
+            });
+        }
+
+        function handleTableButtonClick(e) { const btn = e.target.closest('button'); if (!btn) return; if(btn.matches('.btn-edit-fornecedor')) editFornecedor(btn.dataset.id); else if (btn.matches('.btn-delete-fornecedor')) confirmDelete('fornecedor', btn.dataset.id); else if(btn.matches('.btn-edit-insumo')) editInsumo(btn.dataset.id); else if (btn.matches('.btn-delete-insumo')) confirmDelete('insumo', btn.dataset.id); else if (btn.matches('.btn-edit-receita')) editReceita(btn.dataset.id); else if (btn.matches('.btn-delete-receita')) confirmDelete('receita', btn.dataset.id); else if(btn.matches('.btn-edit-custo-mensal')) editCustoMensal(btn.dataset.id); else if(btn.matches('.btn-delete-custo-mensal')) confirmDelete('custoMensal', btn.dataset.id); else if (btn.matches('.btn-view-report')) generateRecipePDF(btn.dataset.id); }
+        function resetFornecedorForm() { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value = ''; document.getElementById('fornecedor-form-title').textContent = 'Cadastrar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); }
+        function editFornecedor(id) { const f = fornecedoresCache.find(i => i.id === id); if (!f) return; showView('fornecedores'); Object.keys(f).forEach(key => { const el = document.getElementById(`fornecedor-${key}`); if (el) el.value = f[key]; }); document.getElementById('fornecedor-id').value = f.id; document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.remove('hidden'); window.scrollTo(0, 0); }
+        function resetInsumoForm() { document.getElementById('insumo-form').reset(); document.getElementById('insumo-id').value = ''; document.getElementById('insumo-form-title').textContent = 'Cadastrar Insumo'; document.getElementById('cancel-edit-insumo').classList.add('hidden'); }
+        function editInsumo(id) { const i = insumosCache.find(item => item.id === id); if (!i) return; showView('insumos'); document.getElementById('insumo-id').value = i.id; document.getElementById('insumo-nome').value = i.nome; document.getElementById('insumo-fornecedor-select').value = i.fornecedorId; document.getElementById('insumo-custo-embalagem').value = i.custo_embalagem; document.getElementById('insumo-qtd-embalagem').value = i.quantidade_embalagem; document.getElementById('insumo-unidade-embalagem').value = i.unidade_embalagem; document.getElementById('insumo-lote').value = i.lote; document.getElementById('insumo-validade').value = i.validade; document.getElementById('insumo-form-title').textContent = 'Editar Insumo'; document.getElementById('cancel-edit-insumo').classList.remove('hidden'); window.scrollTo(0, 0); }
+        function resetReceitaForm() { document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; document.getElementById('receita-form-title').textContent = 'Criar Receita'; document.getElementById('cancel-edit-receita').classList.add('hidden'); addIngredientRow(); }
+        async function editReceita(id) { const r = receitasCache.find(i => i.id === id); if (!r) return; showView('receitas'); resetReceitaForm(); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-versao').value = r.versao; document.getElementById('receita-tempo-preparo').value = r.tempo_preparo_min; document.getElementById('receita-custo-embalagem').value = r.custo_embalagem_por_unidade; document.getElementById('receita-perda-percentual').value = r.perda_percentual; document.getElementById('receita-observacoes').value = r.observacoes; const ingredientsList = document.getElementById('ingredients-list'); ingredientsList.innerHTML = ''; await new Promise(resolve => setTimeout(resolve, 50)); if (r.ingredientes) { r.ingredientes.forEach(ing => addIngredientRow(ing)); } updateTotalIngredientsCost(); document.getElementById('receita-form-title').textContent = 'Editar Receita'; document.getElementById('cancel-edit-receita').classList.remove('hidden'); window.scrollTo(0, 0); }
+        function resetCustoMensalForm() { document.getElementById('custo-mensal-form').reset(); document.getElementById('custo-mensal-id').value = ''; document.getElementById('custo-mensal-form-title').textContent = 'Lançar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.add('hidden'); }
+        function editCustoMensal(id) { const c = custosMensaisCache.find(i => i.id === id); if (!c) return; showView('custos-mensais'); document.getElementById('custo-mensal-id').value = c.id; document.getElementById('custo-mensal-mes').value = c.mes; document.getElementById('custo-mensal-faturamento').value = c.faturamento; document.getElementById('custo-mensal-custosVariaveis').value = c.custosVariaveis; document.getElementById('custo-mensal-custosFixos').value = c.custosFixos; document.getElementById('custo-mensal-despesasOperacionais').value = c.despesasOperacionais; document.getElementById('custo-mensal-outrasReceitasDespesas').value = c.outrasReceitasDespesas; document.getElementById('custo-mensal-numeroVendas').value = c.numeroVendas; document.getElementById('custo-mensal-impostos').value = c.impostos; document.getElementById('custo-mensal-form-title').textContent = 'Editar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.remove('hidden'); window.scrollTo(0, 0); }
+        
+        function addIngredientRow(ing = {}) {
+            const div = document.createElement('div');
+            div.className = 'ingredient-row';
+            
+            const tempSelect = document.createElement('select');
+            populateInsumosDropdowns(tempSelect);
+            
+            div.innerHTML = `
+                <div style="flex:3;">${tempSelect.outerHTML}</div>
+                <div style="flex:1;"><input type="number" class="ingredient-qty" placeholder="Qtd (g/un)" value="${ing.quantidade_g || ''}" step="0.1"></div>
+                <div class="costo-ingrediente">R$ 0,00</div>
+                <button type="button" class="btn btn-danger btn-small remove-ingredient-btn">X</button>
+            `;
+            
+            document.getElementById('ingredients-list').appendChild(div);
+            
+            const newSelect = div.querySelector('select');
+            if (newSelect) {
+                newSelect.className = 'ingredient-select';
+                newSelect.value = ing.insumoId || '';
+            }
+        }
+
+        function updateTotalIngredientsCost() { let total = 0; document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { const id = row.querySelector('.ingredient-select').value, qty = parseFloat(row.querySelector('.ingredient-qty').value) || 0, cost = calculateCustoIngrediente(id, qty); row.querySelector('.costo-ingrediente').textContent = formatCurrency(cost); total += cost; }); document.getElementById('custo-total-ingredientes').textContent = `Custo: ${formatCurrency(total)}`; }
+        function displayConfiguracoes() { Object.keys(configCache).forEach(key => { const el = document.getElementById(`config-${key.replace(/_/g, '-')}`); if (el) el.value = configCache[key]; }); document.getElementById('alert-threshold-display').textContent = configCache.alerta_variacao || 10; }
+        function updateSimulator() { const id = document.getElementById('simulador-receita-select').value, div = document.getElementById('simulador-detalhes'); if (!id) { div.classList.add('hidden'); return; } div.classList.remove('hidden'); const receita = receitasCache.find(r => r.id === id), cogs = calculateRecipeCOGS(receita); const tbody = document.getElementById('simulador-custos-table').querySelector('tbody'); tbody.innerHTML = `<tr><td>Ingredientes</td><td>${formatCurrency(calculateRecipeIngredientsCost(receita.ingredientes))}</td></tr><tr><td>Perda</td><td>${formatCurrency(calculateRecipeIngredientsCost(receita.ingredientes) * (receita.perda_percentual / 100 || 0))}</td></tr><tr><td>Mão de Obra</td><td>${formatCurrency((configCache.custo_hora_mao_de_obra / 60 || 0) * (receita.tempo_preparo_min || 0))}</td></tr><tr><td>Embalagem</td><td>${formatCurrency(receita.custo_embalagem_por_unidade)}</td></tr><tr><td>Rateio</td><td>${formatCurrency(configCache.rateio_por_pizza)}</td></tr>`; document.getElementById('simulador-cogs-total').textContent = `COGS Total: ${formatCurrency(cogs)}`; const preco = parseFloat(document.getElementById('simulador-preco-venda').value), cmvDiv = document.getElementById('simulador-resultado-cmv'), visDiv = document.getElementById('cmv-visualizer-container'); if (preco > 0) { const cmv = (cogs / preco) * 100, meta = configCache.meta_cmv_padrao || 30; let status = 'ok', sClass = 'cmv-ok'; if (cmv > meta * 1.1) { status = 'danger'; sClass = 'cmv-danger'; } else if (cmv > meta) { status = 'warn'; sClass = 'cmv-warn'; } cmvDiv.innerHTML = `<p>CMV: <strong class="${sClass}">${cmv.toFixed(2)}%</strong> (Meta: ${meta}%)</p>`; cmvDiv.classList.remove('hidden'); const bar = document.getElementById('cmv-bar'); bar.style.width = `${Math.min(cmv, 100)}%`; bar.className = `cmv-visualizer-bar ${status}`; visDiv.classList.remove('hidden'); } else { cmvDiv.classList.add('hidden'); visDiv.classList.add('hidden'); } const metaCMV = parseFloat(document.getElementById('simulador-meta-cmv').value), margem = parseFloat(document.getElementById('simulador-margem-desejada').value), precoDiv = document.getElementById('simulador-resultado-preco'); let html = ''; if (metaCMV > 0) html += `<p>Preço (Meta CMV): <strong>${formatCurrency(cogs / (metaCMV / 100))}</strong></p>`; if (margem > 0 && margem < 100) html += `<p>Preço (Margem ${margem}%): <strong>${formatCurrency(cogs / (1 - (margem / 100)))}</strong></p>`; if (html) { precoDiv.innerHTML = html; precoDiv.classList.remove('hidden'); } else { precoDiv.classList.add('hidden'); } }
+        function updateDashboard() { document.getElementById('dashboard-num-fornecedores').textContent = fornecedoresCache.length; document.getElementById('dashboard-num-insumos').textContent = insumosCache.length; document.getElementById('dashboard-num-receitas').textContent = receitasCache.length; document.getElementById('dashboard-cmv-medio').textContent = `${(configCache.meta_cmv_padrao || 30).toFixed(1)}%`; const alertsDiv = document.getElementById('dashboard-alerts'); alertsDiv.innerHTML = ''; let alerts = 0; insumosCache.forEach(i => { if (i.historico_precos?.length) { const latest = i.custo_embalagem, prev = i.historico_precos[i.historico_precos.length-1].preco; if (prev > 0) { const variation = ((latest - prev) / prev) * 100; if (Math.abs(variation) > (configCache.alerta_variacao || 10)) { alerts++; alertsDiv.innerHTML += `<div class="alert-item">${i.nome} variou ${variation.toFixed(1)}%.</div>`; } } } }); if (alerts === 0) alertsDiv.innerHTML = '<p>Nenhuma variação de preço significativa.</p>'; const topTbody = document.getElementById('dashboard-top-insumos').querySelector('tbody'); topTbody.innerHTML = ''; if (insumosCache.length > 0) { [...insumosCache].sort((a,b) => calculateCustoPorGrama(b) - calculateCustoPorGrama(a)).slice(0, 5).forEach(i => topTbody.innerHTML += `<tr><td>${i.nome}</td><td>${formatCurrency(calculateCustoPorGrama(i))} / ${i.unidade_base || 'g'}</td></tr>`); } else { topTbody.innerHTML = '<tr><td colspan="2">Nenhum insumo.</td></tr>'; } }
+        function updateIndicadores() { const id = document.getElementById('indicadores-mes-select').value; const resultsDiv = document.getElementById('indicadores-results'); if (!id) { resultsDiv.classList.add('hidden'); return; } resultsDiv.classList.remove('hidden'); const data = custosMensaisCache.find(c => c.id === id); if (!data) return; const custoTotal = (data.custosVariaveis || 0) + (data.custosFixos || 0) + (data.despesasOperacionais || 0) + (data.impostos || 0); const lucroLiquido = calculateLucroLiquido(data); const margemLiquida = (data.faturamento > 0) ? (lucroLiquido / data.faturamento) * 100 : 0; const markup = (custoTotal > 0) ? ((data.faturamento - custoTotal) / custoTotal) * 100 : 0; document.getElementById('indicador-lucro-liquido').textContent = formatCurrency(lucroLiquido); document.getElementById('indicador-margem-liquida').textContent = `${margemLiquida.toFixed(2)}%`; document.getElementById('indicador-markup').textContent = `${markup.toFixed(2)}%`; }
+        function confirmDelete(type, id) { const modal = document.getElementById('confirm-modal'); document.getElementById('confirm-modal-text').textContent = `Tem certeza que deseja excluir este(a) ${type}?`; modal.style.display = 'block'; const yesBtn = document.getElementById('confirm-modal-yes'); const noBtn = document.getElementById('confirm-modal-no'); const handleYes = async () => { if (type === 'fornecedor') await deleteData('fornecedores', 'fornecedores', id); if (type === 'insumo') await deleteData('insumos', 'insumos', id); if (type === 'receita') await deleteData('receitas', 'receitas', id); if (type === 'custoMensal') await deleteData('custosMensais', 'custosMensais', id); await loadAllData(); closeModal(); }; const closeModal = () => { modal.style.display = 'none'; yesBtn.removeEventListener('click', handleYes); noBtn.removeEventListener('click', closeModal); }; yesBtn.addEventListener('click', handleYes, { once: true }); noBtn.addEventListener('click', closeModal, { once: true }); }
+        document.getElementById('export-insumos-xlsx').addEventListener('click', () => { const data = insumosCache.map(i => ({ Nome: i.nome, Fornecedor: i.fornecedorNome, 'Custo Emb.': i.custo_embalagem, 'Qtd Emb.': i.quantidade_embalagem, Unidade: i.unidade_embalagem, 'Custo/g': calculateCustoPorGrama(i) })); const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Insumos"); XLSX.writeFile(wb, "insumos.xlsx"); });
+        document.getElementById('export-receitas-xlsx').addEventListener('click', () => { const wb = XLSX.utils.book_new(); receitasCache.forEach(r => { const cogs = calculateRecipeCOGS(r); const data = [ { Item: 'Nome', Valor: r.nome }, { Item: 'COGS', Valor: cogs }, {}, { Item: 'Ingrediente', Qtd: 'Custo'} ]; if (r.ingredientes) { r.ingredientes.forEach(ing => { data.push({ Item: ing.nome, Qtd: ing.quantidade_g, Custo: calculateCustoIngrediente(ing.insumoId, ing.quantidade_g) }); }); } const ws = XLSX.utils.json_to_sheet(data, {skipHeader: true}); XLSX.utils.book_append_sheet(wb, ws, r.nome.substring(0, 30)); }); XLSX.writeFile(wb, "fichas_tecnicas.xlsx"); });
+        document.getElementById('list-ingredients-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(18); doc.text('Lista de Ingredientes por Receita', 14, 22); doc.setFontSize(11); let finalY = 30; receitasCache.forEach(r => { if (finalY > 260) { doc.addPage(); finalY = 20; } doc.setFont('helvetica', 'bold'); doc.text(`${r.nome}`, 14, finalY); finalY += 7; doc.setFont('helvetica', 'normal'); if (r.ingredientes) { r.ingredientes.forEach(ing => { doc.text(`- ${ing.nome}: ${ing.quantidade_g} g`, 18, finalY); finalY += 7; }); } finalY += 5; }); doc.save('Lista_Ingredientes.pdf'); });
+        function generateRecipePDF(id) { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const r = receitasCache.find(i => i.id === id); if (!r) return; const cogs = calculateRecipeCOGS(r); doc.setFontSize(18); doc.text(`Ficha Técnica - ${r.nome}`, 14, 22); doc.setFontSize(11); doc.text(`Versão: ${r.versao || '1.0'}`, 14, 30); const head = [['Ingrediente', 'Qtd (g/un)', 'Custo Unit.', 'Custo Total']]; const body = r.ingredientes ? r.ingredientes.map(ing => { const ins = insumosCache.find(i => i.id === ing.insumoId); const cUnit = calculateCustoPorGrama(ins); return [ ing.nome, ing.quantidade_g, formatCurrency(cUnit), formatCurrency(cUnit * ing.quantidade_g) ]; }) : []; doc.autoTable({ startY: 40, head, body }); doc.autoTable({ startY: doc.lastAutoTable.finalY + 10, head: [['Item de Custo', 'Valor']], body: [ ['Ingredientes', formatCurrency(calculateRecipeIngredientsCost(r.ingredientes))], ['Mão de Obra', formatCurrency(((configCache.custo_hora_mao_de_obra || 0) / 60) * (r.tempo_preparo_min || 0))], ['Embalagem', formatCurrency(r.custo_embalagem_por_unidade)], ['Rateio', formatCurrency(configCache.rateio_por_pizza)] ], theme: 'grid' }); doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text(`CUSTO TOTAL (COGS): ${formatCurrency(cogs)}`, 14, doc.lastAutoTable.finalY + 10); doc.save(`Ficha_${r.nome}.pdf`); }
+        document.getElementById('generate-general-report-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(20); doc.text('Relatório Geral', 14, 22); doc.setFontSize(12); doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30); doc.autoTable({ startY: 40, head: [['KPI', 'Valor']], body: [ ['Fornecedores', fornecedoresCache.length], ['Insumos', insumosCache.length], ['Receitas', receitasCache.length], ['Meta CMV', `${configCache.meta_cmv_padrao || 30}%`], ], }); doc.addPage(); doc.setFontSize(16); doc.text('Top 10 Receitas por Custo', 14, 22); const topR = [...receitasCache].sort((a,b) => calculateRecipeCOGS(b) - calculateRecipeCOGS(a)).slice(0,10); doc.autoTable({ startY: 30, head: [['Receita', 'Custo (COGS)']], body: topR.map(r => [r.nome, formatCurrency(calculateRecipeCOGS(r))]), }); doc.save('Relatorio_Geral.pdf'); });
+        document.getElementById('run-validation-button').addEventListener('click', () => { const div = document.getElementById('validation-results'); div.classList.remove('hidden'); div.innerHTML = 'Executando...'; const conf = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80 }; const ins = [{id:'f',c:80,q:25000},{id:'m',c:12,q:3000},{id:'q',c:28,q:1000},{id:'a',c:30,q:1000},{id:'o',c:0.1,q:1}]; const rec = {ings:[{i:'f',q:300},{i:'m',q:120},{i:'q',q:150},{i:'a',q:10},{i:'o',q:1}],t:8,e:1.5,p:0}; const cogsCalc = (c, i, r) => (r.ingredientes.reduce((t,ing) => t + ((i.find(x=>x.id===ing.insumoId).c/i.find(x=>x.id===ing.insumoId).q)*ing.quantidade_g),0)) * (1 + (r.perda_percentual || 0) / 100) + ((c.custo_hora_mao_de_obra/60||0)*(r.tempo_preparo_min||0)) + (r.custo_embalagem_por_unidade||0) + (c.rateio_por_pizza||0); const cogs = cogsCalc(conf, ins.map(x=>({id:x.id,c:x.c,q:x.q})), {ingredientes:rec.ings.map(y=>({insumoId:y.i,quantidade_g:y.q})),tempo_preparo_min:rec.t,custo_embalagem_por_unidade:rec.e,perda_percentual:rec.p}); const preco = cogs/0.3; const cogsOk = Math.abs(cogs - 11.01)<0.01; const precoOk = Math.abs(preco - 36.70)<0.01; div.innerHTML = `<h4>Resultados</h4><p>COGS: <strong>${formatCurrency(cogs)}</strong> (Esp: R$ 11,01) -> <span style="color:${cogsOk?'green':'red'}">${cogsOk?'OK':'ERRO'}</span></p><p>Preço (CMV 30%): <strong>${formatCurrency(preco)}</strong> (Esp: R$ 36,70) -> <span style="color:${precoOk?'green':'red'}">${precoOk?'OK':'ERRO'}</span></p>`; });
+        
+        if(isLocalMode) { 
+            currentUser = { uid: 'local' }; 
+            initApp(); 
+        }
     });
     </script>
 </body>
