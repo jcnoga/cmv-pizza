@@ -89,6 +89,9 @@
         .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: var(--border-radius); text-align: center; }
         .modal-buttons { margin-top: 20px; } .modal-buttons .btn { width: 120px; margin: 0 10px; }
         .hidden { display: none; }
+        #ajuda-view .card { margin-bottom: 1.5rem; } 
+        #ajuda-view h3 { color: var(--primary-dark); margin-bottom: 1rem; } 
+        #ajuda-view p { margin-bottom: 0.75rem; }
     </style>
 </head>
 <body>
@@ -103,6 +106,7 @@
             <a href="#" class="nav-link" data-view="custos-mensais">Custos Mensais</a>
             <a href="#" class="nav-link" data-view="indicadores">Indicadores</a>
             <a href="#" class="nav-link" data-view="simulador">Simulador</a>
+            <a href="#" class="nav-link" data-view="ajuda">Glossário</a>
             <a href="#" class="nav-link" data-view="configuracoes">⚙️</a>
             <button id="logout-button">Sair</button>
         </nav>
@@ -195,6 +199,68 @@
             
             <section id="configuracoes-view" class="view">
                 <div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label for="config-rateio-despesas-fixas">Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label for="config-meta-cmv-padrao">Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label for="config-alerta-variacao">Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div>
+            </section>
+
+            <!-- NOVA SEÇÃO DE AJUDA -->
+            <section id="ajuda-view" class="view">
+                <h2>Glossário de Ajuda</h2>
+
+                <div class="card">
+                    <h3>Faturamento (Receita Bruta)</h3>
+                    <p><strong>Fórmula:</strong> Preço de Venda × Número de Unidades Vendidas.</p>
+                    <p><strong>Significado:</strong> É o valor total arrecadado com as vendas de produtos ou serviços antes de deduzir qualquer custo ou despesa. Representa toda a entrada de dinheiro gerada pela atividade principal do negócio.</p>
+                    <p><strong>Exemplo:</strong> Se uma pizzaria vende 100 pizzas a R$ 50,00 cada em um dia, o faturamento desse dia é de R$ 5.000,00.</p>
+                    <p><strong>Dica:</strong> Faturamento alto não significa lucro. É importante analisar os custos e despesas para garantir que a operação seja rentável.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Custos Fixos (CF)</h3>
+                    <p><strong>Fórmula:</strong> Soma de todos os custos que não variam conforme o volume de produção ou vendas.</p>
+                    <p><strong>Significado:</strong> São despesas que a empresa precisa pagar todos os meses, independente do faturamento — como aluguel, energia mínima, contabilidade ou salários fixos.</p>
+                    <p><strong>Exemplo:</strong> Aluguel do ponto comercial de R$ 2.000 + folha de pagamento de R$ 8.000 = R$ 10.000 de custos fixos mensais.</p>
+                    <p><strong>Dica:</strong> Faça uma revisão periódica dos custos fixos para identificar itens que podem ser reduzidos ou renegociados sem prejudicar a operação.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Custos Variáveis (CV)</h3>
+                    <p><strong>Fórmula:</strong> Soma dos custos que mudam proporcionalmente ao volume de produção ou vendas.</p>
+                    <p><strong>Significado:</strong> São os gastos diretamente ligados à produção e venda de cada produto. Se você não vende nada, esse custo é zero. Inclui ingredientes, embalagens para delivery, etc.</p>
+                    <p><strong>Exemplo:</strong> Se cada pizza consome R$ 8,00 em ingredientes e R$ 1,50 em embalagem, o custo variável por pizza é de R$ 9,50.</p>
+                    <p><strong>Dica:</strong> Negociar preços melhores com fornecedores para compras em maior volume é a principal forma de reduzir seus custos variáveis e aumentar a margem de lucro por produto.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Custo da Mercadoria Vendida (CMV ou COGS)</h3>
+                    <p><strong>Fórmula:</strong> Soma de todos os custos diretos para produzir uma unidade (ingredientes, mão de obra direta, embalagem, rateio de custos fixos por produto).</p>
+                    <p><strong>Significado:</strong> Representa o custo total para produzir cada pizza que você vende. É o principal indicador de custo do seu produto finalizado.</p>
+                    <p><strong>Exemplo:</strong> R$ 8,00 (ingredientes) + R$ 2,00 (mão de obra por pizza) + R$ 1,50 (embalagem) = R$ 11,50 de CMV por pizza.</p>
+                    <p><strong>Dica:</strong> Manter as fichas técnicas das suas receitas sempre atualizadas é fundamental para ter um cálculo de CMV preciso e garantir que seus preços de venda estão corretos.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Lucro Líquido (LL)</h3>
+                    <p><strong>Fórmula:</strong> Faturamento - (Custos Fixos + Custos Variáveis + Impostos + Despesas Operacionais).</p>
+                    <p><strong>Significado:</strong> É o resultado final da empresa, ou seja, o dinheiro que efetivamente sobra no caixa após o pagamento de todas as contas, custos e impostos. É o indicador mais importante da saúde financeira do negócio.</p>
+                    <p><strong>Exemplo:</strong> Faturamento de R$ 50.000 - Total de Custos e Despesas de R$ 42.000 = R$ 8.000 de Lucro Líquido.</p>
+                    <p><strong>Dica:</strong> Um negócio só é sustentável a longo prazo se gerar Lucro Líquido de forma consistente. Acompanhe este indicador mensalmente.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Margem Líquida (ML)</h3>
+                    <p><strong>Fórmula:</strong> (Lucro Líquido / Faturamento) × 100.</p>
+                    <p><strong>Significado:</strong> Indica a porcentagem de lucro que a empresa obtém para cada real de faturamento. Mostra o quão eficiente é a sua operação em transformar vendas em lucro real.</p>
+                    <p><strong>Exemplo:</strong> (R$ 8.000 de Lucro Líquido / R$ 50.000 de Faturamento) × 100 = 16%. Isso significa que 16% de tudo que você vende se torna lucro.</p>
+                    <p><strong>Dica:</strong> Uma margem líquida maior indica uma empresa mais saudável e rentável. Compare sua margem com a de outros negócios no mesmo setor para avaliar sua competitividade.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Markup</h3>
+                    <p><strong>Fórmula:</strong> ((Preço de Venda - Custo Total Unitário) / Custo Total Unitário) × 100.</p>
+                    <p><strong>Significado:</strong> É um índice aplicado sobre o custo do produto para formar o preço de venda. Ele mostra o quanto o seu preço está acima do seu custo.</p>
+                    <p><strong>Exemplo:</strong> Uma pizza custa R$ 10,00 para ser feita e é vendida por R$ 45,00. O Markup é ((45 - 10) / 10) × 100 = 350%.</p>
+                    <p><strong>Dica:</strong> O Markup é uma ferramenta útil para a precificação inicial, mas não deve ser confundido com a margem de lucro. A Margem Líquida é um indicador mais preciso da rentabilidade geral do negócio.</p>
+                </div>
+
             </section>
         </div>
     </main>
@@ -474,7 +540,7 @@
                 } catch (error) { showToast(error.message, 'error');
                 } finally { button.disabled = false; button.textContent = 'Salvar Receita'; }
             });
-            document.getElementById('add-ingredient-btn').addEventListener('click', addIngredientRow);
+            document.getElementById('add-ingredient-btn').addEventListener('click', () => addIngredientRow());
             ingredientsList.addEventListener('change', e => { if(e.target.matches('.ingredient-select, .ingredient-qty')) updateTotalIngredientsCost(); });
             ingredientsList.addEventListener('click', e => { if(e.target.classList.contains('remove-ingredient-btn')) { e.target.closest('.ingredient-row').remove(); updateTotalIngredientsCost(); } });
             document.getElementById('cancel-edit-receita').addEventListener('click', resetReceitaForm);
@@ -510,14 +576,12 @@
         function resetCustoMensalForm() { document.getElementById('custo-mensal-form').reset(); document.getElementById('custo-mensal-id').value = ''; document.getElementById('custo-mensal-form-title').textContent = 'Lançar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.add('hidden'); }
         function editCustoMensal(id) { const c = custosMensaisCache.find(i => i.id === id); if (!c) return; showView('custos-mensais'); document.getElementById('custo-mensal-id').value = c.id; document.getElementById('custo-mensal-mes').value = c.mes; document.getElementById('custo-mensal-faturamento').value = c.faturamento; document.getElementById('custo-mensal-custosVariaveis').value = c.custosVariaveis; document.getElementById('custo-mensal-custosFixos').value = c.custosFixos; document.getElementById('custo-mensal-despesasOperacionais').value = c.despesasOperacionais; document.getElementById('custo-mensal-outrasReceitasDespesas').value = c.outrasReceitasDespesas; document.getElementById('custo-mensal-numeroVendas').value = c.numeroVendas; document.getElementById('custo-mensal-impostos').value = c.impostos; document.getElementById('custo-mensal-form-title').textContent = 'Editar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.remove('hidden'); window.scrollTo(0, 0); }
         
-        // CORREÇÃO APLICADA AQUI
         function addIngredientRow(ing = {}) {
             const div = document.createElement('div');
             div.className = 'ingredient-row';
             
-            // Cria a estrutura HTML da linha
             const tempSelect = document.createElement('select');
-            populateInsumosDropdowns(tempSelect); // Popula um select temporário para obter o HTML
+            populateInsumosDropdowns(tempSelect);
             
             div.innerHTML = `
                 <div style="flex:3;">${tempSelect.outerHTML}</div>
@@ -526,14 +590,12 @@
                 <button type="button" class="btn btn-danger btn-small remove-ingredient-btn">X</button>
             `;
             
-            // Adiciona a nova linha ao DOM
             document.getElementById('ingredients-list').appendChild(div);
             
-            // AGORA, com a linha já na tela, seleciona o insumo correto
-            const newSelect = div.querySelector('select'); // Encontra o select que acabamos de adicionar
+            const newSelect = div.querySelector('select');
             if (newSelect) {
-                newSelect.className = 'ingredient-select'; // Garante que a classe está correta
-                newSelect.value = ing.insumoId || ''; // Define o valor, que agora vai funcionar
+                newSelect.className = 'ingredient-select';
+                newSelect.value = ing.insumoId || '';
             }
         }
 
