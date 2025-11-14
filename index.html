@@ -11,9 +11,10 @@
     ====================================================================================================
     1.  COLE SUA CONFIGURAÇÃO `firebaseConfig` NA SEÇÃO <script> ABAIXO.
     2.  ATIVE "E-mail/senha" NA ABA "AUTHENTICATION" DO FIREBASE.
-    3.  CRIE O "FIRESTORE DATABASE" EM MODO DE PRODUÇÃO.
-    4.  CRIE OS ÍNDICES COMPOSTOS (userId ASC, nome ASC) PARA 'fornecedores', 'insumos', 'receitas'.
-    5.  CRIE O ÍNDICE COMPOSTO (userId ASC, mes DESC) PARA A NOVA COLEÇÃO 'custosMensais'.
+    3.  ATIVE O "STORAGE" NO SEU PROJETO FIREBASE.
+    4.  CRIE O "FIRESTORE DATABASE" EM MODO DE PRODUÇÃO.
+    5.  CRIE OS ÍNDICES COMPOSTOS (userId ASC, nome ASC) PARA 'fornecedores', 'insumos', 'receitas'.
+    6.  CRIE O ÍNDICE COMPOSTO (userId ASC, mes DESC) PARA A NOVA COLEÇÃO 'custosMensais'.
     ====================================================================================================
     -->
 
@@ -28,13 +29,16 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--light-gray); color: var(--text-color); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
         header { background-color: var(--primary-color); color: var(--white); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); flex-wrap: wrap; }
-        header h1 { font-size: 1.5rem; margin-right: 2rem; }
+        header h1 { font-size: 1.5rem; margin-right: 2rem; display: flex; align-items: center;}
+        #header-logo { height: 35px; width: 35px; object-fit: cover; margin-right: 15px; border-radius: 5px; }
+        #header-logo-default { font-size: 1.8rem; margin-right: 15px; }
         #auth-container, #app-container { width: 100%; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
         .auth-form { background: var(--white); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); max-width: 450px; margin: 2rem auto; }
         .auth-form h2 { text-align: center; margin-bottom: 1.5rem; color: var(--primary-dark); }
         .form-group { margin-bottom: 1.25rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--medium-gray); border-radius: var(--border-radius); font-size: 1rem; }
+        .form-group input[type="file"] { padding: 0.5rem; }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2); }
         .btn { display: inline-block; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.3s, transform 0.1s; width: 100%; }
         .btn:disabled { background-color: var(--medium-gray); cursor: not-allowed; }
@@ -101,7 +105,11 @@
 <body>
 
     <header>
-        <h1>🍕 Pizzaria Cost Control Pro</h1>
+        <h1>
+            <span id="header-logo-default">🍕</span>
+            <img id="header-logo" src="" alt="Logo da Empresa" class="hidden">
+            <span id="header-title">Pizzaria Cost Control Pro</span>
+        </h1>
         <nav id="app-nav" class="hidden">
             <a href="#" class="nav-link" data-view="dashboard">Dashboard</a>
             <a href="#" class="nav-link" data-view="fornecedores">Fornecedores</a>
@@ -140,12 +148,20 @@
                 <h2>Cadastro</h2>
                 <form id="register-form">
                     <div class="form-group">
-                        <label for="register-email">Email</label>
+                        <label for="register-company-name">Nome da empresa</label>
+                        <input type="text" id="register-company-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email de acesso</label>
                         <input type="email" id="register-email" required>
                     </div>
                     <div class="form-group">
                         <label for="register-password">Senha (mínimo 6 caracteres)</label>
                         <input type="password" id="register-password" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-logo">Logo da empresa (opcional)</label>
+                        <input type="file" id="register-logo" accept="image/*">
                     </div>
                     <button type="submit" class="btn btn-primary">Cadastrar</button>
                 </form>
@@ -169,7 +185,8 @@
         </div>
 
         <div id="app-container" class="hidden">
-            <section id="dashboard-view" class="view">
+            <!-- O restante das seções (dashboard, fornecedores, etc.) permanece o mesmo -->
+             <section id="dashboard-view" class="view">
                 <h2>Dashboard</h2>
                 <div class="grid-container grid-4"><div class="card kpi-card"><h3>CMV Médio</h3><div class="value" id="dashboard-cmv-medio">--%</div></div><div class="card kpi-card"><h3>Fornecedores</h3><div class="value" id="dashboard-num-fornecedores">--</div></div><div class="card kpi-card"><h3>Insumos</h3><div class="value" id="dashboard-num-insumos">--</div></div><div class="card kpi-card"><h3>Receitas</h3><div class="value" id="dashboard-num-receitas">--</div></div></div>
                 <div class="grid-container grid-2"><div class="card"><h3>Alertas de Variação (> <span id="alert-threshold-display">10</span>%)</h3><div id="dashboard-alerts"><p>Nenhum alerta.</p></div></div><div class="card"><h3>Top 5 Insumos por Custo</h3><table id="dashboard-top-insumos"><thead><tr><th>Insumo</th><th>Custo/g (ou un)</th></tr></thead><tbody><tr><td colspan="2">N/A</td></tr></tbody></table></div></div>
@@ -280,6 +297,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <!-- SCRIPT DO FIREBASE STORAGE -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -290,12 +309,12 @@
             apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
             authDomain: "cmv-pizza.firebaseapp.com",
             projectId: "cmv-pizza",
-            storageBucket: "cmv-pizza.firebasestorage.app",
+            storageBucket: "cmv-pizza.appspot.com", // Verifique se o seu storageBucket está correto
             messagingSenderId: "1022435006716",
             appId: "1:1022435006716:web:ec39f22702097beca25f79"
         };
 
-        let firebaseApp, auth, db, currentUser;
+        let firebaseApp, auth, db, storage, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {}, custosMensais: [] };
         let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {}, custosMensaisCache = [];
@@ -334,7 +353,8 @@
             try { 
                 firebaseApp = firebase.initializeApp(firebaseConfig); 
                 auth = firebase.auth(); 
-                db = firebase.firestore(); 
+                db = firebase.firestore();
+                storage = firebase.storage(); // Inicializa o Storage
                 setupAuthListeners();
             } 
             catch (error) { 
@@ -398,11 +418,34 @@
                 e.preventDefault();
                 const button = registerForm.querySelector('button[type="submit"]');
                 button.disabled = true; button.textContent = 'Aguarde...';
+                
+                const companyName = document.getElementById('register-company-name').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const logoFile = document.getElementById('register-logo').files[0];
+
                 try {
-                    await auth.createUserWithEmailAndPassword(
-                        document.getElementById('register-email').value,
-                        document.getElementById('register-password').value
-                    );
+                    const { user } = await auth.createUserWithEmailAndPassword(email, password);
+                    
+                    let logoUrl = '';
+                    if (logoFile && storage) {
+                        showToast('Enviando logo...', 'info');
+                        const filePath = `logos/${user.uid}/${logoFile.name}`;
+                        const fileRef = storage.ref().child(filePath);
+                        await fileRef.put(logoFile);
+                        logoUrl = await fileRef.getDownloadURL();
+                    }
+
+                    const configData = {
+                        companyName,
+                        logoUrl,
+                        custo_hora_mao_de_obra: 20, 
+                        rateio_por_pizza: 0.80, 
+                        meta_cmv_padrao: 30, 
+                        alerta_variacao: 10
+                    };
+                    await db.collection('configuracoes').doc(user.uid).set(configData);
+
                     showToast("Cadastro realizado com sucesso! Faça o login.");
                     toggleAuthViews('login-view');
                 } catch (err) {
@@ -455,7 +498,31 @@
             setupHelpModals();
             await loadAllData(); 
         }
-        function resetAppState() { fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; custosMensaisCache = []; ['fornecedores-table', 'insumos-table', 'receitas-table', 'custos-mensais-table'].forEach(id => { const table = document.getElementById(id); if (table) table.querySelector('tbody').innerHTML = '' }); }
+
+        function updateHeader() {
+            if (configCache.companyName) {
+                document.getElementById('header-title').textContent = configCache.companyName;
+            }
+            if (configCache.logoUrl) {
+                const logoImg = document.getElementById('header-logo');
+                logoImg.src = configCache.logoUrl;
+                logoImg.classList.remove('hidden');
+                document.getElementById('header-logo-default').classList.add('hidden');
+            }
+        }
+
+        function resetHeader() {
+             document.getElementById('header-title').textContent = 'Pizzaria Cost Control Pro';
+             document.getElementById('header-logo').classList.add('hidden');
+             document.getElementById('header-logo').src = "";
+             document.getElementById('header-logo-default').classList.remove('hidden');
+        }
+
+        function resetAppState() { 
+            resetHeader();
+            fornecedoresCache = []; insumosCache = []; receitasCache = []; configCache = {}; custosMensaisCache = []; 
+            ['fornecedores-table', 'insumos-table', 'receitas-table', 'custos-mensais-table'].forEach(id => { const table = document.getElementById(id); if (table) table.querySelector('tbody').innerHTML = '' }); 
+        }
         async function loadAllData() { await fetchConfiguracoes(); await Promise.all([fetchFornecedores(), fetchInsumos(), fetchReceitas(), fetchCustosMensais()]); renderAllTables(); populateAllDropdowns(); updateDashboard(); }
 
         async function fetchCollection(collectionName, cacheArray, localKey, orderByField = 'nome', orderDirection = 'asc') {
@@ -503,9 +570,40 @@
         async function fetchInsumos() { await fetchCollection('insumos', insumosCache, 'insumos'); }
         async function fetchReceitas() { await fetchCollection('receitas', receitasCache, 'receitas'); }
         async function fetchCustosMensais() { await fetchCollection('custosMensais', custosMensaisCache, 'custosMensais', 'mes', 'desc'); }
-        async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } catch(error) { console.error("Erro configs:", error); } } displayConfiguracoes(); }
-        async function saveConfiguracoes(configData) { configData.userId = currentUser.uid; try { if(isLocalMode) { localData.configuracoes.default = configData; } else { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } showToast("Configurações salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); } catch(error) { showToast("Erro ao salvar.", 'error'); } }
+        async function fetchConfiguracoes() { 
+            if (isLocalMode) { 
+                configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; 
+            } else { 
+                try { 
+                    const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); 
+                    configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; 
+                } catch(error) { 
+                    console.error("Erro configs:", error); 
+                    configCache = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 };
+                } 
+            } 
+            updateHeader();
+            displayConfiguracoes(); 
+        }
+
+        async function saveConfiguracoes(configData) { 
+            configData.userId = currentUser.uid; 
+            try { 
+                if(isLocalMode) { 
+                    localData.configuracoes.default = { ...localData.configuracoes.default, ...configData }; 
+                } else { 
+                    await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); 
+                } 
+                showToast("Configurações salvas!"); 
+                configCache = { ...configCache, ...configData}; 
+                displayConfiguracoes(); 
+                updateDashboard(); 
+            } catch(error) { 
+                showToast("Erro ao salvar.", 'error'); 
+            } 
+        }
         
+        // As demais funções (renderAllTables, populateAllDropdowns, etc.) permanecem as mesmas
         function renderAllTables() { renderFornecedoresTable(); renderInsumosTable(); renderReceitasTable(); renderCustosMensaisTable(); }
         function populateAllDropdowns() { populateFornecedoresDropdowns(); populateReceitaSelects(); populateIndicadoresMesSelect(); }
         function renderFornecedoresTable() { const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = ''; if (fornecedoresCache.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; } fornecedoresCache.forEach(f => { const insumosCount = insumosCache.filter(i => i.fornecedorId === f.id).length; const tr = document.createElement('tr'); tr.innerHTML = `<td>${f.nome}</td><td>${f.contato || '--'}</td><td>${f.telefone || '--'}</td><td>${insumosCount}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
