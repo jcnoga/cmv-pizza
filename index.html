@@ -409,13 +409,12 @@
         function renderCustosMensaisTable() { const tbody = document.getElementById('custos-mensais-table').querySelector('tbody'); tbody.innerHTML = ''; if (custosMensaisCache.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Nenhum custo mensal lançado.</td></tr>'; return; } custosMensaisCache.forEach(c => { const [year, month] = c.mes.split('-'); const lucro = calculateLucroLiquido(c); const tr = document.createElement('tr'); tr.innerHTML = `<td>${month}/${year}</td><td>${formatCurrency(c.faturamento)}</td><td>${formatCurrency(lucro)}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-custo-mensal" data-id="${c.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-custo-mensal" data-id="${c.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
         function populateFornecedoresDropdowns() { const select = document.getElementById('insumo-fornecedor-select'); const current = select.value; select.innerHTML = '<option value="">-- Selecione --</option>'; fornecedoresCache.forEach(f => { select.innerHTML += `<option value="${f.id}" data-nome="${f.nome}">${f.nome}</option>`; }); select.value = current; }
         
-        // CORREÇÃO APLICADA AQUI para os nomes dos insumos
         function populateInsumosDropdowns(selectEl) { 
             if(selectEl){ 
                 let html = '<option value="">Selecione um insumo</option>'; 
                 insumosCache.forEach(i => { 
                     const custo = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : i.custo_embalagem; 
-                    const nomeInsumo = i.nome || 'NOME INDEFINIDO'; // Garante que algo seja exibido mesmo se o nome estiver faltando
+                    const nomeInsumo = i.nome || 'NOME INDEFINIDO';
                     html += `<option value="${i.id}" data-nome="${nomeInsumo}">${nomeInsumo} (${formatCurrency(custo)}/${i.unidade_base || 'g'})</option>`; 
                 }); 
                 selectEl.innerHTML = html;
@@ -428,7 +427,7 @@
         function calculateCustoPorGrama(insumo) { if (!insumo || !insumo.custo_embalagem || !insumo.qtd_embalagem_g) return 0; return insumo.custo_embalagem / insumo.qtd_embalagem_g; }
         function calculateCustoIngrediente(insumoId, quantidade_g) { const insumo = insumosCache.find(i => i.id === insumoId); if (!insumo) return 0; return calculateCustoPorGrama(insumo) * quantidade_g; }
         function calculateRecipeIngredientsCost(ingredients = []) { return ingredients.reduce((total, ing) => total + calculateCustoIngrediente(ing.insumoId, ing.quantidade_g), 0); }
-        function calculateRecipeCOGS(receita) { if (!receita || !receita.ingredientes) return 0; // Adicionada verificação de segurança
+        function calculateRecipeCOGS(receita) { if (!receita || !receita.ingredientes) return 0;
             const custoIngredientes = calculateRecipeIngredientsCost(receita.ingredientes); 
             const custoComPerda = custoIngredientes * (1 + (receita.perda_percentual || 0) / 100); 
             const custoMaoDeObra = ((configCache.custo_hora_mao_de_obra || 0) / 60) * (receita.tempo_preparo_min || 0); 
@@ -510,7 +509,34 @@
         async function editReceita(id) { const r = receitasCache.find(i => i.id === id); if (!r) return; showView('receitas'); resetReceitaForm(); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-versao').value = r.versao; document.getElementById('receita-tempo-preparo').value = r.tempo_preparo_min; document.getElementById('receita-custo-embalagem').value = r.custo_embalagem_por_unidade; document.getElementById('receita-perda-percentual').value = r.perda_percentual; document.getElementById('receita-observacoes').value = r.observacoes; const ingredientsList = document.getElementById('ingredients-list'); ingredientsList.innerHTML = ''; await new Promise(resolve => setTimeout(resolve, 50)); if (r.ingredientes) { r.ingredientes.forEach(ing => addIngredientRow(ing)); } updateTotalIngredientsCost(); document.getElementById('receita-form-title').textContent = 'Editar Receita'; document.getElementById('cancel-edit-receita').classList.remove('hidden'); window.scrollTo(0, 0); }
         function resetCustoMensalForm() { document.getElementById('custo-mensal-form').reset(); document.getElementById('custo-mensal-id').value = ''; document.getElementById('custo-mensal-form-title').textContent = 'Lançar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.add('hidden'); }
         function editCustoMensal(id) { const c = custosMensaisCache.find(i => i.id === id); if (!c) return; showView('custos-mensais'); document.getElementById('custo-mensal-id').value = c.id; document.getElementById('custo-mensal-mes').value = c.mes; document.getElementById('custo-mensal-faturamento').value = c.faturamento; document.getElementById('custo-mensal-custosVariaveis').value = c.custosVariaveis; document.getElementById('custo-mensal-custosFixos').value = c.custosFixos; document.getElementById('custo-mensal-despesasOperacionais').value = c.despesasOperacionais; document.getElementById('custo-mensal-outrasReceitasDespesas').value = c.outrasReceitasDespesas; document.getElementById('custo-mensal-numeroVendas').value = c.numeroVendas; document.getElementById('custo-mensal-impostos').value = c.impostos; document.getElementById('custo-mensal-form-title').textContent = 'Editar Custos do Mês'; document.getElementById('cancel-edit-custo-mensal').classList.remove('hidden'); window.scrollTo(0, 0); }
-        function addIngredientRow(ing = {}) { const div = document.createElement('div'); div.className = 'ingredient-row'; const select = document.createElement('select'); select.className = 'ingredient-select'; populateInsumosDropdowns(select); select.value = ing.insumoId || ''; div.innerHTML = `<div style="flex:3;">${select.outerHTML}</div><div style="flex:1;"><input type="number" class="ingredient-qty" placeholder="Qtd (g/un)" value="${ing.quantidade_g || ''}" step="0.1"></div><div class="costo-ingrediente">R$ 0,00</div><button type="button" class="btn btn-danger btn-small remove-ingredient-btn">X</button>`; document.getElementById('ingredients-list').appendChild(div); }
+        
+        // CORREÇÃO APLICADA AQUI
+        function addIngredientRow(ing = {}) {
+            const div = document.createElement('div');
+            div.className = 'ingredient-row';
+            
+            // Cria a estrutura HTML da linha
+            const tempSelect = document.createElement('select');
+            populateInsumosDropdowns(tempSelect); // Popula um select temporário para obter o HTML
+            
+            div.innerHTML = `
+                <div style="flex:3;">${tempSelect.outerHTML}</div>
+                <div style="flex:1;"><input type="number" class="ingredient-qty" placeholder="Qtd (g/un)" value="${ing.quantidade_g || ''}" step="0.1"></div>
+                <div class="costo-ingrediente">R$ 0,00</div>
+                <button type="button" class="btn btn-danger btn-small remove-ingredient-btn">X</button>
+            `;
+            
+            // Adiciona a nova linha ao DOM
+            document.getElementById('ingredients-list').appendChild(div);
+            
+            // AGORA, com a linha já na tela, seleciona o insumo correto
+            const newSelect = div.querySelector('select'); // Encontra o select que acabamos de adicionar
+            if (newSelect) {
+                newSelect.className = 'ingredient-select'; // Garante que a classe está correta
+                newSelect.value = ing.insumoId || ''; // Define o valor, que agora vai funcionar
+            }
+        }
+
         function updateTotalIngredientsCost() { let total = 0; document.querySelectorAll('#ingredients-list .ingredient-row').forEach(row => { const id = row.querySelector('.ingredient-select').value, qty = parseFloat(row.querySelector('.ingredient-qty').value) || 0, cost = calculateCustoIngrediente(id, qty); row.querySelector('.costo-ingrediente').textContent = formatCurrency(cost); total += cost; }); document.getElementById('custo-total-ingredientes').textContent = `Custo: ${formatCurrency(total)}`; }
         function displayConfiguracoes() { Object.keys(configCache).forEach(key => { const el = document.getElementById(`config-${key.replace(/_/g, '-')}`); if (el) el.value = configCache[key]; }); document.getElementById('alert-threshold-display').textContent = configCache.alerta_variacao || 10; }
         function updateSimulator() { const id = document.getElementById('simulador-receita-select').value, div = document.getElementById('simulador-detalhes'); if (!id) { div.classList.add('hidden'); return; } div.classList.remove('hidden'); const receita = receitasCache.find(r => r.id === id), cogs = calculateRecipeCOGS(receita); const tbody = document.getElementById('simulador-custos-table').querySelector('tbody'); tbody.innerHTML = `<tr><td>Ingredientes</td><td>${formatCurrency(calculateRecipeIngredientsCost(receita.ingredientes))}</td></tr><tr><td>Perda</td><td>${formatCurrency(calculateRecipeIngredientsCost(receita.ingredientes) * (receita.perda_percentual / 100 || 0))}</td></tr><tr><td>Mão de Obra</td><td>${formatCurrency((configCache.custo_hora_mao_de_obra / 60 || 0) * (receita.tempo_preparo_min || 0))}</td></tr><tr><td>Embalagem</td><td>${formatCurrency(receita.custo_embalagem_por_unidade)}</td></tr><tr><td>Rateio</td><td>${formatCurrency(configCache.rateio_por_pizza)}</td></tr>`; document.getElementById('simulador-cogs-total').textContent = `COGS Total: ${formatCurrency(cogs)}`; const preco = parseFloat(document.getElementById('simulador-preco-venda').value), cmvDiv = document.getElementById('simulador-resultado-cmv'), visDiv = document.getElementById('cmv-visualizer-container'); if (preco > 0) { const cmv = (cogs / preco) * 100, meta = configCache.meta_cmv_padrao || 30; let status = 'ok', sClass = 'cmv-ok'; if (cmv > meta * 1.1) { status = 'danger'; sClass = 'cmv-danger'; } else if (cmv > meta) { status = 'warn'; sClass = 'cmv-warn'; } cmvDiv.innerHTML = `<p>CMV: <strong class="${sClass}">${cmv.toFixed(2)}%</strong> (Meta: ${meta}%)</p>`; cmvDiv.classList.remove('hidden'); const bar = document.getElementById('cmv-bar'); bar.style.width = `${Math.min(cmv, 100)}%`; bar.className = `cmv-visualizer-bar ${status}`; visDiv.classList.remove('hidden'); } else { cmvDiv.classList.add('hidden'); visDiv.classList.add('hidden'); } const metaCMV = parseFloat(document.getElementById('simulador-meta-cmv').value), margem = parseFloat(document.getElementById('simulador-margem-desejada').value), precoDiv = document.getElementById('simulador-resultado-preco'); let html = ''; if (metaCMV > 0) html += `<p>Preço (Meta CMV): <strong>${formatCurrency(cogs / (metaCMV / 100))}</strong></p>`; if (margem > 0 && margem < 100) html += `<p>Preço (Margem ${margem}%): <strong>${formatCurrency(cogs / (1 - (margem / 100)))}</strong></p>`; if (html) { precoDiv.innerHTML = html; precoDiv.classList.remove('hidden'); } else { precoDiv.classList.add('hidden'); } }
