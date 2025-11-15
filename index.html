@@ -12,7 +12,17 @@
     1.  COLE SUA CONFIGURAÇÃO `firebaseConfig` NA SEÇÃO <script> ABAIXO.
     2.  ATIVE "E-mail/senha" NA ABA "AUTHENTICATION" DO FIREBASE.
     3.  CRIE O "FIRESTORE DATABASE" EM MODO DE PRODUÇÃO.
-    4.  **NOVO:** ATIVE O "FIREBASE STORAGE".
+    4.  **NOVO:** ATIVE O "FIREBASE STORAGE" E VERIFIQUE AS REGRAS DE SEGURANÇA.
+        - Para um início rápido, você pode usar: 
+          rules_version = '2';
+          service firebase.storage {
+            match /b/{bucket}/o {
+              match /logos/{userId}/{allPaths=**} {
+                allow read;
+                allow write: if request.auth != null && request.auth.uid == userId;
+              }
+            }
+          }
     5.  CRIE OS ÍNDICES COMPOSTOS (userId ASC, nome ASC) PARA 'fornecedores', 'insumos', 'receitas'.
     6.  CRIE O ÍNDICE COMPOSTO (userId ASC, mes DESC) PARA A NOVA COLEÇÃO 'custosMensais'.
     ====================================================================================================
@@ -397,7 +407,7 @@
                     let logoUrl = '';
 
                     if (logoFile) {
-                        const storageRef = storage.ref(`logos/${user.uid}`);
+                        const storageRef = storage.ref(`logos/${user.uid}/${logoFile.name}`);
                         const uploadTask = await storageRef.put(logoFile);
                         logoUrl = await uploadTask.ref.getDownloadURL();
                     }
@@ -530,7 +540,7 @@
                 meta_cmv_padrao: 30, alerta_variacao: 10
             };
             if (isLocalMode) { 
-                configCache = localData.configuracoes.default || defaultConfig; 
+                configCache = { ...defaultConfig, ...(localData.configuracoes.default || {}) }; 
             } else { 
                 try { 
                     const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); 
@@ -544,27 +554,6 @@
             displayConfiguracoes(); 
         }
 
-        async function saveConfiguracoes(configData) {
-            configData.userId = currentUser.uid;
-            try {
-                if (isLocalMode) {
-                    localData.configuracoes.default = configData;
-                } else {
-                    await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true });
-                }
-                showToast("Configurações salvas!");
-                configCache = configData;
-                updateBranding();
-                displayConfiguracoes();
-                updateDashboard();
-            } catch (error) {
-                showToast("Erro ao salvar configurações.", 'error');
-                console.error("Erro em saveConfiguracoes:", error);
-                throw error; // Re-lança o erro para o bloco 'finally' do chamador funcionar
-            }
-        }
-
-
         function updateBranding() {
             const headerLogo = document.getElementById('header-logo-container');
             const headerText = document.getElementById('header-text-container');
@@ -572,7 +561,7 @@
             const defaultName = 'Pizzaria Cost Control Pro';
             
             if (configCache.logoUrl) {
-                headerLogo.innerHTML = `<img src="${configCache.logoUrl}" alt="Logo">`;
+                headerLogo.innerHTML = `<img src="${configCache.logoUrl}" alt="Logotipo da empresa">`;
             } else {
                 headerLogo.innerHTML = '🍕';
             }
@@ -622,16 +611,54 @@
         
         function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
         
-        // CORRIGIDO: Nova função para ler todos os dados de configuração do DOM.
-        function getFullConfigFromDOM() {
-            return {
-                companyName: document.getElementById('config-company-name').value,
-                logoUrl: configCache.logoUrl || '', // Mantém o logoUrl existente do cache
-                custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value) || 0,
-                rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value) || 0,
-                meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value) || 0,
-                alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) || 10
-            };
+        async function handleSaveSettings(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const button = form.querySelector('button[type="submit"]');
+            const originalButtonText = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Aguarde...';
+
+            try {
+                // 1. Coleta todos os dados dos formulários de configuração
+                const configData = {
+                    ...configCache, // Começa com o cache atual para não perder dados
+                    companyName: document.getElementById('config-company-name').value,
+                    custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value) || 0,
+                    rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value) || 0,
+                    meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value) || 0,
+                    alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) || 10,
+                    userId: currentUser.uid
+                };
+
+                // 2. Verifica se um novo logotipo foi enviado
+                const newLogoFile = document.getElementById('config-logo').files[0];
+                if (newLogoFile) {
+                    showToast("Enviando logotipo...", "info");
+                    const storageRef = storage.ref(`logos/${currentUser.uid}/${newLogoFile.name}`);
+                    const uploadTask = await storageRef.put(newLogoFile);
+                    configData.logoUrl = await uploadTask.ref.getDownloadURL();
+                }
+
+                // 3. Salva o objeto de configuração completo no Firestore
+                await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true });
+
+                // 4. Atualiza o cache local e a interface
+                configCache = configData;
+                updateBranding();
+                displayConfiguracoes();
+                updateDashboard();
+                document.getElementById('config-logo').value = ''; // Limpa o seletor de arquivo
+                showToast("Configurações salvas com sucesso!");
+
+            } catch (error) {
+                console.error("Erro ao salvar configurações:", error);
+                showToast(`Erro ao salvar: ${error.message}`, "error");
+            } finally {
+                // 5. Restaura o botão
+                button.disabled = false;
+                button.textContent = originalButtonText;
+            }
         }
 
         function setupFormListeners() {
@@ -688,49 +715,10 @@
             });
             document.getElementById('cancel-edit-custo-mensal').addEventListener('click', resetCustoMensalForm);
             
-            // CORRIGIDO: Handler do formulário de identidade com try/finally.
-            document.getElementById('branding-config-form').addEventListener('submit', async e => {
-                e.preventDefault();
-                const button = e.currentTarget.querySelector('button[type="submit"]');
-                button.disabled = true;
-                button.textContent = 'Aguarde...';
-                try {
-                    let fullConfig = getFullConfigFromDOM();
-                    const newLogoFile = document.getElementById('config-logo').files[0];
-
-                    if (newLogoFile) {
-                        showToast("Enviando logotipo...", "info");
-                        const storageRef = storage.ref(`logos/${currentUser.uid}`);
-                        const uploadTask = await storageRef.put(newLogoFile);
-                        fullConfig.logoUrl = await uploadTask.ref.getDownloadURL();
-                    }
-                    await saveConfiguracoes(fullConfig);
-                    document.getElementById('config-logo').value = '';
-                } catch (error) {
-                    console.error("Erro ao salvar identidade:", error);
-                    showToast("Ocorreu um erro ao salvar a identidade.", "error");
-                } finally {
-                    button.disabled = false;
-                    button.textContent = 'Salvar Identidade';
-                }
-            });
-
-            // CORRIGIDO: Handler do formulário geral com try/finally.
-            document.getElementById('configuracoes-form').addEventListener('submit', async e => {
-                e.preventDefault();
-                const button = e.currentTarget.querySelector('button[type="submit"]');
-                button.disabled = true;
-                try {
-                    const fullConfig = getFullConfigFromDOM();
-                    await saveConfiguracoes(fullConfig);
-                } catch (error) {
-                    console.error("Erro ao salvar configurações:", error);
-                    showToast("Ocorreu um erro ao salvar as configurações.", "error");
-                } finally {
-                    button.disabled = false;
-                }
-            });
-
+            // CORRIGIDO: Ambos os formulários agora usam o handler unificado.
+            document.getElementById('branding-config-form').addEventListener('submit', handleSaveSettings);
+            document.getElementById('configuracoes-form').addEventListener('submit', handleSaveSettings);
+            
             document.getElementById('simulador-receita-select').addEventListener('change', updateSimulator);
             ['simulador-preco-venda', 'simulador-meta-cmv', 'simulador-margem-desejada'].forEach(id => document.getElementById(id).addEventListener('input', updateSimulator));
             document.getElementById('indicadores-mes-select').addEventListener('change', updateIndicadores);
