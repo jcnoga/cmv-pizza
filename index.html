@@ -384,20 +384,16 @@
                     const companyName = document.getElementById('register-company-name').value;
                     const logoFile = document.getElementById('register-logo').files[0];
                     let logoUrl = '';
-
                     if (logoFile) {
                         const storageRef = storage.ref(`logos/${user.uid}/${logoFile.name}`);
                         const snapshot = await storageRef.put(logoFile);
                         logoUrl = await snapshot.ref.getDownloadURL();
                     }
-                    
-                    // Salva os dados de perfil na coleção 'userProfiles'
                     await db.collection('userProfiles').doc(user.uid).set({
                         companyName: companyName,
                         logoUrl: logoUrl,
                         userId: user.uid
                     });
-                    
                     showToast("Cadastro realizado com sucesso! Faça o login.");
                     toggleAuthViews('login-view');
                 } catch (err) {
@@ -410,19 +406,26 @@
             const resetForm = document.getElementById('reset-password-form');
             resetForm.addEventListener('submit', async e => { e.preventDefault(); const button = resetForm.querySelector('button[type="submit"]'); button.disabled = true; button.textContent = 'Aguarde...'; try { await auth.sendPasswordResetEmail(document.getElementById('reset-email').value); showToast("Email de recuperação enviado!"); toggleAuthViews('login-view'); } catch (err) { showToast(err.message, 'error'); } finally { button.disabled = false; button.textContent = 'Enviar link'; } });
             
-            // CORREÇÃO DO BOTÃO SAIR
+            // ==========================================================
+            // BOTÃO SAIR CORRIGIDO
+            // ==========================================================
             document.getElementById('logout-button').addEventListener('click', () => {
-                if (auth) {
-                    auth.signOut();
+                if (!isLocalMode && auth) {
+                    auth.signOut().catch(error => {
+                        console.error("Erro ao fazer logout no Firebase:", error);
+                        showToast("Ocorreu um erro ao sair.", "error");
+                    });
                 } else {
-                    // Força o logout em modo local
+                    // Lógica para logout em modo local
                     currentUser = null;
                     resetAppState();
                     authContainer.classList.remove('hidden');
                     appContainer.classList.add('hidden');
                     appNav.classList.add('hidden');
+                    toggleAuthViews('login-view');
                 }
             });
+            // ==========================================================
             
             ['show-register', 'show-login', 'show-reset-password', 'back-to-login'].forEach(id => { document.getElementById(id).addEventListener('click', e => { e.preventDefault(); const viewMap = { 'show-register': 'register-view', 'show-login': 'login-view', 'show-reset-password': 'reset-password-view', 'back-to-login': 'login-view' }; toggleAuthViews(viewMap[id]); }); });
         }
@@ -430,7 +433,7 @@
 
         async function initApp() { 
             if (isLocalMode) { currentUser = { uid: 'local', email: 'local@app.com' }; authContainer.classList.add('hidden'); appContainer.classList.remove('hidden'); appNav.classList.remove('hidden'); }
-            await fetchUserProfile(); // Carrega perfil antes de qualquer outra coisa
+            await fetchUserProfile();
             showView('dashboard'); 
             setupNavListeners(); 
             setupFormListeners();
@@ -449,15 +452,13 @@
             const companyNameEl = document.getElementById('header-company-name');
             const logoEl = document.getElementById('header-logo');
             const defaultName = '🍕 Pizzaria Cost Control Pro';
-
             if (userProfileCache && userProfileCache.companyName) {
                 companyNameEl.textContent = userProfileCache.companyName;
-                document.title = userProfileCache.companyName + " - Cost Control Pro"; // Atualiza o título da página
+                document.title = userProfileCache.companyName + " - Cost Control Pro";
             } else {
                 companyNameEl.textContent = defaultName;
                 document.title = "Pizzaria Cost Control Pro - Gestão Completa";
             }
-            
             if (userProfileCache && userProfileCache.logoUrl) {
                 logoEl.src = userProfileCache.logoUrl;
                 logoEl.classList.remove('hidden');
@@ -503,7 +504,6 @@
         async function fetchConfiguracoes() { if (isLocalMode) { configCache = localData.configuracoes.default || { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; } catch(error) { console.error("Erro configs:", error); } } displayConfiguracoes(); }
         async function saveConfiguracoes(configData) { configData.userId = currentUser.uid; try { if(isLocalMode) { localData.configuracoes.default = configData; } else { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } showToast("Configurações de cálculo salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); } catch(error) { showToast("Erro ao salvar.", 'error'); } }
         
-        // As demais funções JavaScript (renderização de tabelas, cálculos, etc.) permanecem as mesmas
         function renderAllTables() { renderFornecedoresTable(); renderInsumosTable(); renderReceitasTable(); renderCustosMensaisTable(); }
         function populateAllDropdowns() { populateFornecedoresDropdowns(); populateReceitaSelects(); populateIndicadoresMesSelect(); }
         function renderFornecedoresTable() { const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = ''; if (fornecedoresCache.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; } fornecedoresCache.forEach(f => { const insumosCount = insumosCache.filter(i => i.fornecedorId === f.id).length; const tr = document.createElement('tr'); tr.innerHTML = `<td>${f.nome}</td><td>${f.contato || '--'}</td><td>${f.telefone || '--'}</td><td>${insumosCount}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
@@ -539,7 +539,6 @@
             document.getElementById('cancel-edit-custo-mensal').addEventListener('click', resetCustoMensalForm);
             document.getElementById('configuracoes-form').addEventListener('submit', async e => { e.preventDefault(); const data = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; await saveConfiguracoes(data); });
             
-            // CORREÇÃO DO ERRO DE DIGITAÇÃO
             document.getElementById('profile-config-form').addEventListener('submit', async e => {
                 e.preventDefault();
                 if (!currentUser) return;
@@ -549,16 +548,12 @@
                     const companyName = document.getElementById('config-company-name').value;
                     const logoFile = document.getElementById('config-logo').files[0];
                     const updateData = { companyName };
-
                     if (logoFile) {
                         const storageRef = storage.ref(`logos/${currentUser.uid}/${logoFile.name}`);
                         const snapshot = await storageRef.put(logoFile);
                         updateData.logoUrl = await snapshot.ref.getDownloadURL();
                     }
-                    
-                    // AQUI ESTAVA O ERRO: db.colletion virou db.collection
                     await db.collection('userProfiles').doc(currentUser.uid).set(updateData, { merge: true });
-                    
                     await fetchUserProfile();
                     showToast('Dados da empresa atualizados com sucesso!');
                 } catch(err) {
