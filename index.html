@@ -252,7 +252,6 @@
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
     
-    <!-- NOVO MODAL DE AJUDA -->
     <div id="help-modal" class="modal">
         <div id="help-modal-content" class="modal-content">
             <h3 id="help-modal-title"></h3>
@@ -472,7 +471,6 @@
                 const table = document.getElementById(id); 
                 if (table) table.querySelector('tbody').innerHTML = '' 
             }); 
-            // Reset header to default
             document.getElementById('header-logo-container').innerHTML = '🍕';
             document.getElementById('header-text-container').textContent = 'Pizzaria Cost Control Pro';
             document.getElementById('footer-text').textContent = 'Pizzaria Cost Control Pro © 2025.';
@@ -524,33 +522,48 @@
         async function fetchInsumos() { await fetchCollection('insumos', insumosCache, 'insumos'); }
         async function fetchReceitas() { await fetchCollection('receitas', receitasCache, 'receitas'); }
         async function fetchCustosMensais() { await fetchCollection('custosMensais', custosMensaisCache, 'custosMensais', 'mes', 'desc'); }
+        
         async function fetchConfiguracoes() { 
+            const defaultConfig = {
+                companyName: 'Pizzaria Cost Control Pro', logoUrl: '',
+                custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80,
+                meta_cmv_padrao: 30, alerta_variacao: 10
+            };
             if (isLocalMode) { 
-                configCache = localData.configuracoes.default || { companyName: 'Pizzaria Local', custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; 
+                configCache = localData.configuracoes.default || defaultConfig; 
             } else { 
                 try { 
                     const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); 
-                    configCache = doc.exists ? doc.data() : { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80, meta_cmv_padrao: 30, alerta_variacao: 10 }; 
-                } catch(error) { console.error("Erro configs:", error); } 
+                    configCache = doc.exists ? { ...defaultConfig, ...doc.data() } : defaultConfig; 
+                } catch(error) { 
+                    console.error("Erro ao buscar configurações:", error);
+                    configCache = defaultConfig;
+                } 
             } 
             updateBranding();
             displayConfiguracoes(); 
         }
-        async function saveConfiguracoes(configData) { 
-            configData.userId = currentUser.uid; 
-            try { 
-                if(isLocalMode) { 
-                    localData.configuracoes.default = configData; 
-                } else { 
-                    await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); 
-                } 
-                showToast("Configurações salvas!"); 
-                configCache = configData; 
+
+        async function saveConfiguracoes(configData) {
+            configData.userId = currentUser.uid;
+            try {
+                if (isLocalMode) {
+                    localData.configuracoes.default = configData;
+                } else {
+                    await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true });
+                }
+                showToast("Configurações salvas!");
+                configCache = configData;
                 updateBranding();
-                displayConfiguracoes(); 
-                updateDashboard(); 
-            } catch(error) { showToast("Erro ao salvar.", 'error'); } 
+                displayConfiguracoes();
+                updateDashboard();
+            } catch (error) {
+                showToast("Erro ao salvar configurações.", 'error');
+                console.error("Erro em saveConfiguracoes:", error);
+                throw error; // Re-lança o erro para o bloco 'finally' do chamador funcionar
+            }
         }
+
 
         function updateBranding() {
             const headerLogo = document.getElementById('header-logo-container');
@@ -609,6 +622,18 @@
         
         function setupNavListeners() { navLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); showView(e.currentTarget.dataset.view); })); }
         
+        // CORRIGIDO: Nova função para ler todos os dados de configuração do DOM.
+        function getFullConfigFromDOM() {
+            return {
+                companyName: document.getElementById('config-company-name').value,
+                logoUrl: configCache.logoUrl || '', // Mantém o logoUrl existente do cache
+                custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value) || 0,
+                rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value) || 0,
+                meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value) || 0,
+                alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) || 10
+            };
+        }
+
         function setupFormListeners() {
             document.getElementById('fornecedor-form').addEventListener('submit', async e => { e.preventDefault(); const button = e.currentTarget.querySelector('button[type="submit"]'); button.disabled = true; button.textContent = 'Aguarde...'; const data = { nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value, email: document.getElementById('fornecedor-email').value, endereco: document.getElementById('fornecedor-endereco').value, id: document.getElementById('fornecedor-id').value || null }; const success = await saveData('fornecedores', 'fornecedores', data); if (success) { await fetchFornecedores(); renderFornecedoresTable(); populateFornecedoresDropdowns(); resetFornecedorForm(); } button.disabled = false; button.textContent = 'Salvar Fornecedor'; });
             document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
@@ -663,29 +688,49 @@
             });
             document.getElementById('cancel-edit-custo-mensal').addEventListener('click', resetCustoMensalForm);
             
+            // CORRIGIDO: Handler do formulário de identidade com try/finally.
             document.getElementById('branding-config-form').addEventListener('submit', async e => {
                 e.preventDefault();
                 const button = e.currentTarget.querySelector('button[type="submit"]');
-                button.disabled = true; button.textContent = 'Aguarde...';
-                
-                const newName = document.getElementById('config-company-name').value;
-                const newLogoFile = document.getElementById('config-logo').files[0];
-                let newLogoUrl = configCache.logoUrl || '';
+                button.disabled = true;
+                button.textContent = 'Aguarde...';
+                try {
+                    let fullConfig = getFullConfigFromDOM();
+                    const newLogoFile = document.getElementById('config-logo').files[0];
 
-                if (newLogoFile) {
-                    showToast("Enviando logotipo...", "info");
-                    const storageRef = storage.ref(`logos/${currentUser.uid}`);
-                    const uploadTask = await storageRef.put(newLogoFile);
-                    newLogoUrl = await uploadTask.ref.getDownloadURL();
+                    if (newLogoFile) {
+                        showToast("Enviando logotipo...", "info");
+                        const storageRef = storage.ref(`logos/${currentUser.uid}`);
+                        const uploadTask = await storageRef.put(newLogoFile);
+                        fullConfig.logoUrl = await uploadTask.ref.getDownloadURL();
+                    }
+                    await saveConfiguracoes(fullConfig);
+                    document.getElementById('config-logo').value = '';
+                } catch (error) {
+                    console.error("Erro ao salvar identidade:", error);
+                    showToast("Ocorreu um erro ao salvar a identidade.", "error");
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Salvar Identidade';
                 }
-
-                const updatedConfig = { ...configCache, companyName: newName, logoUrl: newLogoUrl };
-                await saveConfiguracoes(updatedConfig);
-                document.getElementById('config-logo').value = ''; // Limpa o campo de arquivo
-                button.disabled = false; button.textContent = 'Salvar Identidade';
             });
-            
-            document.getElementById('configuracoes-form').addEventListener('submit', async e => { e.preventDefault(); const button = e.currentTarget.querySelector('button[type="submit"]'); button.disabled = true; const data = { ...configCache, custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; await saveConfiguracoes(data); button.disabled = false; });
+
+            // CORRIGIDO: Handler do formulário geral com try/finally.
+            document.getElementById('configuracoes-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const button = e.currentTarget.querySelector('button[type="submit"]');
+                button.disabled = true;
+                try {
+                    const fullConfig = getFullConfigFromDOM();
+                    await saveConfiguracoes(fullConfig);
+                } catch (error) {
+                    console.error("Erro ao salvar configurações:", error);
+                    showToast("Ocorreu um erro ao salvar as configurações.", "error");
+                } finally {
+                    button.disabled = false;
+                }
+            });
+
             document.getElementById('simulador-receita-select').addEventListener('change', updateSimulator);
             ['simulador-preco-venda', 'simulador-meta-cmv', 'simulador-margem-desejada'].forEach(id => document.getElementById(id).addEventListener('input', updateSimulator));
             document.getElementById('indicadores-mes-select').addEventListener('change', updateIndicadores);
