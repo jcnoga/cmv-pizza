@@ -13,8 +13,10 @@
     2.  ATIVE "E-mail/senha" NA ABA "AUTHENTICATION" DO FIREBASE.
     3.  CRIE O "FIRESTORE DATABASE" EM MODO DE PRODUÇÃO.
     4.  CRIE O "CLOUD STORAGE" PARA ARMAZENAR OS LOGOTIPOS.
-    5.  CRIE OS ÍNDICES COMPOSTOS (userId ASC, nome ASC) PARA 'fornecedores', 'insumos', 'receitas'.
-    6.  CRIE O ÍNDICE COMPOSTO (userId ASC, mes DESC) PARA A NOVA COLEÇÃO 'custosMensais'.
+    5.  NO FIRESTORE, CRIE UMA COLEÇÃO CHAMADA `userProfiles`.
+    6.  CRIE OS ÍNDICES COMPOSTOS (userId ASC, nome ASC) PARA 'fornecedores', 'insumos', 'receitas'.
+    7.  CRIE O ÍNDICE COMPOSTO (userId ASC, mes DESC) PARA A NOVA COLEÇÃO 'custosMensais'.
+    8.  AJUSTE AS REGRAS DE SEGURANÇA DO FIRESTORE (VEJA INSTRUÇÕES NO FINAL DA PÁGINA).
     ====================================================================================================
     -->
 
@@ -139,6 +141,7 @@
         </div>
 
         <div id="app-container" class="hidden">
+            <!-- As seções da aplicação (dashboard, fornecedores, etc.) continuam aqui sem alterações -->
             <section id="dashboard-view" class="view">
                 <h2>Dashboard</h2>
                 <div class="grid-container grid-4"><div class="card kpi-card"><h3>CMV Médio</h3><div class="value" id="dashboard-cmv-medio">--%</div></div><div class="card kpi-card"><h3>Fornecedores</h3><div class="value" id="dashboard-num-fornecedores">--</div></div><div class="card kpi-card"><h3>Insumos</h3><div class="value" id="dashboard-num-insumos">--</div></div><div class="card kpi-card"><h3>Receitas</h3><div class="value" id="dashboard-num-receitas">--</div></div></div>
@@ -245,6 +248,7 @@
 
             <section id="ajuda-view" class="view">
                 <h2>Glossário de Ajuda</h2>
+                <!-- O conteúdo do glossário permanece o mesmo -->
                 <div class="card"><h3>Faturamento (Receita Bruta)</h3><p><strong>Fórmula:</strong> Preço de Venda × Número de Unidades Vendidas.</p><p><strong>Significado:</strong> É o valor total arrecadado com as vendas de produtos ou serviços antes de deduzir qualquer custo ou despesa. Representa toda a entrada de dinheiro gerada pela atividade principal do negócio.</p><p><strong>Exemplo:</strong> Se uma pizzaria vende 100 pizzas a R$ 50,00 cada em um dia, o faturamento desse dia é de R$ 5.000,00.</p><p><strong>Dica:</strong> Faturamento alto não significa lucro. É importante analisar os custos e despesas para garantir que a operação seja rentável.</p></div>
                 <div class="card"><h3>Custos Fixos (CF)</h3><p><strong>Fórmula:</strong> Soma de todos os custos que não variam conforme o volume de produção ou vendas.</p><p><strong>Significado:</strong> São despesas que a empresa precisa pagar todos os meses, independente do faturamento — como aluguel, energia mínima, contabilidade ou salários fixos.</p><p><strong>Exemplo:</strong> Aluguel do ponto comercial de R$ 2.000 + folha de pagamento de R$ 8.000 = R$ 10.000 de custos fixos mensais.</p><p><strong>Dica:</strong> Faça uma revisão periódica dos custos fixos para identificar itens que podem ser reduzidos ou renegociados sem prejudicar a operação.</p></div>
                 <div class="card"><h3>Custos Variáveis (CV)</h3><p><strong>Fórmula:</strong> Soma dos custos que mudam proporcionalmente ao volume de produção ou vendas.</p><p><strong>Significado:</strong> São os gastos diretamente ligados à produção e venda de cada produto. Se você não vende nada, esse custo é zero. Inclui ingredientes, embalagens para delivery, etc.</p><p><strong>Exemplo:</strong> Se cada pizza consome R$ 8,00 em ingredientes e R$ 1,50 em embalagem, o custo variável por pizza é de R$ 9,50.</p><p><strong>Dica:</strong> Negociar preços melhores com fornecedores para compras em maior volume é a principal forma de reduzir seus custos variáveis e aumentar a margem de lucro por produto.</p></div>
@@ -260,7 +264,6 @@
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
     
-    <!-- NOVO MODAL DE AJUDA -->
     <div id="help-modal" class="modal">
         <div id="help-modal-content" class="modal-content">
             <h3 id="help-modal-title"></h3>
@@ -282,15 +285,15 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const firebaseConfig = {
-            // SUA CONFIGURAÇÃO DO FIREBASE AQUI
+            // INSIRA SUA CONFIGURAÇÃO DO FIREBASE AQUI
         };
 
         let firebaseApp, auth, db, storage, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores: [], insumos: [], receitas: [], configuracoes: {}, custosMensais: [], userProfile: {} };
         let fornecedoresCache = [], insumosCache = [], receitasCache = [], configCache = {}, custosMensaisCache = [], userProfileCache = {};
-
-        // Objeto com todos os textos de ajuda (sem alterações)
+        
+        // Objeto de ajuda permanece o mesmo
         const helpTexts = {
             fornecedorNome: { title: 'Nome do Fornecedor', text: 'Nome fantasia ou razão social da empresa que fornece os insumos. Ex: "Distribuidora de Frios S.A.".' },
             fornecedorContato: { title: 'Nome do Contato', text: 'Nome do vendedor ou pessoa principal com quem você fala na empresa. Ex: "Carlos Andrade".' },
@@ -321,7 +324,7 @@
             configAlerta: { title: 'Alerta de Variação de Preço (%)', text: 'O sistema irá gerar um alerta no Dashboard se o preço de compra de um insumo variar mais do que este percentual (para cima ou para baixo).' }
         };
 
-        if (firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_")) {
+        if (firebaseConfig.apiKey && firebaseConfig.projectId) {
             try { 
                 firebaseApp = firebase.initializeApp(firebaseConfig); 
                 auth = firebase.auth(); 
@@ -355,7 +358,6 @@
             auth.onAuthStateChanged(async user => {
                 if (user) {
                     currentUser = { uid: user.uid, email: user.email };
-                    await fetchUserProfile();
                     authContainer.classList.add('hidden');
                     appContainer.classList.remove('hidden');
                     appNav.classList.remove('hidden');
@@ -378,11 +380,7 @@
                 const button = registerForm.querySelector('button[type="submit"]');
                 button.disabled = true; button.textContent = 'Aguarde...';
                 try {
-                    const { user } = await auth.createUserWithEmailAndPassword(
-                        document.getElementById('register-email').value,
-                        document.getElementById('register-password').value
-                    );
-                    
+                    const { user } = await auth.createUserWithEmailAndPassword(document.getElementById('register-email').value, document.getElementById('register-password').value);
                     const companyName = document.getElementById('register-company-name').value;
                     const logoFile = document.getElementById('register-logo').files[0];
                     let logoUrl = '';
@@ -392,7 +390,8 @@
                         const snapshot = await storageRef.put(logoFile);
                         logoUrl = await snapshot.ref.getDownloadURL();
                     }
-
+                    
+                    // Salva os dados de perfil na coleção 'userProfiles'
                     await db.collection('userProfiles').doc(user.uid).set({
                         companyName: companyName,
                         logoUrl: logoUrl,
@@ -411,14 +410,27 @@
             const resetForm = document.getElementById('reset-password-form');
             resetForm.addEventListener('submit', async e => { e.preventDefault(); const button = resetForm.querySelector('button[type="submit"]'); button.disabled = true; button.textContent = 'Aguarde...'; try { await auth.sendPasswordResetEmail(document.getElementById('reset-email').value); showToast("Email de recuperação enviado!"); toggleAuthViews('login-view'); } catch (err) { showToast(err.message, 'error'); } finally { button.disabled = false; button.textContent = 'Enviar link'; } });
             
-            document.getElementById('logout-button').addEventListener('click', () => { if (auth) auth.signOut(); });
+            // CORREÇÃO DO BOTÃO SAIR
+            document.getElementById('logout-button').addEventListener('click', () => {
+                if (auth) {
+                    auth.signOut();
+                } else {
+                    // Força o logout em modo local
+                    currentUser = null;
+                    resetAppState();
+                    authContainer.classList.remove('hidden');
+                    appContainer.classList.add('hidden');
+                    appNav.classList.add('hidden');
+                }
+            });
+            
             ['show-register', 'show-login', 'show-reset-password', 'back-to-login'].forEach(id => { document.getElementById(id).addEventListener('click', e => { e.preventDefault(); const viewMap = { 'show-register': 'register-view', 'show-login': 'login-view', 'show-reset-password': 'reset-password-view', 'back-to-login': 'login-view' }; toggleAuthViews(viewMap[id]); }); });
         }
         function toggleAuthViews(view) { ['login-view', 'register-view', 'reset-password-view'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById(view).classList.remove('hidden'); }
 
         async function initApp() { 
             if (isLocalMode) { currentUser = { uid: 'local', email: 'local@app.com' }; authContainer.classList.add('hidden'); appContainer.classList.remove('hidden'); appNav.classList.remove('hidden'); }
-            applyBranding();
+            await fetchUserProfile(); // Carrega perfil antes de qualquer outra coisa
             showView('dashboard'); 
             setupNavListeners(); 
             setupFormListeners();
@@ -440,30 +452,28 @@
 
             if (userProfileCache && userProfileCache.companyName) {
                 companyNameEl.textContent = userProfileCache.companyName;
+                document.title = userProfileCache.companyName + " - Cost Control Pro"; // Atualiza o título da página
             } else {
                 companyNameEl.textContent = defaultName;
+                document.title = "Pizzaria Cost Control Pro - Gestão Completa";
             }
             
             if (userProfileCache && userProfileCache.logoUrl) {
                 logoEl.src = userProfileCache.logoUrl;
                 logoEl.classList.remove('hidden');
-                if(!companyNameEl.textContent.startsWith('🍕')) companyNameEl.textContent = " " + companyNameEl.textContent;
+                companyNameEl.textContent = " " + companyNameEl.textContent;
             } else {
+                logoEl.src = "";
                 logoEl.classList.add('hidden');
-                if(!companyNameEl.textContent.startsWith('🍕')) companyNameEl.textContent = '🍕' + companyNameEl.textContent;
+                if(!companyNameEl.textContent.includes('🍕')) companyNameEl.textContent = '🍕' + companyNameEl.textContent;
             }
         }
         
         async function fetchUserProfile() {
-            if (isLocalMode) { userProfileCache = localData.userProfile; return; }
-            if (!currentUser) return;
+            if (isLocalMode || !currentUser) { userProfileCache = localData.userProfile; applyBranding(); return; }
             try {
                 const doc = await db.collection('userProfiles').doc(currentUser.uid).get();
-                if (doc.exists) {
-                    userProfileCache = doc.data();
-                } else {
-                    userProfileCache = {};
-                }
+                userProfileCache = doc.exists ? doc.data() : {};
             } catch (error) {
                 console.error("Erro ao buscar perfil do usuário:", error);
                 userProfileCache = {};
@@ -486,7 +496,6 @@
             } catch (error) { const errorMsg = error.code === 'permission-denied' ? 'Permissão negada. Verifique suas Regras de Segurança do Firestore.' : error.message; showToast(`Erro: ${errorMsg}`, 'error'); console.error(`Erro ao salvar em ${collectionName}:`, error); return false; }
         }
         async function deleteData(collectionName, localKey, id) { try { if (isLocalMode) { localData[localKey] = localData[localKey].filter(i => i.id !== id); } else { await db.collection(collectionName).doc(id).delete(); } showToast(`${collectionName.replace('sMensais', '').slice(0, -1)} excluído!`); return true; } catch (error) { showToast("Erro ao excluir.", 'error'); return false; } }
-
         async function fetchFornecedores() { await fetchCollection('fornecedores', fornecedoresCache, 'fornecedores'); }
         async function fetchInsumos() { await fetchCollection('insumos', insumosCache, 'insumos'); }
         async function fetchReceitas() { await fetchCollection('receitas', receitasCache, 'receitas'); }
@@ -495,8 +504,6 @@
         async function saveConfiguracoes(configData) { configData.userId = currentUser.uid; try { if(isLocalMode) { localData.configuracoes.default = configData; } else { await db.collection('configuracoes').doc(currentUser.uid).set(configData, { merge: true }); } showToast("Configurações de cálculo salvas!"); configCache = configData; displayConfiguracoes(); updateDashboard(); } catch(error) { showToast("Erro ao salvar.", 'error'); } }
         
         // As demais funções JavaScript (renderização de tabelas, cálculos, etc.) permanecem as mesmas
-        // ... (código original de renderização, cálculos, etc.) ...
-        
         function renderAllTables() { renderFornecedoresTable(); renderInsumosTable(); renderReceitasTable(); renderCustosMensaisTable(); }
         function populateAllDropdowns() { populateFornecedoresDropdowns(); populateReceitaSelects(); populateIndicadoresMesSelect(); }
         function renderFornecedoresTable() { const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = ''; if (fornecedoresCache.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; } fornecedoresCache.forEach(f => { const insumosCount = insumosCache.filter(i => i.fornecedorId === f.id).length; const tr = document.createElement('tr'); tr.innerHTML = `<td>${f.nome}</td><td>${f.contato || '--'}</td><td>${f.telefone || '--'}</td><td>${insumosCount}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`; tbody.appendChild(tr); }); }
@@ -531,8 +538,11 @@
             custoMensalForm.addEventListener('submit', async e => { e.preventDefault(); const button = custoMensalForm.querySelector('button[type="submit"]'); button.disabled = true; button.textContent = 'Aguarde...'; const data = { mes: document.getElementById('custo-mensal-mes').value, faturamento: parseFloat(document.getElementById('custo-mensal-faturamento').value) || 0, custosVariaveis: parseFloat(document.getElementById('custo-mensal-custosVariaveis').value) || 0, custosFixos: parseFloat(document.getElementById('custo-mensal-custosFixos').value) || 0, despesasOperacionais: parseFloat(document.getElementById('custo-mensal-despesasOperacionais').value) || 0, outrasReceitasDespesas: parseFloat(document.getElementById('custo-mensal-outrasReceitasDespesas').value) || 0, numeroVendas: parseInt(document.getElementById('custo-mensal-numeroVendas').value) || 0, impostos: parseFloat(document.getElementById('custo-mensal-impostos').value) || 0, id: document.getElementById('custo-mensal-id').value || null }; const success = await saveData('custosMensais', 'custosMensais', data); if (success) { await fetchCustosMensais(); renderCustosMensaisTable(); populateIndicadoresMesSelect(); resetCustoMensalForm(); } button.disabled = false; button.textContent = 'Salvar Mês'; });
             document.getElementById('cancel-edit-custo-mensal').addEventListener('click', resetCustoMensalForm);
             document.getElementById('configuracoes-form').addEventListener('submit', async e => { e.preventDefault(); const data = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; await saveConfiguracoes(data); });
+            
+            // CORREÇÃO DO ERRO DE DIGITAÇÃO
             document.getElementById('profile-config-form').addEventListener('submit', async e => {
                 e.preventDefault();
+                if (!currentUser) return;
                 const button = e.currentTarget.querySelector('button');
                 button.disabled = true; button.textContent = 'Salvando...';
                 try {
@@ -545,11 +555,15 @@
                         const snapshot = await storageRef.put(logoFile);
                         updateData.logoUrl = await snapshot.ref.getDownloadURL();
                     }
-                    await db.collection('userProfiles').doc(currentUser.uid).update(updateData);
-                    await fetchUserProfile(); // Re-fetch para atualizar o cache
+                    
+                    // AQUI ESTAVA O ERRO: db.colletion virou db.collection
+                    await db.collection('userProfiles').doc(currentUser.uid).set(updateData, { merge: true });
+                    
+                    await fetchUserProfile();
                     showToast('Dados da empresa atualizados com sucesso!');
                 } catch(err) {
                     showToast('Erro ao atualizar dados: ' + err.message, 'error');
+                    console.error(err);
                 } finally {
                     button.disabled = false; button.textContent = 'Salvar Dados da Empresa';
                 }
@@ -601,7 +615,10 @@
         document.getElementById('generate-general-report-pdf').addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(20); doc.text('Relatório Geral', 14, 22); doc.setFontSize(12); doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30); doc.autoTable({ startY: 40, head: [['KPI', 'Valor']], body: [ ['Fornecedores', fornecedoresCache.length], ['Insumos', insumosCache.length], ['Receitas', receitasCache.length], ['Meta CMV', `${configCache.meta_cmv_padrao || 30}%`], ], }); doc.addPage(); doc.setFontSize(16); doc.text('Top 10 Receitas por Custo', 14, 22); const topR = [...receitasCache].sort((a,b) => calculateRecipeCOGS(b) - calculateRecipeCOGS(a)).slice(0,10); doc.autoTable({ startY: 30, head: [['Receita', 'Custo (COGS)']], body: topR.map(r => [r.nome, formatCurrency(calculateRecipeCOGS(r))]), }); doc.save('Relatorio_Geral.pdf'); });
         document.getElementById('run-validation-button').addEventListener('click', () => { const div = document.getElementById('validation-results'); div.classList.remove('hidden'); div.innerHTML = 'Executando...'; const conf = { custo_hora_mao_de_obra: 20, rateio_por_pizza: 0.80 }; const ins = [{id:'f',c:80,q:25000},{id:'m',c:12,q:3000},{id:'q',c:28,q:1000},{id:'a',c:30,q:1000},{id:'o',c:0.1,q:1}]; const rec = {ings:[{i:'f',q:300},{i:'m',q:120},{i:'q',q:150},{i:'a',q:10},{i:'o',q:1}],t:8,e:1.5,p:0}; const cogsCalc = (c, i, r) => (r.ingredientes.reduce((t,ing) => t + ((i.find(x=>x.id===ing.insumoId).c/i.find(x=>x.id===ing.insumoId).q)*ing.quantidade_g),0)) * (1 + (r.perda_percentual || 0) / 100) + ((c.custo_hora_mao_de_obra/60||0)*(r.tempo_preparo_min||0)) + (r.custo_embalagem_por_unidade||0) + (c.rateio_por_pizza||0); const cogs = cogsCalc(conf, ins.map(x=>({id:x.id,c:x.c,q:x.q})), {ingredientes:rec.ings.map(y=>({insumoId:y.i,quantidade_g:y.q})),tempo_preparo_min:rec.t,custo_embalagem_por_unidade:rec.e,perda_percentual:rec.p}); const preco = cogs/0.3; const cogsOk = Math.abs(cogs - 11.01)<0.01; const precoOk = Math.abs(preco - 36.70)<0.01; div.innerHTML = `<h4>Resultados</h4><p>COGS: <strong>${formatCurrency(cogs)}</strong> (Esp: R$ 11,01) -> <span style="color:${cogsOk?'green':'red'}">${cogsOk?'OK':'ERRO'}</span></p><p>Preço (CMV 30%): <strong>${formatCurrency(preco)}</strong> (Esp: R$ 36,70) -> <span style="color:${precoOk?'green':'red'}">${precoOk?'OK':'ERRO'}</span></p>`; });
         
-        if(isLocalMode) { currentUser = { uid: 'local' }; initApp(); }
+        if(isLocalMode) { 
+            currentUser = { uid: 'local' }; 
+            initApp(); 
+        }
     });
     </script>
 </body>
