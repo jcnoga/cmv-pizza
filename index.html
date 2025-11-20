@@ -96,20 +96,17 @@
             <a href="#" class="nav-link" data-view="insumos">Insumos</a>
             <a href="#" class="nav-link" data-view="receitas">Receitas</a>
             <a href="#" class="nav-link" data-view="fornecedores">Fornecedores</a>
-            
             <a href="#" class="nav-link" data-view="configuracoes">⚙️</a>
             <button id="logout-button">Sair</button>
         </nav>
     </header>
 
     <main>
-        <!-- TELAS DE AUTENTICAÇÃO -->
         <div id="auth-container">
             <div id="login-view" class="auth-form"><h2>Login</h2><form id="login-form"><div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required></div><div class="form-group"><label for="login-password">Senha</label><input type="password" id="login-password" required></div><button type="submit" class="btn btn-primary">Entrar</button></form><div class="auth-link"><p>Não tem conta? <a href="#" id="show-register">Cadastre-se</a></p></div></div>
             <div id="register-view" class="auth-form hidden"><h2>Cadastro</h2><form id="register-form"><div class="form-group"><label for="register-email">Email</label><input type="email" id="register-email" required></div><div class="form-group"><label for="register-password">Senha</label><input type="password" id="register-password" required minlength="6"></div><button type="submit" class="btn btn-primary">Cadastrar</button></form><div class="auth-link"><p>Já tem conta? <a href="#" id="show-login">Faça login</a></p></div></div>
         </div>
 
-        <!-- ÁREA DO APLICATIVO -->
         <div id="app-container" class="hidden">
             
             <!-- 1. DASHBOARD -->
@@ -126,193 +123,49 @@
 
             <!-- 2. VENDAS DIÁRIAS -->
             <section id="vendas-diarias-view" class="view">
-                <div class="card">
-                    <h2>Registrar Vendas do Dia</h2>
-                    <div class="form-group">
-                        <label>Data do Movimento</label>
-                        <input type="date" id="venda-data" required>
-                    </div>
-                    
-                    <div class="grid-container grid-2">
-                        <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
-                            <h3>🍕 Venda de Pizzas</h3>
-                            <div class="form-group">
-                                <label>Sabor (Receita)</label>
-                                <select id="venda-pizza-select"><option value="">Selecione...</option></select>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group"><label>Tamanho</label><select id="venda-pizza-tamanho"><option value="G">Grande</option><option value="M">Média</option><option value="P">Pequena</option></select></div>
-                                <div class="form-group"><label>Qtd</label><input type="number" id="venda-pizza-qtd" value="1" min="1"></div>
-                                <div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-pizza-valor" step="0.01"></div>
-                            </div>
-                            <button class="btn btn-primary" id="btn-add-pizza-sale">Adicionar Pizza</button>
-                        </div>
-
-                        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
-                            <h3>🥤 Venda de Produtos (Revenda)</h3>
-                            <div class="form-group">
-                                <label>Produto</label>
-                                <select id="venda-produto-select"><option value="">Selecione...</option></select>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group"><label>Qtd</label><input type="number" id="venda-produto-qtd" value="1" min="1"></div>
-                                <div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-produto-valor" step="0.01"></div>
-                            </div>
-                            <button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button>
-                        </div>
-                    </div>
-
-                    <h3 style="margin-top: 20px;">Itens lançados hoje:</h3>
-                    <table id="sales-table">
-                        <thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                    <div class="total-cost" id="daily-total-display">Total do Dia: R$ 0,00</div>
-                    <button class="btn btn-success" id="btn-save-day" style="margin-top: 15px;">💾 Salvar Movimento do Dia</button>
-                </div>
+                <div class="card"><h2>Registrar Vendas do Dia</h2><div class="form-group"><label>Data do Movimento</label><input type="date" id="venda-data" required></div><div class="grid-container grid-2"><div style="background: #fff3e0; padding: 15px; border-radius: 8px;"><h3>🍕 Venda de Pizzas</h3><div class="form-group"><label>Sabor (Receita)</label><select id="venda-pizza-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Tamanho</label><select id="venda-pizza-tamanho"><option value="G">Grande</option><option value="M">Média</option><option value="P">Pequena</option></select></div><div class="form-group"><label>Qtd</label><input type="number" id="venda-pizza-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-pizza-valor" step="0.01"></div></div><button class="btn btn-primary" id="btn-add-pizza-sale">Adicionar Pizza</button></div><div style="background: #e3f2fd; padding: 15px; border-radius: 8px;"><h3>🥤 Venda de Produtos (Revenda)</h3><div class="form-group"><label>Produto</label><select id="venda-produto-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-produto-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-produto-valor" step="0.01"></div></div><button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button></div></div><h3 style="margin-top: 20px;">Itens lançados hoje:</h3><table id="sales-table"><thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead><tbody></tbody></table><div class="total-cost" id="daily-total-display">Total do Dia: R$ 0,00</div><button class="btn btn-success" id="btn-save-day" style="margin-top: 15px;">💾 Salvar Movimento do Dia</button></div>
             </section>
 
-            <!-- 3. MENSAL (Custos) -->
+            <!-- 3. MENSAL -->
             <section id="custos-mensais-view" class="view">
-                <div class="card">
-                    <h2>Fechamento Mensal</h2>
-                    <form id="custo-mensal-form">
-                        <input type="hidden" id="custo-mensal-id">
-                        <div class="form-row">
-                            <div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div>
-                            <div class="form-group" style="display:flex; align-items:end;">
-                                <button type="button" id="btn-pull-daily" class="btn btn-info">🔄 Puxar do Diário</button>
-                            </div>
-                        </div>
-                        <div class="checkbox-wrapper">
-                            <input type="checkbox" id="enable-manual-edit">
-                            <label for="enable-manual-edit"><strong>Habilitar Edição Manual</strong> (Marque para corrigir valores calculados)</label>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required disabled></div>
-                            <div class="form-group"><label>Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01" disabled></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01" disabled></div>
-                            <div class="form-group"><label>Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01" disabled></div>
-                        </div>
-                        <div class="form-row">
-                             <div class="form-group"><label>Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01" disabled></div>
-                             <div class="form-group"><label>Outras Rec/Desp (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" disabled></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salvar Mês</button>
-                    </form>
-                </div>
-                <div class="card">
-                    <h2>Histórico Mensal</h2>
-                    <table id="custos-mensais-table">
-                        <thead><tr><th>Mês</th><th>Faturamento</th><th>Lucro Líquido</th><th>Ações</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+                <div class="card"><h2>Fechamento Mensal</h2><form id="custo-mensal-form"><input type="hidden" id="custo-mensal-id"><div class="form-row"><div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div><div class="form-group" style="display:flex; align-items:end;"><button type="button" id="btn-pull-daily" class="btn btn-info">🔄 Puxar do Diário</button></div></div><div class="checkbox-wrapper"><input type="checkbox" id="enable-manual-edit"><label for="enable-manual-edit"><strong>Habilitar Edição Manual</strong></label></div><div class="form-row"><div class="form-group"><label>Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required disabled></div><div class="form-group"><label>Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01" disabled></div><div class="form-group"><label>Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01" disabled></div><div class="form-group"><label>Outras Rec/Desp (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" disabled></div></div><button type="submit" class="btn btn-primary">Salvar Mês</button></form></div><div class="card"><h2>Histórico Mensal</h2><table id="custos-mensais-table"><thead><tr><th>Mês</th><th>Faturamento</th><th>Lucro Líquido</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- 4. LISTA DE COMPRAS -->
             <section id="lista-compras-view" class="view">
-                <div class="card">
-                    <h2>🛒 Sugestão de Compras</h2>
-                    <div class="filter-container">
-                        <button id="btn-generate-shopping" class="btn btn-primary">Gerar Lista Atualizada</button>
-                        <button id="btn-print-shopping" class="btn btn-secondary">Imprimir PDF</button>
-                    </div>
-                    <table id="shopping-list-table">
-                        <thead><tr><th>Item</th><th>Tipo</th><th>Estoque Atual</th><th>Mínimo</th><th>Ideal</th><th>Comprar</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+                <div class="card"><h2>🛒 Sugestão de Compras</h2><div class="filter-container"><button id="btn-generate-shopping" class="btn btn-primary">Gerar Lista Atualizada</button><button id="btn-print-shopping" class="btn btn-secondary">Imprimir PDF</button></div><table id="shopping-list-table"><thead><tr><th>Item</th><th>Tipo</th><th>Estoque Atual</th><th>Mínimo</th><th>Ideal</th><th>Comprar</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 5. PRODUTOS (REVENDA) -->
+            <!-- 5. PRODUTOS -->
             <section id="produtos-view" class="view">
-                <div class="card"><h2>Cadastrar Produto (Revenda)</h2>
-                    <form id="produto-form">
-                        <input type="hidden" id="produto-id">
-                        <div class="form-row">
-                            <div class="form-group"><label>Nome</label><input type="text" id="prod-nome" required></div>
-                            <div class="form-group"><label>Categoria</label><select id="prod-categoria"><option value="Bebida">Bebida</option><option value="Sobremesa">Sobremesa</option><option value="Outro">Outro</option></select></div>
-                        </div>
-                        <div class="form-row">
-                             <!-- NOVO CAMPO FORNECEDOR -->
-                            <div class="form-group"><label>Fornecedor</label><select id="prod-fornecedor-select"><option value="">Selecione</option></select></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Preço Compra (R$)</label><input type="number" id="prod-custo" step="0.01" required></div>
-                            <div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="prod-venda" step="0.01" required></div>
-                            <div class="form-group"><label>Unidade</label><select id="prod-unidade"><option value="un">Unidade</option><option value="lt">Lata</option><option value="gf">Garrafa</option></select></div>
-                        </div>
-                        <h3>Controle de Estoque</h3>
-                        <div class="form-row">
-                            <div class="form-group"><label>Atual</label><input type="number" id="prod-est-atual" value="0"></div>
-                            <div class="form-group"><label>Mínimo</label><input type="number" id="prod-est-min" value="10"></div>
-                            <div class="form-group"><label>Ideal</label><input type="number" id="prod-est-ideal" value="50"></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salvar Produto</button>
-                        <button type="button" id="cancel-edit-produto" class="btn btn-secondary hidden">Cancelar</button>
-                    </form>
-                </div>
-                <div class="card"><h2>Lista de Produtos</h2><table id="produtos-table"><thead><tr><th>Nome</th><th>Fornecedor</th><th>Venda</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
+                <div class="card"><h2>Cadastrar Produto (Revenda)</h2><form id="produto-form"><input type="hidden" id="produto-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="prod-nome" required></div><div class="form-group"><label>Categoria</label><select id="prod-categoria"><option value="Bebida">Bebida</option><option value="Sobremesa">Sobremesa</option><option value="Outro">Outro</option></select></div></div><div class="form-row"><div class="form-group"><label>Fornecedor</label><select id="prod-fornecedor-select"><option value="">Selecione</option></select></div></div><div class="form-row"><div class="form-group"><label>Preço Compra (R$)</label><input type="number" id="prod-custo" step="0.01" required></div><div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="prod-venda" step="0.01" required></div><div class="form-group"><label>Unidade</label><select id="prod-unidade"><option value="un">Unidade</option><option value="lt">Lata</option><option value="gf">Garrafa</option></select></div></div><h3>Controle de Estoque</h3><div class="form-row"><div class="form-group"><label>Atual</label><input type="number" id="prod-est-atual" value="0"></div><div class="form-group"><label>Mínimo</label><input type="number" id="prod-est-min" value="10"></div><div class="form-group"><label>Ideal</label><input type="number" id="prod-est-ideal" value="50"></div></div><button type="submit" class="btn btn-primary">Salvar Produto</button><button type="button" id="cancel-edit-produto" class="btn btn-secondary hidden">Cancelar</button></form></div><div class="card"><h2>Lista de Produtos</h2><table id="produtos-table"><thead><tr><th>Nome</th><th>Fornecedor</th><th>Venda</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- 6. INSUMOS -->
             <section id="insumos-view" class="view">
-                <div class="card"><h2>Cadastrar Insumo</h2>
-                    <form id="insumo-form"><input type="hidden" id="insumo-id">
-                        <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="insumo-nome" required></div><div class="form-group"><label>Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div></div>
-                        <div class="form-row"><div class="form-group"><label>Custo Emb. (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div><div class="form-group"><label>Qtd. Emb.</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div><div class="form-group"><label>Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div></div>
-                        <h3 style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">Controle de Estoque (em <span id="insumo-base-unit">g/ml/un</span>)</h3>
-                        <div class="form-row">
-                            <div class="form-group"><label>Atual</label><input type="number" id="insumo-est-atual" value="0"></div>
-                            <div class="form-group"><label>Mínimo</label><input type="number" id="insumo-est-min" value="0"></div>
-                            <div class="form-group"><label>Ideal</label><input type="number" id="insumo-est-ideal" value="0"></div>
-                        </div>
-                        <div class="form-row"><div class="form-group"><label>Validade</label><input type="date" id="insumo-validade"></div></div>
-                        <button type="submit" class="btn btn-primary">Salvar Insumo</button><button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden">Cancelar</button>
-                    </form>
-                </div>
-                <div class="card"><h2>Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="Filtrar..."></div><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo Base</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
+                <div class="card"><h2>Cadastrar Insumo</h2><form id="insumo-form"><input type="hidden" id="insumo-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="insumo-nome" required></div><div class="form-group"><label>Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div></div><div class="form-row"><div class="form-group"><label>Custo Emb. (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div><div class="form-group"><label>Qtd. Emb.</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div><div class="form-group"><label>Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div></div><h3 style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">Controle de Estoque</h3><div class="form-row"><div class="form-group"><label>Atual</label><input type="number" id="insumo-est-atual" value="0"></div><div class="form-group"><label>Mínimo</label><input type="number" id="insumo-est-min" value="0"></div><div class="form-group"><label>Ideal</label><input type="number" id="insumo-est-ideal" value="0"></div></div><div class="form-row"><div class="form-group"><label>Validade</label><input type="date" id="insumo-validade"></div></div><button type="submit" class="btn btn-primary">Salvar Insumo</button><button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden">Cancelar</button></form></div><div class="card"><h2>Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="Filtrar..."></div><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo Base</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- 7. RECEITAS -->
             <section id="receitas-view" class="view">
-                <div class="card"><h2>Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div class="total-cost" id="custo-total-ingredientes">Custo: R$ 0,00</div><button type="submit" class="btn btn-primary" style="margin-top:10px;">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar</button></form></div>
-                <div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
+                <div class="card"><h2>Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div class="total-cost" id="custo-total-ingredientes">Custo: R$ 0,00</div><button type="submit" class="btn btn-primary" style="margin-top:10px;">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar</button></form></div><div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 8. FORNECEDORES (CORRIGIDO E COMPLETO) -->
+            <!-- 8. FORNECEDORES (CORRIGIDO COMPLETO) -->
             <section id="fornecedores-view" class="view">
                 <div class="card">
                     <h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2>
                     <form id="fornecedor-form">
                         <input type="hidden" id="fornecedor-id">
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="fornecedor-nome">Nome da Empresa</label>
-                                <input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos">
-                            </div>
-                            <div class="form-group">
-                                <label for="fornecedor-contato">Pessoa de Contato</label>
-                                <input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João">
-                            </div>
+                            <div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div>
+                            <div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="fornecedor-telefone">Telefone / WhatsApp</label>
-                                <input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999">
-                            </div>
-                            <div class="form-group">
-                                <label for="fornecedor-email">Email</label>
-                                <input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com">
-                            </div>
+                            <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div>
+                            <div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div>
                         </div>
-                        <div class="form-group">
-                            <label for="fornecedor-endereco">Endereço Completo</label>
-                            <input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade">
-                        </div>
+                        <div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div>
                         <button type="submit" class="btn btn-primary">Salvar Fornecedor</button>
                         <button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
                     </form>
@@ -331,7 +184,7 @@
                                     <th class="actions-cell">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody><!-- Preenchido via JS --></tbody>
+                            <tbody><!-- JS --></tbody>
                         </table>
                     </div>
                 </div>
@@ -345,18 +198,14 @@
 
             <!-- CONFIGURAÇÕES -->
             <section id="configuracoes-view" class="view">
-                <div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo Mão de Obra (R$/hora) <i class="help-icon" data-help-key="configMaoDeObra">ℹ️</i></label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label for="config-rateio-despesas-fixas">Rateio Fixo (R$/pizza) <i class="help-icon" data-help-key="configRateio">ℹ️</i></label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label for="config-meta-cmv-padrao">Meta CMV Padrão (%) <i class="help-icon" data-help-key="configMetaCMV">ℹ️</i></label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label for="config-alerta-variacao">Alerta Variação Preço (%) <i class="help-icon" data-help-key="configAlerta">ℹ️</i></label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div>
+                <div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label for="config-custo-hora-mao-de-obra">Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label for="config-rateio-despesas-fixas">Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label for="config-meta-cmv-padrao">Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label for="config-alerta-variacao">Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div>
             </section>
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v2.7</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v2.8</p></footer>
     <div id="toast" class="toast"></div>
-    
-    <!-- MODAL AJUDA -->
     <div id="help-modal" class="modal"><div class="modal-content"><h3 id="help-modal-title"></h3><div id="help-modal-text"></div><div class="modal-buttons"><button id="help-modal-close" class="btn btn-primary">Fechar</button></div></div></div>
-    
-    <!-- MODAL CONFIRMAÇÃO -->
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
     <!-- SCRIPTS -->
@@ -382,8 +231,6 @@
         let localData = { fornecedores:[], insumos:[], receitas:[], produtos:[], vendasDiarias:[], custosMensais:[] };
         let cache = { fornecedores:[], insumos:[], receitas:[], produtos:[], vendasDiarias:[], custosMensais:[] };
         let configCache = {};
-        
-        // VARIÁVEL GLOBAL PARA CONTROLE DE EXCLUSÃO
         let itemParaExcluir = null;
 
         if (firebaseConfig.apiKey) {
@@ -395,7 +242,7 @@
             } catch (e) { console.error(e); isLocalMode = true; initApp(); }
         } else { isLocalMode = true; initApp(); }
 
-        // --- MODAL DE EXCLUSÃO (LÓGICA CORRIGIDA E PROTEGIDA) ---
+        // --- MODAL DE EXCLUSÃO SEGURO ---
         const confirmModal = document.getElementById('confirm-modal');
         const btnYes = document.getElementById('confirm-modal-yes');
         const btnNo = document.getElementById('confirm-modal-no');
@@ -403,17 +250,15 @@
         btnYes.addEventListener('click', async () => {
             if (itemParaExcluir) {
                 btnYes.textContent = "Excluindo...";
-                // Proteção: desabilita o botão para evitar duplo clique
-                btnYes.disabled = true;
+                btnYes.disabled = true; // Previne duplo clique
                 
                 try {
                     await deleteData(itemParaExcluir.collection, itemParaExcluir.id);
                     
-                    // Atualiza a tabela específica
+                    // Atualiza dados específicos
                     if (itemParaExcluir.collection === 'fornecedores') {
                         await fetchData('fornecedores');
                         renderFornecedoresTable();
-                        // Também atualiza selects pois eles dependem de fornecedores
                         populateSelects();
                     } else if (itemParaExcluir.collection === 'produtos') {
                         await fetchData('produtos');
@@ -421,18 +266,17 @@
                     } else if (itemParaExcluir.collection === 'insumos') {
                          await fetchData('insumos');
                          renderInsumos();
-                    } else {
-                        // Fallback
-                        await fetchData(itemParaExcluir.collection);
-                        renderAll();
+                    } else if (itemParaExcluir.collection === 'receitas') {
+                         await fetchData('receitas');
+                         renderReceitas();
                     }
 
                     showToast('Item excluído com sucesso!', 'success');
                 } catch (e) {
                     console.error(e);
-                    showToast('Erro ao excluir. Verifique o console.', 'error');
+                    showToast('Erro ao excluir: ' + e.message, 'error');
                 } finally {
-                    // Reset do Modal
+                    // Reseta o estado do modal sempre
                     confirmModal.style.display = 'none';
                     btnYes.textContent = "Sim";
                     btnYes.disabled = false;
@@ -450,6 +294,7 @@
 
         function confirmDelete(coll, id) {
             if (!id) { console.error("ID inválido para exclusão"); return; }
+            console.log(`Solicitando exclusão: ${coll} - ${id}`); // Debug
             itemParaExcluir = { collection: coll, id: id };
             document.getElementById('confirm-modal-text').textContent = "Tem certeza que deseja excluir permanentemente?";
             confirmModal.style.display = 'block';
@@ -488,19 +333,34 @@
             else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : {}; } catch(e){} }
             displayConfiguracoes();
         }
+        
+        // FUNÇÃO SAVEDATA CORRIGIDA PARA EDIÇÃO
         async function saveData(coll, data) {
             data.userId = currentUser.uid;
-            if(isLocalMode) {
-                if(data.id) { const idx = localData[coll].findIndex(i=>i.id===data.id); localData[coll][idx] = data; }
-                else { data.id = Date.now().toString(); localData[coll].push(data); }
-            } else {
-                if(data.id) await db.collection(coll).doc(data.id).update(data);
-                else await db.collection(coll).add(data);
+            try {
+                if(isLocalMode) {
+                    if(data.id) { const idx = localData[coll].findIndex(i=>i.id===data.id); localData[coll][idx] = data; }
+                    else { data.id = Date.now().toString(); localData[coll].push(data); }
+                } else {
+                    if(data.id) {
+                        // Atualiza ou Cria se não existir com ID específico (Merge para segurança)
+                        await db.collection(coll).doc(data.id).set(data, {merge: true});
+                    } else {
+                        // Cria novo com ID automático
+                        await db.collection(coll).add(data);
+                    }
+                }
+                return true;
+            } catch(e) {
+                console.error("Erro ao salvar:", e);
+                showToast("Erro ao salvar: " + e.message, "error");
+                return false;
             }
-            return true;
         }
+
         async function deleteData(coll, id) {
             if(!id) return false;
+            console.log(`Deletando de ${coll}: ${id}`); // Debug
             if(isLocalMode) localData[coll] = localData[coll].filter(i=>i.id!==id);
             else await db.collection(coll).doc(id).delete();
             return true;
@@ -541,32 +401,28 @@
             });
         }
 
+        // FUNÇÃO EDITAR CORRIGIDA (Captura campos novos)
         function editFornecedor(id) {
             const f = cache.fornecedores.find(i => i.id === id);
-            if (!f) { console.error('Fornecedor não encontrado no cache local', id); return; }
+            if (!f) { console.error("Fornecedor não encontrado no cache:", id); return; }
             
-            showView('fornecedores'); // Garante que a aba está visível
-            
-            // Preenche campos
-            document.getElementById('fornecedor-id').value = f.id;
+            showView('fornecedores');
+            document.getElementById('fornecedor-id').value = f.id; // ID vital para edição
             document.getElementById('fornecedor-nome').value = f.nome;
             document.getElementById('fornecedor-contato').value = f.contato || '';
             document.getElementById('fornecedor-telefone').value = f.telefone || '';
             document.getElementById('fornecedor-email').value = f.email || '';
             document.getElementById('fornecedor-endereco').value = f.endereco || '';
             
-            // Muda UI para edição
             document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor';
             document.querySelector('#fornecedor-form button[type="submit"]').textContent = 'Atualizar Fornecedor';
             document.getElementById('cancel-edit-fornecedor').classList.remove('hidden');
-            
-            // Rola para o topo
             document.getElementById('fornecedor-form').scrollIntoView({ behavior: 'smooth' });
         }
 
         function resetFornecedorForm() {
             document.getElementById('fornecedor-form').reset();
-            document.getElementById('fornecedor-id').value = '';
+            document.getElementById('fornecedor-id').value = ''; // Limpa ID para criar novo
             document.getElementById('fornecedor-form-title').textContent = 'Cadastrar Fornecedor';
             document.getElementById('cancel-edit-fornecedor').classList.add('hidden');
             document.querySelector('#fornecedor-form button[type="submit"]').textContent = 'Salvar Fornecedor';
@@ -578,7 +434,7 @@
             button.disabled = true; button.textContent = 'Salvando...';
             
             const data = {
-                id: document.getElementById('fornecedor-id').value || null,
+                id: document.getElementById('fornecedor-id').value || null, // Se tiver ID, é edição
                 nome: document.getElementById('fornecedor-nome').value,
                 contato: document.getElementById('fornecedor-contato').value,
                 telefone: document.getElementById('fornecedor-telefone').value,
@@ -593,14 +449,11 @@
                 populateSelects(); 
                 resetFornecedorForm(); 
                 showToast('Fornecedor salvo com sucesso!'); 
-            } else {
-                showToast('Erro ao salvar fornecedor', 'error');
             }
             button.disabled = false; button.textContent = 'Salvar Fornecedor';
         });
         document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
 
-        // Zerar fornecedores
         document.getElementById('btn-zerar-fornecedores')?.addEventListener('click', async () => {
             if(!confirm("ATENÇÃO: Isso apagará TODOS os seus fornecedores. Não tem volta. Tem certeza?")) return;
             const btn = document.getElementById('btn-zerar-fornecedores');
@@ -619,7 +472,7 @@
             btn.textContent = "ZERAR TODOS OS FORNECEDORES"; btn.disabled = false;
         });
 
-        // --- PRODUTOS (REVENDA) ---
+        // --- PRODUTOS ---
         function renderProdutos() {
             const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
             cache.produtos.forEach(p => { 
@@ -664,17 +517,30 @@
             showToast('Insumo salvo!');
         });
 
-        // --- CLICK HANDLER GLOBAL ---
+        // --- CLICK HANDLER GLOBAL (MELHORADO) ---
         document.body.addEventListener('click', (e) => {
+            // Busca o botão mais próximo, caso o clique seja no ícone interno
             const btn = e.target.closest('button'); 
             if (!btn) return; 
             
-            if(btn.matches('.btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(btn.dataset.id); }
-            else if (btn.matches('.btn-delete-fornecedor')) { e.preventDefault(); confirmDelete('fornecedores', btn.dataset.id); }
-            
-            else if (btn.matches('.btn-delete-insumo')) { e.preventDefault(); confirmDelete('insumos', btn.dataset.id); }
-            else if (btn.matches('.btn-delete-produto')) { e.preventDefault(); confirmDelete('produtos', btn.dataset.id); }
-            else if (btn.matches('.btn-delete-receita')) { e.preventDefault(); confirmDelete('receitas', btn.dataset.id); }
+            // Captura o ID (Dataset)
+            const id = btn.dataset.id;
+
+            if (btn.classList.contains('btn-edit-fornecedor')) {
+                e.preventDefault(); editFornecedor(id);
+            } 
+            else if (btn.classList.contains('btn-delete-fornecedor')) {
+                e.preventDefault(); confirmDelete('fornecedores', id);
+            }
+            else if (btn.classList.contains('btn-delete-insumo')) {
+                e.preventDefault(); confirmDelete('insumos', id);
+            }
+            else if (btn.classList.contains('btn-delete-produto')) {
+                e.preventDefault(); confirmDelete('produtos', id);
+            }
+            else if (btn.classList.contains('btn-delete-receita')) {
+                e.preventDefault(); confirmDelete('receitas', id);
+            }
         });
 
         function renderReceitas() { const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = ''; cache.receitas.forEach(r => tb.innerHTML += `<tr><td>${r.nome}</td><td>-</td><td><button class="btn-delete-receita btn btn-danger btn-small" data-id="${r.id}">🗑</button></td></tr>`); }
@@ -684,9 +550,7 @@
             const selForn = document.getElementById('insumo-fornecedor-select'); 
             const selProdForn = document.getElementById('prod-fornecedor-select'); 
             
-            // Filtra nulos e ordena por nome
             const sortedForns = [...cache.fornecedores].filter(f => f && f.nome).sort((a,b) => a.nome.localeCompare(b.nome));
-            
             const options = '<option value="">Selecione</option>' + sortedForns.map(f => `<option value="${f.id}">${f.nome}</option>`).join('');
             selForn.innerHTML = options;
             selProdForn.innerHTML = options;
