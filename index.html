@@ -331,7 +331,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v4.6 (Full Features)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v4.6 (Dashboard Active)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -359,7 +359,10 @@
         let cache = { fornecedores:[], insumos:[], receitas:[], produtos:[], vendasDiarias:[], custosMensais:[] };
         let configCache = {};
         let itemParaExcluir = null;
+        
+        // BUFFER PARA VENDAS
         let dailySalesBuffer = [];
+
         const COLLECTIONS_LIST = ['fornecedores', 'insumos', 'produtos', 'receitas', 'vendasDiarias', 'custosMensais'];
 
         if (firebaseConfig.apiKey) {
@@ -405,11 +408,13 @@
                     const coll = itemParaExcluir.collection;
                     if (!isLocalMode) cache[coll] = cache[coll].filter(i => i.id !== itemParaExcluir.id);
                     await fetchData(coll);
+                    // ATUALIZA O DASHBOARD IMEDIATAMENTE APÓS QUALQUER EXCLUSÃO
                     if(coll === 'fornecedores') { renderFornecedoresTable(); populateSelects(); }
-                    else if(coll === 'produtos') { renderProdutos(); populateSelects(); }
-                    else if(coll === 'insumos') { renderInsumos(); populateSelects(); }
-                    else if(coll === 'receitas') { renderReceitas(); populateSelects(); }
+                    else if(coll === 'produtos') { renderProdutos(); populateSelects(); updateDashboard(); }
+                    else if(coll === 'insumos') { renderInsumos(); populateSelects(); updateDashboard(); }
+                    else if(coll === 'receitas') { renderReceitas(); populateSelects(); updateDashboard(); }
                     else if(coll === 'custosMensais') { renderCustosMensais(); }
+                    else if(coll === 'vendasDiarias') { updateDashboard(); } // Se excluir venda, atualiza dash
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
                 finally { confirmModal.style.display = 'none'; btnYes.textContent = "Sim"; btnYes.disabled = false; itemParaExcluir = null; }
@@ -434,6 +439,41 @@
         // RENDERS
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); populateSelects(); updateDashboard(); }
 
+        // DASHBOARD LOGIC (UPDATED)
+        function updateDashboard() {
+            // 1. Counts
+            document.getElementById('dashboard-num-receitas').textContent = cache.receitas.length;
+            document.getElementById('dash-stock-count').textContent = cache.insumos.length + cache.produtos.length;
+
+            // 2. Sales Today
+            const today = new Date().toISOString().split('T')[0];
+            const salesToday = cache.vendasDiarias.filter(s => s.data === today);
+            
+            const totalVal = salesToday.reduce((acc, item) => acc + (parseFloat(item.valor)||0), 0);
+            const totalPizzas = salesToday.filter(s => s.tipo === 'Pizza').reduce((acc, item) => acc + (parseFloat(item.qtd)||0), 0);
+
+            document.getElementById('dash-vendas-hoje').textContent = formatMoney(totalVal);
+            document.getElementById('dash-pizzas-hoje').textContent = totalPizzas;
+
+            // 3. Alerts
+            const alertsDiv = document.getElementById('stock-alerts');
+            let alertsHtml = '';
+
+            cache.insumos.forEach(i => {
+                if((parseFloat(i.estoque_atual)||0) <= (parseFloat(i.estoque_min)||0)) {
+                    alertsHtml += `<div class="alert-item cmv-danger">⚠️ Insumo <strong>${i.nome}</strong> está baixo (Atual: ${i.estoque_atual})</div>`;
+                }
+            });
+            cache.produtos.forEach(p => {
+                 if((parseFloat(p.estoque_atual)||0) <= (parseFloat(p.estoque_min)||0)) {
+                    alertsHtml += `<div class="alert-item cmv-danger">⚠️ Produto <strong>${p.nome}</strong> está baixo (Atual: ${p.estoque_atual})</div>`;
+                }
+            });
+
+            if(alertsHtml === '') alertsHtml = '<p class="stock-ok">✅ Tudo certo com o estoque.</p>';
+            alertsDiv.innerHTML = alertsHtml;
+        }
+
         // --- LOGIC: PULL FROM DAILY & SAVE MONTHLY ---
         document.getElementById('btn-pull-daily')?.addEventListener('click', () => {
             const mesAno = document.getElementById('custo-mensal-mes').value;
@@ -441,12 +481,8 @@
             const vendasDoMes = cache.vendasDiarias.filter(v => v.data && v.data.startsWith(mesAno));
             const totalFaturamento = vendasDoMes.reduce((acc, curr) => acc + (parseFloat(curr.valor) || 0), 0);
             
-            // CORREÇÃO 4.5: Habilitar checkbox e disparar evento
             const chkManual = document.getElementById('enable-manual-edit');
-            if(chkManual) {
-                chkManual.checked = true;
-                chkManual.dispatchEvent(new Event('change'));
-            }
+            if(chkManual) { chkManual.checked = true; chkManual.dispatchEvent(new Event('change')); }
 
             if(vendasDoMes.length === 0) { showToast("Nenhuma venda encontrada.", "error"); } else { document.getElementById('custo-mensal-faturamento').value = totalFaturamento.toFixed(2); showToast(`Importado: ${formatMoney(totalFaturamento)}`); }
         });
@@ -534,10 +570,10 @@
         prodSelect.addEventListener('change', calcProdTotal); prodQtd.addEventListener('input', calcProdTotal);
 
         function renderDailySalesTable() { const tbody = document.getElementById('sales-table').querySelector('tbody'); tbody.innerHTML = ''; let total = 0; dailySalesBuffer.forEach((item, index) => { total += item.valor; tbody.innerHTML += `<tr><td>${item.tipo}</td><td>${item.nome}</td><td>${item.qtd}</td><td>${formatMoney(item.valor)}</td><td><button class="btn btn-danger btn-small" onclick="removeSaleItem(${index})">X</button></td></tr>`; }); document.getElementById('daily-total-display').textContent = 'Total do Dia: ' + formatMoney(total); }
-        window.removeSaleItem = async function(index) { const item = dailySalesBuffer[index]; if(item.id) { if(!confirm("Este item já está salvo. Deseja excluí-lo permanentemente do banco de dados?")) return; await deleteData('vendasDiarias', item.id); await fetchData('vendasDiarias'); } dailySalesBuffer.splice(index, 1); renderDailySalesTable(); showToast("Item removido"); };
+        window.removeSaleItem = async function(index) { const item = dailySalesBuffer[index]; if(item.id) { if(!confirm("Este item já está salvo. Deseja excluí-lo permanentemente do banco de dados?")) return; await deleteData('vendasDiarias', item.id); await fetchData('vendasDiarias'); updateDashboard(); } dailySalesBuffer.splice(index, 1); renderDailySalesTable(); showToast("Item removido"); };
         document.getElementById('btn-add-pizza-sale').addEventListener('click', () => { const id = pizzaSelect.value; const qtd = parseFloat(pizzaQtd.value); const val = parseFloat(pizzaVal.value); if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; } const receita = cache.receitas.find(r => r.id === id); dailySalesBuffer.push({ tipo: 'Pizza', itemId: id, nome: receita ? receita.nome : '?', qtd: qtd, valor: val }); pizzaSelect.value = ''; pizzaQtd.value = 1; pizzaVal.value = ''; renderDailySalesTable(); });
         document.getElementById('btn-add-prod-sale').addEventListener('click', () => { const id = prodSelect.value; const qtd = parseFloat(prodQtd.value); const val = parseFloat(prodVal.value); if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; } const produto = cache.produtos.find(p => p.id === id); dailySalesBuffer.push({ tipo: 'Produto', itemId: id, nome: produto ? produto.nome : '?', qtd: qtd, valor: val }); prodSelect.value = ''; prodQtd.value = 1; prodVal.value = ''; renderDailySalesTable(); });
-        document.getElementById('btn-save-day').addEventListener('click', async () => { if(dailySalesBuffer.length === 0) { showToast("Nenhum item para salvar", "error"); return; } const dataMov = document.getElementById('venda-data').value; if(!dataMov) { showToast("Selecione a data", "error"); return; } for(const item of dailySalesBuffer) { await saveData('vendasDiarias', { ...item, data: dataMov }); } await fetchData('vendasDiarias'); loadDailySales(dataMov); showToast("Movimento do dia salvo com sucesso!"); });
+        document.getElementById('btn-save-day').addEventListener('click', async () => { if(dailySalesBuffer.length === 0) { showToast("Nenhum item para salvar", "error"); return; } const dataMov = document.getElementById('venda-data').value; if(!dataMov) { showToast("Selecione a data", "error"); return; } for(const item of dailySalesBuffer) { await saveData('vendasDiarias', { ...item, data: dataMov }); } await fetchData('vendasDiarias'); loadDailySales(dataMov); updateDashboard(); showToast("Movimento do dia salvo com sucesso!"); });
 
         // CRUD & HELPERS (Same as before)
         function renderFornecedoresTable() { const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = ''; if (!cache.fornecedores.length) { tbody.innerHTML = '<tr><td colspan="5">Vazio.</td></tr>'; return; } [...cache.fornecedores].sort((a,b)=>(a.nome||"").localeCompare(b.nome||"")).forEach(f => { if(!f.id) return; tbody.innerHTML += `<tr><td>${f.nome}</td><td>${f.contato||''}</td><td>${f.telefone||''}</td><td>${f.endereco||''}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td></tr>`; }); }
@@ -546,18 +582,18 @@
         document.getElementById('cancel-edit-fornecedor').addEventListener('click', () => { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value=''; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); });
         function renderProdutos() { const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = ''; cache.produtos.forEach(p => { const f=cache.fornecedores.find(x=>x.id===p.fornecedorId)?.nome||'-'; tb.innerHTML += `<tr><td>${p.nome}</td><td>${f}</td><td>${formatMoney(p.preco_venda)}</td><td>${p.estoque_atual||0}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-produto" data-id="${p.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-produto" data-id="${p.id}">🗑</button></td></tr>`; }); }
         function editProduto(id) { const p = cache.produtos.find(i => i.id === id); if (!p) return; showView('produtos'); document.getElementById('produto-id').value = p.id; document.getElementById('prod-nome').value = p.nome; document.getElementById('prod-categoria').value = p.categoria; document.getElementById('prod-fornecedor-select').value = p.fornecedorId; document.getElementById('prod-custo').value = p.preco_compra; document.getElementById('prod-venda').value = p.preco_venda; document.getElementById('prod-unidade').value = p.unidade; document.getElementById('prod-est-atual').value = p.estoque_atual; document.getElementById('prod-est-min').value = p.estoque_min; document.getElementById('prod-est-ideal').value = p.estoque_ideal; document.getElementById('cancel-edit-produto').classList.remove('hidden'); document.getElementById('produto-form').scrollIntoView({behavior:'smooth'}); }
-        document.getElementById('produto-form').addEventListener('submit', async e => { e.preventDefault(); await saveData('produtos', { id:document.getElementById('produto-id').value||null, nome:document.getElementById('prod-nome').value, categoria:document.getElementById('prod-categoria').value, fornecedorId:document.getElementById('prod-fornecedor-select').value, preco_compra:parseFloat(document.getElementById('prod-custo').value), preco_venda:parseFloat(document.getElementById('prod-venda').value), unidade:document.getElementById('prod-unidade').value, estoque_atual:parseFloat(document.getElementById('prod-est-atual').value), estoque_min:parseFloat(document.getElementById('prod-est-min').value), estoque_ideal:parseFloat(document.getElementById('prod-est-ideal').value) }); document.getElementById('produto-form').reset(); document.getElementById('produto-id').value=''; document.getElementById('cancel-edit-produto').classList.add('hidden'); await fetchData('produtos'); renderProdutos(); populateSelects(); showToast('Salvo!'); });
+        document.getElementById('produto-form').addEventListener('submit', async e => { e.preventDefault(); await saveData('produtos', { id:document.getElementById('produto-id').value||null, nome:document.getElementById('prod-nome').value, categoria:document.getElementById('prod-categoria').value, fornecedorId:document.getElementById('prod-fornecedor-select').value, preco_compra:parseFloat(document.getElementById('prod-custo').value), preco_venda:parseFloat(document.getElementById('prod-venda').value), unidade:document.getElementById('prod-unidade').value, estoque_atual:parseFloat(document.getElementById('prod-est-atual').value), estoque_min:parseFloat(document.getElementById('prod-est-min').value), estoque_ideal:parseFloat(document.getElementById('prod-est-ideal').value) }); document.getElementById('produto-form').reset(); document.getElementById('produto-id').value=''; document.getElementById('cancel-edit-produto').classList.add('hidden'); await fetchData('produtos'); renderProdutos(); populateSelects(); updateDashboard(); showToast('Salvo!'); });
         document.getElementById('cancel-edit-produto').addEventListener('click', () => { document.getElementById('produto-form').reset(); document.getElementById('produto-id').value=''; document.getElementById('cancel-edit-produto').classList.add('hidden'); });
         function renderInsumos() { const tb = document.getElementById('insumos-table').querySelector('tbody'); tb.innerHTML = ''; cache.insumos.forEach(i => { const cb = i.qtd_embalagem_g>0?(i.custo_embalagem/i.qtd_embalagem_g):0; tb.innerHTML += `<tr><td>${i.nome}</td><td>${formatMoney(cb)}/${i.unidade_base}</td><td>${i.estoque_atual||0}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-insumo" data-id="${i.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-insumo" data-id="${i.id}">🗑</button></td></tr>`; }); }
         function editInsumo(id) { const i = cache.insumos.find(x => x.id === id); if (!i) return; showView('insumos'); document.getElementById('insumo-id').value = i.id; document.getElementById('insumo-nome').value = i.nome; document.getElementById('insumo-fornecedor-select').value = i.fornecedorId; document.getElementById('insumo-custo-embalagem').value = i.custo_embalagem; document.getElementById('insumo-qtd-embalagem').value = i.quantidade_embalagem; document.getElementById('insumo-unidade-embalagem').value = i.unidade_embalagem; document.getElementById('insumo-est-atual').value = i.estoque_atual; document.getElementById('insumo-est-min').value = i.estoque_min; document.getElementById('insumo-est-ideal').value = i.estoque_ideal; if(i.validade) document.getElementById('insumo-validade').value = i.validade; document.getElementById('cancel-edit-insumo').classList.remove('hidden'); document.getElementById('insumo-form').scrollIntoView({behavior:'smooth'}); }
-        document.getElementById('insumo-form').addEventListener('submit', async e => { e.preventDefault(); const q=parseFloat(document.getElementById('insumo-qtd-embalagem').value), u=document.getElementById('insumo-unidade-embalagem').value; let qg=q, b='un'; if(u==='kg'||u==='L'){qg=q*1000;b=u==='kg'?'g':'ml'} else if(u==='g'||u==='ml'){b=u} await saveData('insumos', { id:document.getElementById('insumo-id').value||null, nome:document.getElementById('insumo-nome').value, fornecedorId:document.getElementById('insumo-fornecedor-select').value, custo_embalagem:parseFloat(document.getElementById('insumo-custo-embalagem').value), quantidade_embalagem:q, unidade_embalagem:u, qtd_embalagem_g:qg, unidade_base:b, estoque_atual:parseFloat(document.getElementById('insumo-est-atual').value), estoque_min:parseFloat(document.getElementById('insumo-est-min').value), estoque_ideal:parseFloat(document.getElementById('insumo-est-ideal').value) }); document.getElementById('insumo-form').reset(); document.getElementById('insumo-id').value=''; document.getElementById('cancel-edit-insumo').classList.add('hidden'); await fetchData('insumos'); renderInsumos(); populateSelects(); showToast('Salvo!'); });
+        document.getElementById('insumo-form').addEventListener('submit', async e => { e.preventDefault(); const q=parseFloat(document.getElementById('insumo-qtd-embalagem').value), u=document.getElementById('insumo-unidade-embalagem').value; let qg=q, b='un'; if(u==='kg'||u==='L'){qg=q*1000;b=u==='kg'?'g':'ml'} else if(u==='g'||u==='ml'){b=u} await saveData('insumos', { id:document.getElementById('insumo-id').value||null, nome:document.getElementById('insumo-nome').value, fornecedorId:document.getElementById('insumo-fornecedor-select').value, custo_embalagem:parseFloat(document.getElementById('insumo-custo-embalagem').value), quantidade_embalagem:q, unidade_embalagem:u, qtd_embalagem_g:qg, unidade_base:b, estoque_atual:parseFloat(document.getElementById('insumo-est-atual').value), estoque_min:parseFloat(document.getElementById('insumo-est-min').value), estoque_ideal:parseFloat(document.getElementById('insumo-est-ideal').value) }); document.getElementById('insumo-form').reset(); document.getElementById('insumo-id').value=''; document.getElementById('cancel-edit-insumo').classList.add('hidden'); await fetchData('insumos'); renderInsumos(); populateSelects(); updateDashboard(); showToast('Salvo!'); });
         document.getElementById('cancel-edit-insumo').addEventListener('click', () => { document.getElementById('insumo-form').reset(); document.getElementById('insumo-id').value=''; document.getElementById('cancel-edit-insumo').classList.add('hidden'); });
         function updateReceitaTotal() { let total = 0; document.querySelectorAll('.ingredient-row').forEach(row => { const id = row.querySelector('.ing-select').value; const qty = parseFloat(row.querySelector('.ing-qtd').value) || 0; const insumo = cache.insumos.find(i => i.id === id); if (insumo && insumo.qtd_embalagem_g > 0) { const pricePerUnit = insumo.custo_embalagem / insumo.qtd_embalagem_g; total += pricePerUnit * qty; } }); document.getElementById('custo-total-ingredientes').textContent = 'Custo: ' + formatMoney(total); }
         function addReceitaRow(ingId = '', qtyVal = 1) { const div = document.createElement('div'); div.className='ingredient-row'; div.innerHTML = `<select class="ing-select"><option value="">Insumo...</option>${cache.insumos.map(i=>`<option value="${i.id}">${i.nome}</option>`).join('')}</select><input type="number" class="ing-qtd" placeholder="Qtd (g/ml/un)" value="${qtyVal}"><button type="button" class="btn btn-danger btn-small remove-ing-btn">X</button>`; if(ingId) div.querySelector('.ing-select').value = ingId; const select = div.querySelector('.ing-select'); const input = div.querySelector('.ing-qtd'); const btn = div.querySelector('.remove-ing-btn'); select.addEventListener('change', updateReceitaTotal); input.addEventListener('input', updateReceitaTotal); btn.addEventListener('click', () => { div.remove(); updateReceitaTotal(); }); document.getElementById('ingredients-list').appendChild(div); updateReceitaTotal(); }
         document.getElementById('add-ingredient-btn').addEventListener('click', () => addReceitaRow());
         function renderReceitas() { const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = ''; cache.receitas.forEach(r => { let custoReceita = 0; if(r.ingredientes) { r.ingredientes.forEach(ing => { const ins = cache.insumos.find(i => i.id === ing.id); if(ins && ins.qtd_embalagem_g > 0) { const unitCost = ins.custo_embalagem / ins.qtd_embalagem_g; custoReceita += unitCost * ing.qtd; } }); } tb.innerHTML += `<tr><td>${r.nome}</td><td>${formatMoney(custoReceita)}</td><td>${formatMoney(r.preco_venda)}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-receita" data-id="${r.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-receita" data-id="${r.id}">🗑</button></td></tr>`; }); }
         function editReceita(id) { const r = cache.receitas.find(x => x.id === id); if (!r) return; showView('receitas'); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-venda').value = r.preco_venda || ''; const list = document.getElementById('ingredients-list'); list.innerHTML = ''; if (r.ingredientes && Array.isArray(r.ingredientes)) { r.ingredientes.forEach(ing => { addReceitaRow(ing.id, ing.qtd); }); } updateReceitaTotal(); document.getElementById('cancel-edit-receita').classList.remove('hidden'); document.getElementById('receita-form').scrollIntoView({behavior:'smooth'}); }
-        document.getElementById('receita-form').addEventListener('submit', async e => { e.preventDefault(); const rows = document.querySelectorAll('.ingredient-row'); const ings = []; rows.forEach(r => { const id = r.querySelector('.ing-select').value; const qtd = parseFloat(r.querySelector('.ing-qtd').value); if(id && qtd>0) ings.push({id, qtd}); }); await saveData('receitas', { id: document.getElementById('receita-id').value || null, nome: document.getElementById('receita-nome').value, preco_venda: parseFloat(document.getElementById('receita-venda').value) || 0, ingredientes: ings }); document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('cancel-edit-receita').classList.add('hidden'); document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; await fetchData('receitas'); renderReceitas(); populateSelects(); showToast('Salvo!'); });
+        document.getElementById('receita-form').addEventListener('submit', async e => { e.preventDefault(); const rows = document.querySelectorAll('.ingredient-row'); const ings = []; rows.forEach(r => { const id = r.querySelector('.ing-select').value; const qtd = parseFloat(r.querySelector('.ing-qtd').value); if(id && qtd>0) ings.push({id, qtd}); }); await saveData('receitas', { id: document.getElementById('receita-id').value || null, nome: document.getElementById('receita-nome').value, preco_venda: parseFloat(document.getElementById('receita-venda').value) || 0, ingredientes: ings }); document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('cancel-edit-receita').classList.add('hidden'); document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; await fetchData('receitas'); renderReceitas(); populateSelects(); updateDashboard(); showToast('Salvo!'); });
         document.getElementById('cancel-edit-receita').addEventListener('click', () => { document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('cancel-edit-receita').classList.add('hidden'); document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; });
         async function fetchConfiguracoes(){if(isLocalMode)configCache=localData.configuracoes||{};else{try{const doc=await db.collection('configuracoes').doc(currentUser.uid).get();configCache=doc.exists?doc.data():{};}catch(e){}}displayConfiguracoes();}
         function displayConfiguracoes(){Object.keys(configCache).forEach(k=>{const el=document.getElementById(`config-${k.replace(/_/g,'-')}`);if(el)el.value=configCache[k];});}
@@ -580,7 +616,6 @@
         function formatMoney(v) { return parseFloat(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
         function showToast(msg, type='success') { const t = document.getElementById('toast'); t.textContent=msg; t.className=`toast ${type} show`; setTimeout(()=>t.classList.remove('show'),3000); }
         function populateSelects() { const fOpts = '<option value="">Selecione</option>' + [...cache.fornecedores].sort((a,b)=>(a.nome||"").localeCompare(b.nome||"")).map(f=>`<option value="${f.id}">${f.nome}</option>`).join(''); document.getElementById('insumo-fornecedor-select').innerHTML = fOpts; document.getElementById('prod-fornecedor-select').innerHTML = fOpts; const pizzas = cache.receitas; if(pizzas.length > 0) { document.getElementById('venda-pizza-select').innerHTML = '<option value="">Selecione</option>'+pizzas.map(r=>`<option value="${r.id}">${r.nome}</option>`).join(''); } else { document.getElementById('venda-pizza-select').innerHTML = '<option value="">(Nenhuma receita cadastrada)</option>'; } const produtos = cache.produtos; if(produtos.length > 0) { document.getElementById('venda-produto-select').innerHTML = '<option value="">Selecione</option>'+produtos.map(p=>`<option value="${p.id}">${p.nome}</option>`).join(''); } else { document.getElementById('venda-produto-select').innerHTML = '<option value="">(Nenhum produto cadastrado)</option>'; } }
-        function updateDashboard() { document.getElementById('dash-stock-count').textContent=cache.insumos.length+cache.produtos.length; }
         const navLinks = document.querySelectorAll('.nav-link');
         function showView(id) { document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(id+'-view')?.classList.add('active'); if(id === 'vendas-diarias') { populateSelects(); } }
         navLinks.forEach(l=>l.addEventListener('click', e=>{e.preventDefault(); showView(e.target.dataset.view);}));
