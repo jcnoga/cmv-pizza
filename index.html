@@ -24,6 +24,7 @@
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--medium-gray); border-radius: var(--border-radius); font-size: 1rem; }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2); }
+        .form-group input:disabled { background-color: #eee; color: #888; cursor: not-allowed; }
         .btn { display: inline-block; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.3s, transform 0.1s; width: 100%; }
         .btn:disabled { background-color: var(--medium-gray); cursor: not-allowed; }
         .btn:active:not(:disabled) { transform: scale(0.98); }
@@ -79,7 +80,7 @@
         .hidden { display: none; }
         .help-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-color: var(--info-color); color: white; text-align: center; font-weight: bold; line-height: 20px; cursor: pointer; margin-left: 8px; font-style: normal; user-select: none; }
         .checkbox-wrapper { display: flex; align-items: center; margin-bottom: 1rem; padding: 0.5rem; background: #e3f2fd; border-radius: 4px; }
-        .checkbox-wrapper input { width: auto; margin-right: 10px; }
+        .checkbox-wrapper input { width: auto; margin-right: 10px; cursor: pointer; }
         .stock-warning { color: var(--error-color); font-weight: bold; }
         .stock-ok { color: var(--success-color); }
         /* Backup Area */
@@ -147,7 +148,12 @@
             <section id="custos-mensais-view" class="view">
                 <div class="card">
                     <h2>Fechamento Mensal</h2>
-                    <form id="custo-mensal-form"><input type="hidden" id="custo-mensal-id"><div class="form-row"><div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div><div class="form-group" style="display:flex; align-items:end;"><button type="button" id="btn-pull-daily" class="btn btn-info">🔄 Puxar do Diário</button></div></div><div class="checkbox-wrapper"><input type="checkbox" id="enable-manual-edit"><label for="enable-manual-edit"><strong>Habilitar Edição Manual</strong></label></div><div class="form-row"><div class="form-group"><label>Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required disabled></div><div class="form-group"><label>Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01" disabled></div><div class="form-group"><label>Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01" disabled></div><div class="form-group"><label>Outras Rec/Desp (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" disabled></div></div><button type="submit" class="btn btn-primary">Salvar Mês</button></form>
+                    <form id="custo-mensal-form"><input type="hidden" id="custo-mensal-id"><div class="form-row"><div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div><div class="form-group" style="display:flex; align-items:end;"><button type="button" id="btn-pull-daily" class="btn btn-info">🔄 Puxar do Diário</button></div></div>
+                    
+                    <!-- CHECKBOX CORRIGIDO NA LÓGICA -->
+                    <div class="checkbox-wrapper"><input type="checkbox" id="enable-manual-edit"><label for="enable-manual-edit"><strong>Habilitar Edição Manual</strong></label></div>
+                    
+                    <div class="form-row"><div class="form-group"><label>Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required disabled></div><div class="form-group"><label>Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01" disabled></div><div class="form-group"><label>Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01" disabled></div><div class="form-group"><label>Outras Rec/Desp (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" disabled></div></div><button type="submit" class="btn btn-primary">Salvar Mês</button></form>
                 </div>
                 <div class="card"><h2>Histórico Mensal</h2><table id="custos-mensais-table"><thead><tr><th>Mês</th><th>Faturamento</th><th>Lucro Líquido</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
@@ -223,7 +229,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v3.2 (Full Fix)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v3.2 (Fixed)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -262,6 +268,22 @@
             } catch (e) { console.error(e); isLocalMode = true; initApp(); }
         } else { isLocalMode = true; initApp(); }
 
+        // --- CORREÇÃO 1: LÓGICA DO CHECKBOX DE EDIÇÃO MANUAL ---
+        const chkManual = document.getElementById('enable-manual-edit');
+        if(chkManual) {
+            chkManual.addEventListener('change', (e) => {
+                const fields = [
+                    'custo-mensal-faturamento', 'custo-mensal-custosVariaveis',
+                    'custo-mensal-custosFixos', 'custo-mensal-despesasOperacionais',
+                    'custo-mensal-impostos', 'custo-mensal-outrasReceitasDespesas'
+                ];
+                fields.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.disabled = !e.target.checked;
+                });
+            });
+        }
+
         // --- MODAL DE EXCLUSÃO ---
         const confirmModal = document.getElementById('confirm-modal');
         const btnYes = document.getElementById('confirm-modal-yes');
@@ -272,22 +294,13 @@
                 btnYes.textContent = "Excluindo..."; btnYes.disabled = true;
                 try {
                     await deleteData(itemParaExcluir.collection, itemParaExcluir.id);
-                    
-                    // RESTAURAÇÃO DE CACHE E TELA IMEDIATA (CRUCIAL)
                     const coll = itemParaExcluir.collection;
-                    
-                    // 1. Atualiza Cache local imediatamente para feedback visual instantâneo
                     if (!isLocalMode) cache[coll] = cache[coll].filter(i => i.id !== itemParaExcluir.id);
-
-                    // 2. Busca dados reais para garantir sincronia
                     await fetchData(coll);
-
-                    // 3. Redesenha a tela correta
                     if(coll === 'fornecedores') { renderFornecedoresTable(); populateSelects(); }
                     else if(coll === 'produtos') renderProdutos();
                     else if(coll === 'insumos') renderInsumos();
                     else if(coll === 'receitas') { renderReceitas(); populateSelects(); }
-
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) {
                     console.error(e);
@@ -321,7 +334,16 @@
         // --- DATA ---
         async function initApp() {
             if(isLocalMode) currentUser = {uid:'local'};
-            await Promise.all([fetchConfiguracoes(), fetchData('fornecedores'), fetchData('insumos'), fetchData('receitas'), fetchData('produtos'), fetchData('custosMensais')]);
+            // Corrigida a ordem de carregamento
+            await Promise.all([
+                fetchConfiguracoes(), 
+                fetchData('fornecedores'), 
+                fetchData('insumos'), 
+                fetchData('receitas'), 
+                fetchData('produtos'), 
+                fetchData('custosMensais'),
+                fetchData('vendasDiarias')
+            ]);
             renderAll();
         }
         async function fetchData(coll) {
@@ -396,7 +418,6 @@
         });
         document.getElementById('cancel-edit-fornecedor').addEventListener('click', () => { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value=''; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); });
 
-        // --- OTHER FORMS (Simplified) ---
         // Produtos
         function renderProdutos() {
             const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
@@ -421,33 +442,94 @@
             configCache=data; showToast("Salvo!");
         });
 
-        // BACKUP
-        document.getElementById('btn-backup-restore-click').addEventListener('click', () => { if(confirm("Restaurar apaga dados atuais. OK?")) document.getElementById('backup-file-input').click(); });
+        // --- CORREÇÃO 2: BACKUP E RESTAURAÇÃO ---
+        document.getElementById('btn-backup-restore-click').addEventListener('click', () => { 
+            if(confirm("Restaurar apaga dados atuais. OK?")) document.getElementById('backup-file-input').click(); 
+        });
+
         document.getElementById('backup-file-input').addEventListener('change', async (e) => {
             const file = e.target.files[0]; if(!file) return;
             const reader = new FileReader();
+            
             reader.onload = async (ev) => {
                 try {
                     const d = JSON.parse(ev.target.result);
-                    if(!d.fornecedores) throw new Error("Inválido");
+                    
+                    // Validação básica
+                    if(!d.fornecedores && !d.produtos) throw new Error("Arquivo inválido.");
+                    
                     if(!isLocalMode) {
                         const colls = ['fornecedores','insumos','produtos','receitas','vendasDiarias','custosMensais'];
-                        for(const c of colls) { const s = await db.collection(c).where('userId','==',currentUser.uid).get(); const b = db.batch(); s.docs.forEach(doc=>b.delete(doc.ref)); await b.commit(); }
-                        await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes||{});
-                        for(const c of colls) { if(d[c]) for(const item of d[c]) { item.userId=currentUser.uid; if(item.id) await db.collection(c).doc(item.id).set(item); else await db.collection(c).add(item); } }
-                    } else { localData = {...d}; }
-                    await initApp(); showToast("Restaurado!");
-                } catch(err){ showToast("Erro: "+err.message,"error"); }
+                        
+                        // 1. Limpar dados antigos
+                        for(const c of colls) { 
+                            const s = await db.collection(c).where('userId','==',currentUser.uid).get(); 
+                            if (!s.empty) {
+                                const b = db.batch(); 
+                                s.docs.forEach(doc=>b.delete(doc.ref)); 
+                                await b.commit(); 
+                            }
+                        }
+                        
+                        // 2. Config
+                        if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes);
+                        
+                        // 3. Inserir novos dados
+                        for(const c of colls) { 
+                            if(d[c] && Array.isArray(d[c])) {
+                                for(const item of d[c]) { 
+                                    item.userId=currentUser.uid; 
+                                    if(item.id) await db.collection(c).doc(item.id).set(item); 
+                                    else await db.collection(c).add(item); 
+                                } 
+                            }
+                        }
+                    } else { 
+                        // Modo Local: Mapeamento explicito para garantir estrutura
+                        localData = {
+                            fornecedores: d.fornecedores || [],
+                            insumos: d.insumos || [],
+                            produtos: d.produtos || [],
+                            receitas: d.receitas || [],
+                            vendasDiarias: d.vendasDiarias || [],
+                            custosMensais: d.custosMensais || [],
+                            configuracoes: d.configuracoes || {}
+                        }; 
+                    }
+                    
+                    await initApp(); 
+                    showToast("Restaurado com sucesso!", "success");
+                } catch(err){ 
+                    console.error(err);
+                    showToast("Erro: "+err.message,"error"); 
+                } finally {
+                    // Limpar input para permitir recarregar o mesmo arquivo se necessário
+                    e.target.value = '';
+                }
             };
             reader.readAsText(file);
         });
+
         document.getElementById('btn-backup-download').addEventListener('click', async () => {
              if(!currentUser && !isLocalMode) return;
-             const dlData = { timestamp: new Date(), fornecedores: cache.fornecedores, insumos: cache.insumos, produtos: cache.produtos, receitas: cache.receitas, custosMensais: await fetchFull('custosMensais'), vendasDiarias: await fetchFull('vendasDiarias'), configuracoes: configCache };
+             const dlData = { 
+                 timestamp: new Date(), 
+                 fornecedores: await fetchFull('fornecedores'), 
+                 insumos: await fetchFull('insumos'), 
+                 produtos: await fetchFull('produtos'), 
+                 receitas: await fetchFull('receitas'), 
+                 custosMensais: await fetchFull('custosMensais'), 
+                 vendasDiarias: await fetchFull('vendasDiarias'), 
+                 configuracoes: configCache 
+             };
              const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dlData));
-             const a = document.createElement('a'); a.href=url; a.download="backup.json"; document.body.appendChild(a); a.click(); a.remove();
+             const a = document.createElement('a'); a.href=url; a.download="backup_pizzaria.json"; document.body.appendChild(a); a.click(); a.remove();
         });
-        async function fetchFull(coll) { if(isLocalMode) return localData[coll]; const s=await db.collection(coll).where('userId','==',currentUser.uid).get(); return s.docs.map(d=>({id:d.id,...d.data()})); }
+        async function fetchFull(coll) { 
+            if(isLocalMode) return localData[coll] || []; 
+            const s=await db.collection(coll).where('userId','==',currentUser.uid).get(); 
+            return s.docs.map(d=>({id:d.id,...d.data()})); 
+        }
 
         // GLOBAL CLICKS
         document.body.addEventListener('click', e => {
@@ -461,6 +543,11 @@
         });
 
         // Helpers
+        function formatMoney(v) { return parseFloat(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+        function showToast(msg, type='success') {
+            const t = document.getElementById('toast'); t.textContent=msg; t.className=`toast ${type} show`;
+            setTimeout(()=>t.classList.remove('show'),3000);
+        }
         function populateSelects() {
             const fOpts = '<option value="">Selecione</option>' + [...cache.fornecedores].sort((a,b)=>(a.nome||"").localeCompare(b.nome||"")).map(f=>`<option value="${f.id}">${f.nome}</option>`).join('');
             document.getElementById('insumo-fornecedor-select').innerHTML = fOpts;
