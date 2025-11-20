@@ -163,21 +163,71 @@
                 <div class="card"><h2>🛒 Sugestão de Compras</h2><div class="filter-container"><button id="btn-generate-shopping" class="btn btn-primary">Gerar Lista Atualizada</button><button id="btn-print-shopping" class="btn btn-secondary">Imprimir PDF</button></div><table id="shopping-list-table"><thead><tr><th>Item</th><th>Tipo</th><th>Estoque Atual</th><th>Mínimo</th><th>Ideal</th><th>Comprar</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 5. PRODUTOS -->
+            <!-- 5. PRODUTOS (Com Opção de Alteração) -->
             <section id="produtos-view" class="view">
-                <div class="card"><h2>Cadastrar Produto (Revenda)</h2><form id="produto-form"><input type="hidden" id="produto-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="prod-nome" required></div><div class="form-group"><label>Categoria</label><select id="prod-categoria"><option value="Bebida">Bebida</option><option value="Sobremesa">Sobremesa</option><option value="Outro">Outro</option></select></div></div><div class="form-row"><div class="form-group"><label>Fornecedor</label><select id="prod-fornecedor-select"><option value="">Selecione</option></select></div></div><div class="form-row"><div class="form-group"><label>Preço Compra (R$)</label><input type="number" id="prod-custo" step="0.01" required></div><div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="prod-venda" step="0.01" required></div><div class="form-group"><label>Unidade</label><select id="prod-unidade"><option value="un">Unidade</option><option value="lt">Lata</option><option value="gf">Garrafa</option></select></div></div><h3>Controle de Estoque</h3><div class="form-row"><div class="form-group"><label>Atual</label><input type="number" id="prod-est-atual" value="0"></div><div class="form-group"><label>Mínimo</label><input type="number" id="prod-est-min" value="10"></div><div class="form-group"><label>Ideal</label><input type="number" id="prod-est-ideal" value="50"></div></div><button type="submit" class="btn btn-primary">Salvar Produto</button><button type="button" id="cancel-edit-produto" class="btn btn-secondary hidden">Cancelar</button></form></div>
+                <div class="card"><h2>Cadastrar Produto (Revenda)</h2>
+                    <form id="produto-form">
+                        <input type="hidden" id="produto-id">
+                        <div class="form-row">
+                            <div class="form-group"><label>Nome</label><input type="text" id="prod-nome" required></div>
+                            <div class="form-group"><label>Categoria</label><select id="prod-categoria"><option value="Bebida">Bebida</option><option value="Sobremesa">Sobremesa</option><option value="Outro">Outro</option></select></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Fornecedor</label><select id="prod-fornecedor-select"><option value="">Selecione</option></select></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Preço Compra (R$)</label><input type="number" id="prod-custo" step="0.01" required></div>
+                            <div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="prod-venda" step="0.01" required></div>
+                            <div class="form-group"><label>Unidade</label><select id="prod-unidade"><option value="un">Unidade</option><option value="lt">Lata</option><option value="gf">Garrafa</option></select></div>
+                        </div>
+                        <h3>Controle de Estoque</h3>
+                        <div class="form-row">
+                            <div class="form-group"><label>Atual</label><input type="number" id="prod-est-atual" value="0"></div>
+                            <div class="form-group"><label>Mínimo</label><input type="number" id="prod-est-min" value="10"></div>
+                            <div class="form-group"><label>Ideal</label><input type="number" id="prod-est-ideal" value="50"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Produto</button>
+                        <!-- Botão de cancelar edição -->
+                        <button type="button" id="cancel-edit-produto" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
+                    </form>
+                </div>
                 <div class="card"><h2>Lista de Produtos</h2><table id="produtos-table"><thead><tr><th>Nome</th><th>Fornecedor</th><th>Venda</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 6. INSUMOS -->
+            <!-- 6. INSUMOS (Com Opção de Alteração) -->
             <section id="insumos-view" class="view">
-                <div class="card"><h2>Cadastrar Insumo</h2><form id="insumo-form"><input type="hidden" id="insumo-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="insumo-nome" required></div><div class="form-group"><label>Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div></div><div class="form-row"><div class="form-group"><label>Custo Emb. (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div><div class="form-group"><label>Qtd. Emb.</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div><div class="form-group"><label>Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div></div><h3 style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">Controle de Estoque</h3><div class="form-row"><div class="form-group"><label>Atual</label><input type="number" id="insumo-est-atual" value="0"></div><div class="form-group"><label>Mínimo</label><input type="number" id="insumo-est-min" value="0"></div><div class="form-group"><label>Ideal</label><input type="number" id="insumo-est-ideal" value="0"></div></div><div class="form-row"><div class="form-group"><label>Validade</label><input type="date" id="insumo-validade"></div></div><button type="submit" class="btn btn-primary">Salvar Insumo</button><button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden">Cancelar</button></form></div>
+                <div class="card"><h2>Cadastrar Insumo</h2>
+                    <form id="insumo-form">
+                        <input type="hidden" id="insumo-id">
+                        <div class="form-row">
+                            <div class="form-group"><label>Nome</label><input type="text" id="insumo-nome" required></div>
+                            <div class="form-group"><label>Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Custo Emb. (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div>
+                            <div class="form-group"><label>Qtd. Emb.</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div>
+                            <div class="form-group"><label>Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div>
+                        </div>
+                        <h3 style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">Controle de Estoque</h3>
+                        <div class="form-row">
+                            <div class="form-group"><label>Atual</label><input type="number" id="insumo-est-atual" value="0"></div>
+                            <div class="form-group"><label>Mínimo</label><input type="number" id="insumo-est-min" value="0"></div>
+                            <div class="form-group"><label>Ideal</label><input type="number" id="insumo-est-ideal" value="0"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Validade</label><input type="date" id="insumo-validade"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Insumo</button>
+                        <!-- Botão de cancelar edição -->
+                        <button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
+                    </form>
+                </div>
                 <div class="card"><h2>Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="Filtrar..."></div><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo Base</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- 7. RECEITAS -->
             <section id="receitas-view" class="view">
-                <div class="card"><h2>Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div class="total-cost" id="custo-total-ingredientes">Custo: R$ 0,00</div><button type="submit" class="btn btn-primary" style="margin-top:10px;">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar</button></form></div>
+                <div class="card"><h2>Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div class="total-cost" id="custo-total-ingredientes">Custo: R$ 0,00</div><button type="submit" class="btn btn-primary" style="margin-top:10px;">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar Edição</button></form></div>
                 <div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
@@ -229,7 +279,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v3.3 (Full Fixed)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v3.5 (Edição Produtos/Insumos)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -300,6 +350,7 @@
                     const coll = itemParaExcluir.collection;
                     if (!isLocalMode) cache[coll] = cache[coll].filter(i => i.id !== itemParaExcluir.id);
                     await fetchData(coll);
+                    // Re-renderiza de acordo com a coleção
                     if(coll === 'fornecedores') { renderFornecedoresTable(); populateSelects(); }
                     else if(coll === 'produtos') renderProdutos();
                     else if(coll === 'insumos') renderInsumos();
@@ -337,8 +388,6 @@
         // --- DATA ---
         async function initApp() {
             if(isLocalMode) currentUser = {uid:'local'};
-            
-            // Carrega todas as coleções necessárias para a UI
             await Promise.all([
                 fetchConfiguracoes(), 
                 ...COLLECTIONS_LIST.map(c => fetchData(c))
@@ -352,8 +401,6 @@
             const snap = await db.collection(coll).where('userId','==',currentUser.uid).get();
             cache[coll] = snap.docs.map(d => ({id:d.id, ...d.data()}));
         }
-
-        // Função Auxiliar para Backup (Busca Forçada)
         async function fetchFullDataForBackup(coll) {
             if(isLocalMode) return localData[coll] || [];
             const snap = await db.collection(coll).where('userId','==',currentUser.uid).get();
@@ -384,7 +431,7 @@
         // --- RENDERS ---
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); populateSelects(); updateDashboard(); }
 
-        // --- FORNECEDORES ---
+        // --- 1. FORNECEDORES ---
         function renderFornecedoresTable() {
             const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = '';
             if (!cache.fornecedores.length) { tbody.innerHTML = '<tr><td colspan="5">Vazio.</td></tr>'; return; }
@@ -427,19 +474,206 @@
         });
         document.getElementById('cancel-edit-fornecedor').addEventListener('click', () => { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value=''; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); });
 
-        // Produtos
+        // --- 2. PRODUTOS (Com Edição) ---
         function renderProdutos() {
             const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
-            cache.produtos.forEach(p => { const f=cache.fornecedores.find(x=>x.id===p.fornecedorId)?.nome||'-'; tb.innerHTML += `<tr><td>${p.nome}</td><td>${f}</td><td>${formatMoney(p.preco_venda)}</td><td>${p.estoque_atual||0}</td><td><button class="btn-delete-produto btn btn-danger btn-small" data-id="${p.id}">🗑</button></td></tr>`; });
+            cache.produtos.forEach(p => { 
+                const f=cache.fornecedores.find(x=>x.id===p.fornecedorId)?.nome||'-'; 
+                // Botões de Editar e Excluir
+                tb.innerHTML += `<tr><td>${p.nome}</td><td>${f}</td><td>${formatMoney(p.preco_venda)}</td><td>${p.estoque_atual||0}</td>
+                <td class="actions-cell">
+                    <button class="btn btn-secondary btn-small btn-edit-produto" data-id="${p.id}">✎</button> 
+                    <button class="btn btn-danger btn-small btn-delete-produto" data-id="${p.id}">🗑</button>
+                </td></tr>`; 
+            });
         }
-        document.getElementById('produto-form').addEventListener('submit', async e => { e.preventDefault(); await saveData('produtos', {id:document.getElementById('produto-id').value||null, nome:document.getElementById('prod-nome').value, categoria:document.getElementById('prod-categoria').value, fornecedorId:document.getElementById('prod-fornecedor-select').value, preco_compra:parseFloat(document.getElementById('prod-custo').value), preco_venda:parseFloat(document.getElementById('prod-venda').value), unidade:document.getElementById('prod-unidade').value, estoque_atual:parseFloat(document.getElementById('prod-est-atual').value), estoque_min:parseFloat(document.getElementById('prod-est-min').value), estoque_ideal:parseFloat(document.getElementById('prod-est-ideal').value)}); document.getElementById('produto-form').reset(); await fetchData('produtos'); renderProdutos(); showToast('Salvo!'); });
+        
+        // Função Lógica para carregar dados no formulário
+        function editProduto(id) {
+            const p = cache.produtos.find(i => i.id === id);
+            if (!p) return;
+            showView('produtos');
+            document.getElementById('produto-id').value = p.id;
+            document.getElementById('prod-nome').value = p.nome;
+            document.getElementById('prod-categoria').value = p.categoria;
+            document.getElementById('prod-fornecedor-select').value = p.fornecedorId;
+            document.getElementById('prod-custo').value = p.preco_compra;
+            document.getElementById('prod-venda').value = p.preco_venda;
+            document.getElementById('prod-unidade').value = p.unidade;
+            document.getElementById('prod-est-atual').value = p.estoque_atual;
+            document.getElementById('prod-est-min').value = p.estoque_min;
+            document.getElementById('prod-est-ideal').value = p.estoque_ideal;
+            
+            // Mostrar botão cancelar
+            document.getElementById('cancel-edit-produto').classList.remove('hidden');
+            // Rolar até o formulário
+            document.getElementById('produto-form').scrollIntoView({behavior:'smooth'});
+        }
 
-        // Insumos
+        document.getElementById('produto-form').addEventListener('submit', async e => { 
+            e.preventDefault(); 
+            await saveData('produtos', {
+                id:document.getElementById('produto-id').value||null, 
+                nome:document.getElementById('prod-nome').value, 
+                categoria:document.getElementById('prod-categoria').value, 
+                fornecedorId:document.getElementById('prod-fornecedor-select').value, 
+                preco_compra:parseFloat(document.getElementById('prod-custo').value), 
+                preco_venda:parseFloat(document.getElementById('prod-venda').value), 
+                unidade:document.getElementById('prod-unidade').value, 
+                estoque_atual:parseFloat(document.getElementById('prod-est-atual').value), 
+                estoque_min:parseFloat(document.getElementById('prod-est-min').value), 
+                estoque_ideal:parseFloat(document.getElementById('prod-est-ideal').value)
+            }); 
+            document.getElementById('produto-form').reset(); 
+            document.getElementById('produto-id').value='';
+            document.getElementById('cancel-edit-produto').classList.add('hidden');
+            await fetchData('produtos'); renderProdutos(); showToast('Salvo!'); 
+        });
+
+        // Botão Cancelar Edição Produto
+        document.getElementById('cancel-edit-produto').addEventListener('click', () => {
+            document.getElementById('produto-form').reset();
+            document.getElementById('produto-id').value='';
+            document.getElementById('cancel-edit-produto').classList.add('hidden');
+        });
+
+        // --- 3. INSUMOS (Com Edição) ---
         function renderInsumos() {
             const tb = document.getElementById('insumos-table').querySelector('tbody'); tb.innerHTML = '';
-            cache.insumos.forEach(i => { const cb = i.qtd_embalagem_g>0?(i.custo_embalagem/i.qtd_embalagem_g):0; tb.innerHTML += `<tr><td>${i.nome}</td><td>${formatMoney(cb)}/${i.unidade_base}</td><td>${i.estoque_atual||0}</td><td><button class="btn-delete-insumo btn btn-danger btn-small" data-id="${i.id}">🗑</button></td></tr>`; });
+            cache.insumos.forEach(i => { 
+                const cb = i.qtd_embalagem_g>0?(i.custo_embalagem/i.qtd_embalagem_g):0; 
+                // Botões de Editar e Excluir
+                tb.innerHTML += `<tr><td>${i.nome}</td><td>${formatMoney(cb)}/${i.unidade_base}</td><td>${i.estoque_atual||0}</td>
+                <td class="actions-cell">
+                    <button class="btn btn-secondary btn-small btn-edit-insumo" data-id="${i.id}">✎</button> 
+                    <button class="btn btn-danger btn-small btn-delete-insumo" data-id="${i.id}">🗑</button>
+                </td></tr>`; 
+            });
         }
-        document.getElementById('insumo-form').addEventListener('submit', async e => { e.preventDefault(); const q=parseFloat(document.getElementById('insumo-qtd-embalagem').value), u=document.getElementById('insumo-unidade-embalagem').value; let qg=q, b='un'; if(u==='kg'||u==='L'){qg=q*1000;b=u==='kg'?'g':'ml'} else if(u==='g'||u==='ml'){b=u} await saveData('insumos', {id:document.getElementById('insumo-id').value||null, nome:document.getElementById('insumo-nome').value, fornecedorId:document.getElementById('insumo-fornecedor-select').value, custo_embalagem:parseFloat(document.getElementById('insumo-custo-embalagem').value), quantidade_embalagem:q, unidade_embalagem:u, qtd_embalagem_g:qg, unidade_base:b, estoque_atual:parseFloat(document.getElementById('insumo-est-atual').value), estoque_min:parseFloat(document.getElementById('insumo-est-min').value), estoque_ideal:parseFloat(document.getElementById('insumo-est-ideal').value)}); document.getElementById('insumo-form').reset(); await fetchData('insumos'); renderInsumos(); showToast('Salvo!'); });
+
+        // Função Lógica para carregar dados no formulário de Insumo
+        function editInsumo(id) {
+            const i = cache.insumos.find(x => x.id === id);
+            if (!i) return;
+            showView('insumos');
+            document.getElementById('insumo-id').value = i.id;
+            document.getElementById('insumo-nome').value = i.nome;
+            document.getElementById('insumo-fornecedor-select').value = i.fornecedorId;
+            document.getElementById('insumo-custo-embalagem').value = i.custo_embalagem;
+            document.getElementById('insumo-qtd-embalagem').value = i.quantidade_embalagem;
+            document.getElementById('insumo-unidade-embalagem').value = i.unidade_embalagem;
+            document.getElementById('insumo-est-atual').value = i.estoque_atual;
+            document.getElementById('insumo-est-min').value = i.estoque_min;
+            document.getElementById('insumo-est-ideal').value = i.estoque_ideal;
+            if(i.validade) document.getElementById('insumo-validade').value = i.validade;
+
+            // Mostrar botão cancelar
+            document.getElementById('cancel-edit-insumo').classList.remove('hidden');
+            // Rolar até o formulário
+            document.getElementById('insumo-form').scrollIntoView({behavior:'smooth'});
+        }
+
+        document.getElementById('insumo-form').addEventListener('submit', async e => { 
+            e.preventDefault(); 
+            const q=parseFloat(document.getElementById('insumo-qtd-embalagem').value), u=document.getElementById('insumo-unidade-embalagem').value; 
+            let qg=q, b='un'; if(u==='kg'||u==='L'){qg=q*1000;b=u==='kg'?'g':'ml'} else if(u==='g'||u==='ml'){b=u} 
+            await saveData('insumos', {
+                id:document.getElementById('insumo-id').value||null, 
+                nome:document.getElementById('insumo-nome').value, 
+                fornecedorId:document.getElementById('insumo-fornecedor-select').value, 
+                custo_embalagem:parseFloat(document.getElementById('insumo-custo-embalagem').value), 
+                quantidade_embalagem:q, 
+                unidade_embalagem:u, 
+                qtd_embalagem_g:qg, 
+                unidade_base:b, 
+                estoque_atual:parseFloat(document.getElementById('insumo-est-atual').value), 
+                estoque_min:parseFloat(document.getElementById('insumo-est-min').value), 
+                estoque_ideal:parseFloat(document.getElementById('insumo-est-ideal').value)
+            }); 
+            document.getElementById('insumo-form').reset(); 
+            document.getElementById('insumo-id').value='';
+            document.getElementById('cancel-edit-insumo').classList.add('hidden');
+            await fetchData('insumos'); renderInsumos(); showToast('Salvo!'); 
+        });
+
+        // Botão Cancelar Edição Insumo
+        document.getElementById('cancel-edit-insumo').addEventListener('click', () => {
+            document.getElementById('insumo-form').reset();
+            document.getElementById('insumo-id').value='';
+            document.getElementById('cancel-edit-insumo').classList.add('hidden');
+        });
+
+        // --- 4. RECEITAS (Com Edição) ---
+        function addReceitaRow(ingId = '', qtyVal = 1) {
+            const div = document.createElement('div'); div.className='ingredient-row';
+            div.innerHTML = `<select class="ing-select"><option value="">Insumo...</option>${cache.insumos.map(i=>`<option value="${i.id}">${i.nome}</option>`).join('')}</select><input type="number" class="ing-qtd" placeholder="Qtd (g/ml/un)" value="${qtyVal}"><button type="button" class="btn btn-danger btn-small remove-ing-btn">X</button>`;
+            if(ingId) div.querySelector('.ing-select').value = ingId;
+            div.querySelector('.remove-ing-btn').addEventListener('click',()=>div.remove());
+            document.getElementById('ingredients-list').appendChild(div);
+        }
+
+        document.getElementById('add-ingredient-btn').addEventListener('click', () => addReceitaRow());
+
+        function renderReceitas() { 
+            const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = ''; 
+            cache.receitas.forEach(r => {
+                tb.innerHTML += `<tr><td>${r.nome}</td><td>-</td><td><button class="btn btn-secondary btn-small btn-edit-receita" data-id="${r.id}">✎</button> <button class="btn-delete-receita btn btn-danger btn-small" data-id="${r.id}">🗑</button></td></tr>`;
+            }); 
+        }
+
+        function editReceita(id) {
+            const r = cache.receitas.find(x => x.id === id);
+            if (!r) return;
+            showView('receitas');
+            
+            document.getElementById('receita-id').value = r.id;
+            document.getElementById('receita-nome').value = r.nome;
+            
+            const list = document.getElementById('ingredients-list');
+            list.innerHTML = '';
+            
+            if (r.ingredientes && Array.isArray(r.ingredientes)) {
+                r.ingredientes.forEach(ing => {
+                    addReceitaRow(ing.id, ing.qtd);
+                });
+            }
+
+            document.getElementById('cancel-edit-receita').classList.remove('hidden');
+            document.getElementById('receita-form').scrollIntoView({behavior:'smooth'});
+        }
+
+        document.getElementById('receita-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const rows = document.querySelectorAll('.ingredient-row');
+            const ings = [];
+            rows.forEach(r => {
+                const id = r.querySelector('.ing-select').value;
+                const qtd = parseFloat(r.querySelector('.ing-qtd').value);
+                if(id && qtd>0) ings.push({id, qtd});
+            });
+            await saveData('receitas', {
+                id: document.getElementById('receita-id').value || null,
+                nome: document.getElementById('receita-nome').value,
+                ingredientes: ings
+            });
+            
+            document.getElementById('receita-form').reset();
+            document.getElementById('receita-id').value = '';
+            document.getElementById('ingredients-list').innerHTML = '';
+            document.getElementById('cancel-edit-receita').classList.add('hidden');
+            
+            await fetchData('receitas'); 
+            renderReceitas(); 
+            populateSelects(); 
+            showToast('Salvo!');
+        });
+
+        document.getElementById('cancel-edit-receita').addEventListener('click', () => {
+            document.getElementById('receita-form').reset();
+            document.getElementById('receita-id').value = '';
+            document.getElementById('ingredients-list').innerHTML = '';
+            document.getElementById('cancel-edit-receita').classList.add('hidden');
+        });
 
         // CONFIGS
         async function fetchConfiguracoes(){if(isLocalMode)configCache=localData.configuracoes||{};else{try{const doc=await db.collection('configuracoes').doc(currentUser.uid).get();configCache=doc.exists?doc.data():{};}catch(e){}}displayConfiguracoes();}
@@ -451,108 +685,60 @@
             configCache=data; showToast("Salvo!");
         });
 
-        // --------------------------------------------------------------------------
-        // SISTEMA DE BACKUP E RESTAURAÇÃO CORRIGIDO
-        // --------------------------------------------------------------------------
-
-        // DOWNLOAD (BACKUP)
+        // BACKUP
         document.getElementById('btn-backup-download').addEventListener('click', async () => {
              if(!currentUser && !isLocalMode) return;
-             
-             // Forçar busca de dados mais recentes do banco (não usar cache)
-             const backupPayload = { 
-                 timestamp: new Date(), 
-                 configuracoes: configCache || {} 
-             };
-
-             // Buscar cada coleção explicitamente
-             for(const coll of COLLECTIONS_LIST) {
-                 backupPayload[coll] = await fetchFullDataForBackup(coll);
-             }
-
+             const backupPayload = { timestamp: new Date(), configuracoes: configCache || {} };
+             for(const coll of COLLECTIONS_LIST) { backupPayload[coll] = await fetchFullDataForBackup(coll); }
              const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload));
-             const a = document.createElement('a'); 
-             a.href = url; 
-             a.download = `backup_pizzaria_${new Date().toISOString().split('T')[0]}.json`; 
-             document.body.appendChild(a); 
-             a.click(); 
-             a.remove();
+             const a = document.createElement('a'); a.href = url; a.download = `backup_pizzaria_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove();
         });
 
-        // TRIGGER DE RESTAURAÇÃO
         document.getElementById('btn-backup-restore-click').addEventListener('click', () => { 
             if(confirm("ATENÇÃO: Restaurar o backup apagará os dados atuais e substituirá pelo arquivo. Deseja continuar?")) {
                 document.getElementById('backup-file-input').click(); 
             }
         });
 
-        // PROCESSO DE RESTAURAÇÃO
         document.getElementById('backup-file-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0]; 
-            if(!file) return;
-            
+            const file = e.target.files[0]; if(!file) return;
             const reader = new FileReader();
-            
             reader.onload = async (ev) => {
                 try {
                     const d = JSON.parse(ev.target.result);
-                    
-                    // Validação básica
                     if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio.");
-                    
                     showToast("Iniciando restauração...", "info");
-
                     if(!isLocalMode) {
-                        // 1. Restaurar Configurações
                         if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes);
-                        
-                        // 2. Restaurar Coleções (Loop Seguro)
                         for(const collName of COLLECTIONS_LIST) {
-                            // Limpeza segura: Verifica se existe antes de deletar em lote
                             const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get();
-                            if (!snapshot.empty) {
-                                const batch = db.batch();
-                                snapshot.docs.forEach(doc => batch.delete(doc.ref));
-                                await batch.commit();
-                            }
-
-                            // Inserção: Verifica se há dados no backup para esta coleção
+                            if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); }
                             if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) {
                                 for(const item of d[collName]) {
                                     item.userId = currentUser.uid;
-                                    // Usa set com merge para evitar duplicidade de IDs se o backup tiver IDs fixos
-                                    if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true});
-                                    else await db.collection(collName).add(item);
+                                    if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item);
                                 }
                             }
                         }
-                    } else { 
-                        // Modo Local
-                        localData.configuracoes = d.configuracoes || {};
-                        for(const collName of COLLECTIONS_LIST) {
-                            localData[collName] = d[collName] || [];
-                        }
-                    }
-                    
-                    await initApp(); 
-                    showToast("Restauração concluída com sucesso!", "success");
-
-                } catch(err){ 
-                    console.error(err);
-                    showToast("Erro na restauração: " + err.message, "error"); 
-                } finally {
-                    // Limpar input para permitir recarregar o mesmo arquivo se necessário
-                    e.target.value = '';
-                }
+                    } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } }
+                    await initApp(); showToast("Restauração concluída com sucesso!", "success");
+                } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; }
             };
             reader.readAsText(file);
         });
 
-        // GLOBAL CLICKS
+        // GLOBAL CLICKS - GESTÃO DE EVENTOS DE BOTÕES DE EDIÇÃO
         document.body.addEventListener('click', e => {
             const btn = e.target.closest('button'); if (!btn) return; 
             const id = btn.dataset.id;
+            
+            // DETECÇÃO DE EDIÇÕES
             if(btn.classList.contains('btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(id); }
+            else if(btn.classList.contains('btn-edit-produto')) { e.preventDefault(); editProduto(id); } // Edição de Produto
+            else if(btn.classList.contains('btn-edit-insumo')) { e.preventDefault(); editInsumo(id); }   // Edição de Insumo
+            else if(btn.classList.contains('btn-edit-receita')) { e.preventDefault(); editReceita(id); }
+            
+            // DETECÇÃO DE EXCLUSÕES
             else if(btn.classList.contains('btn-delete-fornecedor')) { e.preventDefault(); confirmDelete('fornecedores', id); }
             else if(btn.classList.contains('btn-delete-insumo')) { e.preventDefault(); confirmDelete('insumos', id); }
             else if(btn.classList.contains('btn-delete-produto')) { e.preventDefault(); confirmDelete('produtos', id); }
@@ -576,8 +762,6 @@
         const navLinks = document.querySelectorAll('.nav-link');
         function showView(id) { document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(id+'-view')?.classList.add('active'); }
         navLinks.forEach(l=>l.addEventListener('click', e=>{e.preventDefault(); showView(e.target.dataset.view);}));
-        function renderReceitas() { const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = ''; cache.receitas.forEach(r => tb.innerHTML += `<tr><td>${r.nome}</td><td>-</td><td><button class="btn-delete-receita btn btn-danger btn-small" data-id="${r.id}">🗑</button></td></tr>`); }
-        function renderCustosMensais() {}
         
         // ZERAR (Mantido)
         document.getElementById('btn-zerar-fornecedores')?.addEventListener('click', async () => {
