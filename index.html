@@ -270,7 +270,7 @@
             } catch (e) { console.error(e); isLocalMode = true; initApp(); }
         } else { isLocalMode = true; initApp(); }
 
-        // --- MODAL DE EXCLUSÃO SEGURO ---
+        // --- MODAL DE EXCLUSÃO ---
         const confirmModal = document.getElementById('confirm-modal');
         const btnYes = document.getElementById('confirm-modal-yes');
         const btnNo = document.getElementById('confirm-modal-no');
@@ -282,25 +282,14 @@
                 try {
                     await deleteData(itemParaExcluir.collection, itemParaExcluir.id);
                     
-                    // Atualização específica por tipo para garantir feedback visual imediato
-                    if (itemParaExcluir.collection === 'fornecedores') {
-                        cache.fornecedores = cache.fornecedores.filter(i => i.id !== itemParaExcluir.id);
-                        renderFornecedoresTable();
-                        populateSelects();
-                    } else if (itemParaExcluir.collection === 'produtos') {
-                        cache.produtos = cache.produtos.filter(i => i.id !== itemParaExcluir.id);
-                        renderProdutos();
-                    } else if (itemParaExcluir.collection === 'insumos') {
-                         cache.insumos = cache.insumos.filter(i => i.id !== itemParaExcluir.id);
-                         renderInsumos();
-                    } else if (itemParaExcluir.collection === 'receitas') {
-                         cache.receitas = cache.receitas.filter(i => i.id !== itemParaExcluir.id);
-                         renderReceitas();
-                    }
-
+                    // FORÇA A ATUALIZAÇÃO TOTAL APÓS EXCLUSÃO
+                    // Isso garante que o fornecedor suma da tabela E dos combos
+                    await fetchData(itemParaExcluir.collection);
+                    
+                    // Atualiza tudo para garantir consistência
+                    renderAll(); 
+                    
                     showToast('Item excluído com sucesso!', 'success');
-                    // Recarrega dados do servidor em segundo plano para garantir sincronia
-                    fetchData(itemParaExcluir.collection);
                 } catch (e) {
                     console.error(e);
                     showToast('Erro ao excluir: ' + e.message, 'error');
@@ -310,29 +299,19 @@
                     btnYes.disabled = false;
                     itemParaExcluir = null;
                 }
-            } else {
-                confirmModal.style.display = 'none';
-                showToast('Erro: ID inválido para exclusão.', 'error');
             }
         });
 
         btnNo.addEventListener('click', () => { confirmModal.style.display = 'none'; itemParaExcluir = null; });
 
         function confirmDelete(coll, id) {
-            if (!id) { console.error("ID inválido para exclusão"); return; }
-            console.log("Solicitando exclusão:", coll, id);
+            if (!id || id === "undefined") { showToast("Erro: ID inválido. Recarregue a página.", "error"); return; }
             itemParaExcluir = { collection: coll, id: id };
-            document.getElementById('confirm-modal-text').textContent = "Tem certeza que deseja excluir permanentemente?";
+            document.getElementById('confirm-modal-text').textContent = "Tem certeza que deseja excluir este item?";
             confirmModal.style.display = 'block';
         }
-        // --------------------------------
 
-        const views = document.querySelectorAll('.view');
-        const navLinks = document.querySelectorAll('.nav-link');
-        function showView(id) { views.forEach(v => v.classList.remove('active')); document.getElementById(id+'-view')?.classList.add('active'); }
-        navLinks.forEach(l => l.addEventListener('click', e => { e.preventDefault(); showView(e.target.dataset.view); }));
-        function showToast(msg, type='success') { const t = document.getElementById('toast'); t.textContent=msg; t.className=`toast show ${type}`; setTimeout(()=>t.className='toast', 3000); }
-        function formatMoney(v) { return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0); }
+        // --- CONFIGURAÇÃO E DADOS ---
 
         function setupAuthListeners() {
             auth.onAuthStateChanged(user => {
@@ -351,69 +330,87 @@
 
         async function fetchData(coll) {
             if(isLocalMode) { cache[coll] = localData[coll]; return; }
+            // Limpa o cache antes de buscar para evitar duplicatas fantasmas
+            cache[coll] = []; 
             const snap = await db.collection(coll).where('userId','==',currentUser.uid).get();
-            cache[coll] = snap.docs.map(d => ({id:d.id, ...d.data()}));
+            cache[coll] = snap.docs.map(d => {
+                const data = d.data();
+                data.id = d.id; // Garante que o ID venha do documento
+                return data;
+            });
         }
-        async function fetchConfiguracoes() {
-            if(isLocalMode) { configCache = localData.configuracoes || {}; }
-            else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : {}; } catch(e){} }
-            displayConfiguracoes();
-        }
-        
-        // FUNÇÃO SAVEDATA CORRIGIDA (SET COM MERGE)
+
         async function saveData(coll, data) {
             data.userId = currentUser.uid;
-            if(isLocalMode) {
-                if(data.id) { const idx = localData[coll].findIndex(i=>i.id===data.id); localData[coll][idx] = data; }
-                else { data.id = Date.now().toString(); localData[coll].push(data); }
-            } else {
-                if(data.id) {
-                    // Usa SET com MERGE para atualizar garantindo que campos não sumam
-                    await db.collection(coll).doc(data.id).set(data, { merge: true });
+            try {
+                if(isLocalMode) {
+                    if(data.id) { const idx = localData[coll].findIndex(i=>i.id===data.id); localData[coll][idx] = data; }
+                    else { data.id = Date.now().toString(); localData[coll].push(data); }
                 } else {
-                    await db.collection(coll).add(data);
+                    if(data.id) {
+                        // Edição
+                        await db.collection(coll).doc(data.id).set(data, { merge: true });
+                    } else {
+                        // Criação
+                        // Remove o campo ID se estiver vazio/null para o Firebase gerar um novo
+                        delete data.id; 
+                        await db.collection(coll).add(data);
+                    }
                 }
+                return true;
+            } catch(e) {
+                console.error(e);
+                showToast("Erro ao salvar: " + e.message, "error");
+                return false;
             }
-            return true;
         }
 
         async function deleteData(coll, id) {
-            if(!id) throw new Error("ID indefinido");
+            if(!id) return false;
             if(isLocalMode) localData[coll] = localData[coll].filter(i=>i.id!==id);
             else await db.collection(coll).doc(id).delete();
             return true;
         }
 
-        function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); populateSelects(); updateDashboard(); }
-        function updateDashboard() {
-            document.getElementById('dash-stock-count').textContent = cache.insumos.length + cache.produtos.length;
-            document.getElementById('dashboard-num-receitas').textContent = cache.receitas.length;
-            const alerts = [];
-            [...cache.insumos, ...cache.produtos].forEach(item => {
-                const atual = parseFloat(item.estoque_atual || 0);
-                const min = parseFloat(item.estoque_min || 0);
-                if(min > 0 && atual <= min) alerts.push(`<p class="stock-warning">Baixo estoque: ${item.nome} (${atual})</p>`);
-            });
-            document.getElementById('stock-alerts').innerHTML = alerts.length ? alerts.join('') : '<p class="stock-ok">Estoque OK.</p>';
+        function renderAll() { 
+            renderFornecedoresTable(); 
+            renderInsumos(); 
+            renderProdutos(); 
+            renderReceitas(); 
+            renderCustosMensais(); 
+            populateSelects(); 
+            updateDashboard(); 
         }
 
         // --- FORNECEDORES ---
         function renderFornecedoresTable() {
             const tbody = document.getElementById('fornecedores-table').querySelector('tbody');
             tbody.innerHTML = '';
-            if (cache.fornecedores.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; }
-            const sorted = [...cache.fornecedores].sort((a, b) => a.nome.localeCompare(b.nome));
+            if (!cache.fornecedores || cache.fornecedores.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="5">Nenhum fornecedor cadastrado.</td></tr>'; return; 
+            }
+            const sorted = [...cache.fornecedores].sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
             sorted.forEach(f => {
+                // Proteção contra ID nulo
+                if(!f.id) return;
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td><strong>${f.nome}</strong></td><td>${f.contato || '-'}</td><td>${f.telefone || '-'}</td><td style="font-size:0.9em;">${f.endereco || '-'}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`;
+                tr.innerHTML = `
+                    <td><strong>${f.nome}</strong></td>
+                    <td>${f.contato || '-'}</td>
+                    <td>${f.telefone || '-'}</td>
+                    <td style="font-size:0.9em;">${f.endereco || '-'}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button>
+                        <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button>
+                    </td>
+                `;
                 tbody.appendChild(tr);
             });
         }
 
         function editFornecedor(id) {
-            console.log("Editando fornecedor ID:", id); // Debug
             const f = cache.fornecedores.find(i => i.id === id);
-            if (!f) { showToast("Fornecedor não encontrado.", "error"); return; }
+            if (!f) { showToast("Erro: Registro não encontrado na memória.", "error"); return; }
             
             showView('fornecedores');
             document.getElementById('fornecedor-id').value = f.id;
@@ -443,8 +440,9 @@
             button.disabled = true; button.textContent = 'Salvando...';
             
             const idField = document.getElementById('fornecedor-id').value;
+            
             const data = {
-                id: idField || null, // Garante que se tiver valor, passa. Se vazio, é null (novo)
+                id: idField && idField !== "" ? idField : null, 
                 nome: document.getElementById('fornecedor-nome').value,
                 contato: document.getElementById('fornecedor-contato').value,
                 telefone: document.getElementById('fornecedor-telefone').value,
@@ -454,29 +452,20 @@
             
             const success = await saveData('fornecedores', data);
             if (success) { 
-                await fetchData('fornecedores'); renderFornecedoresTable(); populateSelects(); resetFornecedorForm(); showToast('Fornecedor salvo!'); 
+                // Recarrega do banco para garantir que temos o ID novo (se foi criação)
+                await fetchData('fornecedores'); 
+                
+                // Atualiza todas as telas (incluindo combos de produtos/insumos)
+                renderAll(); 
+                
+                resetFornecedorForm(); 
+                showToast('Fornecedor salvo com sucesso!'); 
             }
             button.disabled = false; button.textContent = 'Salvar Fornecedor';
         });
         document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
 
-        document.getElementById('btn-zerar-fornecedores')?.addEventListener('click', async () => {
-            if(!confirm("ATENÇÃO: Isso apagará TODOS os seus fornecedores. Não tem volta. Tem certeza?")) return;
-            const btn = document.getElementById('btn-zerar-fornecedores');
-            btn.textContent = "Apagando..."; btn.disabled = true;
-            if (isLocalMode) { localData.fornecedores = []; cache.fornecedores = []; } 
-            else {
-                const snapshot = await db.collection('fornecedores').where('userId', '==', currentUser.uid).get();
-                const batch = db.batch();
-                snapshot.docs.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-            }
-            await fetchData('fornecedores'); renderFornecedoresTable(); populateSelects();
-            showToast("Todos os fornecedores foram apagados.", "success");
-            btn.textContent = "ZERAR TODOS OS FORNECEDORES"; btn.disabled = false;
-        });
-
-        // --- PRODUTOS (REVENDA) ---
+        // --- PRODUTOS ---
         function renderProdutos() {
             const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
             cache.produtos.forEach(p => { 
@@ -487,7 +476,7 @@
         document.getElementById('produto-form').addEventListener('submit', async e => {
             e.preventDefault();
             const data = {
-                id: document.getElementById('produto-id').value,
+                id: document.getElementById('produto-id').value || null,
                 nome: document.getElementById('prod-nome').value,
                 categoria: document.getElementById('prod-categoria').value,
                 fornecedorId: document.getElementById('prod-fornecedor-select').value,
@@ -500,8 +489,7 @@
             };
             await saveData('produtos', data);
             document.getElementById('produto-form').reset();
-            await fetchData('produtos'); renderProdutos();
-            showToast('Produto salvo!');
+            await fetchData('produtos'); renderProdutos(); showToast('Produto salvo!');
         });
 
         // --- INSUMOS ---
@@ -514,49 +502,94 @@
             const qtdEmb = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unid = document.getElementById('insumo-unidade-embalagem').value;
             let qtdG = qtdEmb, base = 'un';
             if(unid==='kg' || unid==='L') { qtdG = qtdEmb * 1000; base = (unid==='kg'?'g':'ml'); } else if(unid==='g' || unid==='ml') { base = unid; }
-            const data = { id: document.getElementById('insumo-id').value, nome: document.getElementById('insumo-nome').value, fornecedorId: document.getElementById('insumo-fornecedor-select').value, custo_embalagem: parseFloat(document.getElementById('insumo-custo-embalagem').value), quantidade_embalagem: qtdEmb, unidade_embalagem: unid, qtd_embalagem_g: qtdG, unidade_base: base, estoque_atual: parseFloat(document.getElementById('insumo-est-atual').value), estoque_min: parseFloat(document.getElementById('insumo-est-min').value), estoque_ideal: parseFloat(document.getElementById('insumo-est-ideal').value) };
+            const data = { id: document.getElementById('insumo-id').value || null, nome: document.getElementById('insumo-nome').value, fornecedorId: document.getElementById('insumo-fornecedor-select').value, custo_embalagem: parseFloat(document.getElementById('insumo-custo-embalagem').value), quantidade_embalagem: qtdEmb, unidade_embalagem: unid, qtd_embalagem_g: qtdG, unidade_base: base, estoque_atual: parseFloat(document.getElementById('insumo-est-atual').value), estoque_min: parseFloat(document.getElementById('insumo-est-min').value), estoque_ideal: parseFloat(document.getElementById('insumo-est-ideal').value) };
             await saveData('insumos', data);
             document.getElementById('insumo-form').reset();
-            await fetchData('insumos'); renderInsumos();
-            showToast('Insumo salvo!');
+            await fetchData('insumos'); renderInsumos(); showToast('Insumo salvo!');
         });
 
-        // --- CLICK HANDLER GLOBAL (Melhorado para garantir clique no botão) ---
+        // --- LISTENER GLOBAL DE CLIQUES (CRUCIAL) ---
         document.body.addEventListener('click', (e) => {
-            // Tenta achar o botão mais próximo (subindo a árvore DOM)
             const btn = e.target.closest('button'); 
             if (!btn) return; 
             
-            // Pega o ID do dataset
             const id = btn.dataset.id;
 
-            // Roteia para a função correta
             if(btn.classList.contains('btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(id); }
             else if (btn.classList.contains('btn-delete-fornecedor')) { e.preventDefault(); confirmDelete('fornecedores', id); }
             
             else if (btn.classList.contains('btn-delete-insumo')) { e.preventDefault(); confirmDelete('insumos', id); }
-            else if (btn.classList.contains('btn-delete-produto')) { e.preventDefault(); confirmDelete('produtos', id); }
-            else if (btn.classList.contains('btn-delete-receita')) { e.preventDefault(); confirmDelete('receitas', id); }
+            else if (btn.matches('.btn-delete-produto')) { e.preventDefault(); confirmDelete('produtos', id); }
+            else if (btn.matches('.btn-delete-receita')) { e.preventDefault(); confirmDelete('receitas', id); }
         });
 
         function renderReceitas() { const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = ''; cache.receitas.forEach(r => tb.innerHTML += `<tr><td>${r.nome}</td><td>-</td><td><button class="btn-delete-receita btn btn-danger btn-small" data-id="${r.id}">🗑</button></td></tr>`); }
         function renderCustosMensais() {}
-        
+        async function fetchConfiguracoes() { if(isLocalMode) { configCache = localData.configuracoes || {}; } else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : {}; } catch(e){} } displayConfiguracoes(); }
+        function displayConfiguracoes() { Object.keys(configCache).forEach(key => { const el = document.getElementById(`config-${key.replace(/_/g, '-')}`); if (el) el.value = configCache[key]; }); }
+        function updateDashboard() {
+            document.getElementById('dash-stock-count').textContent = cache.insumos.length + cache.produtos.length;
+            document.getElementById('dashboard-num-receitas').textContent = cache.receitas.length;
+            const alerts = [];
+            [...cache.insumos, ...cache.produtos].forEach(item => {
+                const atual = parseFloat(item.estoque_atual || 0);
+                const min = parseFloat(item.estoque_min || 0);
+                if(min > 0 && atual <= min) alerts.push(`<p class="stock-warning">Baixo estoque: ${item.nome} (${atual})</p>`);
+            });
+            document.getElementById('stock-alerts').innerHTML = alerts.length ? alerts.join('') : '<p class="stock-ok">Estoque OK.</p>';
+        }
+
+        // --- HELPERS ---
         function populateSelects() {
             const selForn = document.getElementById('insumo-fornecedor-select'); 
             const selProdForn = document.getElementById('prod-fornecedor-select'); 
             
+            // Limpa e recria opções
+            const options = ['<option value="">Selecione</option>'];
+            
             const sortedForns = [...cache.fornecedores].filter(f => f && f.nome).sort((a,b) => a.nome.localeCompare(b.nome));
-            const options = '<option value="">Selecione</option>' + sortedForns.map(f => `<option value="${f.id}">${f.nome}</option>`).join('');
-            selForn.innerHTML = options;
-            selProdForn.innerHTML = options;
+            
+            sortedForns.forEach(f => {
+                options.push(`<option value="${f.id}">${f.nome}</option>`);
+            });
+
+            const htmlOptions = options.join('');
+            selForn.innerHTML = htmlOptions;
+            selProdForn.innerHTML = htmlOptions;
             
             const selPizza = document.getElementById('venda-pizza-select'); selPizza.innerHTML = '<option value="">Selecione</option>' + cache.receitas.map(r=>`<option value="${r.id}">${r.nome}</option>`).join('');
             const selProd = document.getElementById('venda-produto-select'); selProd.innerHTML = '<option value="">Selecione</option>' + cache.produtos.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
         }
-        function displayConfiguracoes() {}
+
+        // Vendas, Lista compras e outros (simplificado para caber, lógica mantida)
+        const views = document.querySelectorAll('.view');
+        const navLinks = document.querySelectorAll('.nav-link');
+        function showView(id) { views.forEach(v => v.classList.remove('active')); document.getElementById(id+'-view')?.classList.add('active'); }
+        navLinks.forEach(l => l.addEventListener('click', e => { e.preventDefault(); showView(e.target.dataset.view); }));
+        function showToast(msg, type='success') { const t = document.getElementById('toast'); t.textContent=msg; t.className=`toast show ${type}`; setTimeout(()=>t.className='toast', 3000); }
+        function formatMoney(v) { return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0); }
+        
+        // Lógica de Zerar (Perigo)
+        document.getElementById('btn-zerar-fornecedores')?.addEventListener('click', async () => {
+            if(!confirm("ATENÇÃO: Isso apagará TODOS os seus fornecedores. Não tem volta. Tem certeza?")) return;
+            const btn = document.getElementById('btn-zerar-fornecedores');
+            btn.textContent = "Apagando..."; btn.disabled = true;
+            if (isLocalMode) { localData.fornecedores = []; cache.fornecedores = []; } 
+            else {
+                const snapshot = await db.collection('fornecedores').where('userId', '==', currentUser.uid).get();
+                const batch = db.batch();
+                snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+            }
+            await fetchData('fornecedores');
+            renderAll(); // Atualiza tabelas e combos
+            showToast("Todos os fornecedores foram apagados.", "success");
+            btn.textContent = "ZERAR TODOS OS FORNECEDORES"; btn.disabled = false;
+        });
 
     });
     </script>
+</body>
+</html>
 </body>
 </html>
