@@ -96,7 +96,6 @@
             <a href="#" class="nav-link" data-view="insumos">Insumos</a>
             <a href="#" class="nav-link" data-view="receitas">Receitas</a>
             <a href="#" class="nav-link" data-view="fornecedores">Fornecedores</a>
-            
             <a href="#" class="nav-link" data-view="configuracoes">⚙️</a>
             <button id="logout-button">Sair</button>
         </nav>
@@ -236,6 +235,9 @@
                             <div class="form-group"><label>Nome</label><input type="text" id="prod-nome" required></div>
                             <div class="form-group"><label>Categoria</label><select id="prod-categoria"><option value="Bebida">Bebida</option><option value="Sobremesa">Sobremesa</option><option value="Outro">Outro</option></select></div>
                         </div>
+                         <div class="form-row">
+                            <div class="form-group"><label>Fornecedor</label><select id="prod-fornecedor-select"><option value="">Selecione</option></select></div>
+                         </div>
                         <div class="form-row">
                             <div class="form-group"><label>Preço Compra (R$)</label><input type="number" id="prod-custo" step="0.01" required></div>
                             <div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="prod-venda" step="0.01" required></div>
@@ -251,7 +253,7 @@
                         <button type="button" id="cancel-edit-produto" class="btn btn-secondary hidden">Cancelar</button>
                     </form>
                 </div>
-                <div class="card"><h2>Lista de Produtos</h2><table id="produtos-table"><thead><tr><th>Nome</th><th>Venda</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
+                <div class="card"><h2>Lista de Produtos</h2><table id="produtos-table"><thead><tr><th>Nome</th><th>Fornecedor</th><th>Venda</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- 6. INSUMOS -->
@@ -279,36 +281,21 @@
                 <div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 8. FORNECEDORES (COMPLETO E CORRIGIDO) -->
+            <!-- 8. FORNECEDORES -->
             <section id="fornecedores-view" class="view">
                 <div class="card">
                     <h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2>
                     <form id="fornecedor-form">
                         <input type="hidden" id="fornecedor-id">
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="fornecedor-nome">Nome da Empresa</label>
-                                <input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos">
-                            </div>
-                            <div class="form-group">
-                                <label for="fornecedor-contato">Pessoa de Contato</label>
-                                <input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João">
-                            </div>
+                            <div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div>
+                            <div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="fornecedor-telefone">Telefone / WhatsApp</label>
-                                <input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999">
-                            </div>
-                            <div class="form-group">
-                                <label for="fornecedor-email">Email</label>
-                                <input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com">
-                            </div>
+                            <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div>
+                            <div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div>
                         </div>
-                        <div class="form-group">
-                            <label for="fornecedor-endereco">Endereço Completo</label>
-                            <input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade">
-                        </div>
+                        <div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div>
                         <button type="submit" class="btn btn-primary">Salvar Fornecedor</button>
                         <button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
                     </form>
@@ -317,22 +304,10 @@
                 <div class="card">
                     <h2>Lista de Fornecedores</h2>
                     <div class="table-container">
-                        <table id="fornecedores-table">
-                            <thead>
-                                <tr>
-                                    <th>Empresa</th>
-                                    <th>Contato</th>
-                                    <th>Telefone</th>
-                                    <th>Endereço</th>
-                                    <th class="actions-cell">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody><!-- JS --></tbody>
-                        </table>
+                        <table id="fornecedores-table"><thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Endereço</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table>
                     </div>
                 </div>
 
-                <!-- ZONA DE PERIGO -->
                 <div class="card" style="margin-top: 20px; border: 1px solid red;">
                     <h3 style="color: red;">Zona de Perigo</h3>
                     <p>Deseja apagar todos os fornecedores cadastrados?</p>
@@ -347,13 +322,13 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v2.5</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v2.6</p></footer>
     <div id="toast" class="toast"></div>
     
     <!-- MODAL AJUDA -->
     <div id="help-modal" class="modal"><div class="modal-content"><h3 id="help-modal-title"></h3><div id="help-modal-text"></div><div class="modal-buttons"><button id="help-modal-close" class="btn btn-primary">Fechar</button></div></div></div>
     
-    <!-- MODAL CONFIRMAÇÃO SIMPLIFICADO -->
+    <!-- MODAL CONFIRMAÇÃO -->
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
     <!-- SCRIPTS -->
@@ -365,7 +340,6 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // CONFIGURAÇÃO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo",
             authDomain: "cmv-pizza.firebaseapp.com",
@@ -381,7 +355,7 @@
         let cache = { fornecedores:[], insumos:[], receitas:[], produtos:[], vendasDiarias:[], custosMensais:[] };
         let configCache = {};
         
-        // VARIAVEL GLOBAL PARA O MODAL DE EXCLUSÃO
+        // GLOBAL VAR FOR DELETION
         let itemParaExcluir = null;
 
         if (firebaseConfig.apiKey) {
@@ -393,7 +367,7 @@
             } catch (e) { console.error(e); isLocalMode = true; initApp(); }
         } else { isLocalMode = true; initApp(); }
 
-        // --- MODAL DE EXCLUSÃO ROBUSTO ---
+        // --- MODAL DE EXCLUSÃO (CORRIGIDO) ---
         const confirmModal = document.getElementById('confirm-modal');
         const btnYes = document.getElementById('confirm-modal-yes');
         const btnNo = document.getElementById('confirm-modal-no');
@@ -401,34 +375,32 @@
         btnYes.addEventListener('click', async () => {
             if (itemParaExcluir) {
                 btnYes.textContent = "Excluindo...";
-                await deleteData(itemParaExcluir.collection, itemParaExcluir.id);
-                
-                if (itemParaExcluir.collection === 'fornecedores') {
-                    await fetchData('fornecedores');
-                    renderFornecedoresTable();
-                } else {
-                    // Recarrega tudo por segurança nos outros casos
-                    await fetchData(itemParaExcluir.collection);
-                    renderAll();
+                try {
+                    await deleteData(itemParaExcluir.collection, itemParaExcluir.id);
+                    // Reload data to reflect changes
+                    if (itemParaExcluir.collection === 'fornecedores') {
+                        await fetchData('fornecedores'); renderFornecedoresTable();
+                    } else {
+                        await fetchData(itemParaExcluir.collection); renderAll();
+                    }
+                    showToast('Item excluído com sucesso!', 'success');
+                } catch (e) { showToast('Erro ao excluir', 'error'); }
+                finally {
+                    confirmModal.style.display = 'none';
+                    btnYes.textContent = "Sim";
+                    itemParaExcluir = null;
                 }
-                showToast('Item excluído com sucesso!', 'success');
-            }
-            confirmModal.style.display = 'none';
-            btnYes.textContent = "Sim";
-            itemParaExcluir = null;
+            } else { confirmModal.style.display = 'none'; }
         });
 
-        btnNo.addEventListener('click', () => {
-            confirmModal.style.display = 'none';
-            itemParaExcluir = null;
-        });
+        btnNo.addEventListener('click', () => { confirmModal.style.display = 'none'; itemParaExcluir = null; });
 
         function confirmDelete(coll, id) {
             itemParaExcluir = { collection: coll, id: id };
             document.getElementById('confirm-modal-text').textContent = "Tem certeza que deseja excluir permanentemente?";
             confirmModal.style.display = 'block';
         }
-        // --- FIM MODAL ---
+        // --------------------------------
 
         const views = document.querySelectorAll('.view');
         const navLinks = document.querySelectorAll('.nav-link');
@@ -492,7 +464,7 @@
             document.getElementById('stock-alerts').innerHTML = alerts.length ? alerts.join('') : '<p class="stock-ok">Estoque OK.</p>';
         }
 
-        // --- FORNECEDORES (LÓGICA CORRIGIDA) ---
+        // --- FORNECEDORES ---
         function renderFornecedoresTable() {
             const tbody = document.getElementById('fornecedores-table').querySelector('tbody');
             tbody.innerHTML = '';
@@ -500,7 +472,7 @@
             const sorted = [...cache.fornecedores].sort((a, b) => a.nome.localeCompare(b.nome));
             sorted.forEach(f => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td><strong>${f.nome}</strong></td><td>${f.contato || '-'}</td><td>${f.telefone || '-'}</td><td style="font-size:0.9em;">${f.endereco || '-'}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td>`;
+                tr.innerHTML = `<td><strong>${f.nome}</strong></td><td>${f.contato || '-'}</td><td>${f.telefone || '-'}</td><td style="font-size:0.9em;">${f.endereco || '-'}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}" title="Editar">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}" title="Excluir">🗑</button></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -543,22 +515,16 @@
             };
             const success = await saveData('fornecedores', data);
             if (success) { 
-                await fetchData('fornecedores'); // Garante dados frescos
-                renderFornecedoresTable(); 
-                populateSelects(); 
-                resetFornecedorForm(); 
-                showToast('Fornecedor salvo!'); 
+                await fetchData('fornecedores'); renderFornecedoresTable(); populateSelects(); resetFornecedorForm(); showToast('Fornecedor salvo!'); 
             }
             button.disabled = false; button.textContent = 'Salvar Fornecedor';
         });
         document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
 
-        // ZERAR FORNECEDORES
         document.getElementById('btn-zerar-fornecedores')?.addEventListener('click', async () => {
             if(!confirm("ATENÇÃO: Isso apagará TODOS os seus fornecedores. Não tem volta. Tem certeza?")) return;
             const btn = document.getElementById('btn-zerar-fornecedores');
             btn.textContent = "Apagando..."; btn.disabled = true;
-
             if (isLocalMode) { localData.fornecedores = []; cache.fornecedores = []; } 
             else {
                 const snapshot = await db.collection('fornecedores').where('userId', '==', currentUser.uid).get();
@@ -573,50 +539,52 @@
             btn.textContent = "ZERAR TODOS OS FORNECEDORES"; btn.disabled = false;
         });
 
-        // --- PRODUTOS, INSUMOS, RECEITAS, VENDAS ---
-        // (Mantidos similares, mas garantindo que usem a mesma estrutura robusta)
+        // --- PRODUTOS ---
         function renderProdutos() {
             const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
-            cache.produtos.forEach(p => { tb.innerHTML += `<tr><td>${p.nome}</td><td>${formatMoney(p.preco_venda)}</td><td>${p.estoque_atual||0} ${p.unidade||'un'}</td><td><button class="btn-delete-produto btn btn-danger btn-small" data-id="${p.id}">🗑</button></td></tr>`; });
+            cache.produtos.forEach(p => { 
+                const fornNome = cache.fornecedores.find(f=>f.id===p.fornecedorId)?.nome || '-';
+                tb.innerHTML += `<tr><td>${p.nome}</td><td>${fornNome}</td><td>${formatMoney(p.preco_venda)}</td><td>${p.estoque_atual||0} ${p.unidade||'un'}</td><td><button class="btn-delete-produto btn btn-danger btn-small" data-id="${p.id}">🗑</button></td></tr>`; 
+            });
         }
-        // ... (Outras funções de renderização omitidas por brevidade, mantendo a lógica original) ...
-        // ... (Listeners de formulário mantidos) ...
+        document.getElementById('produto-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = {
+                id: document.getElementById('produto-id').value,
+                nome: document.getElementById('prod-nome').value,
+                categoria: document.getElementById('prod-categoria').value,
+                fornecedorId: document.getElementById('prod-fornecedor-select').value, // NEW
+                preco_compra: parseFloat(document.getElementById('prod-custo').value),
+                preco_venda: parseFloat(document.getElementById('prod-venda').value),
+                unidade: document.getElementById('prod-unidade').value,
+                estoque_atual: parseFloat(document.getElementById('prod-est-atual').value),
+                estoque_min: parseFloat(document.getElementById('prod-est-min').value),
+                estoque_ideal: parseFloat(document.getElementById('prod-est-ideal').value)
+            };
+            await saveData('produtos', data);
+            document.getElementById('produto-form').reset();
+            await fetchData('produtos'); renderProdutos();
+            showToast('Produto salvo!');
+        });
 
+        // --- INSUMOS ---
         function renderInsumos() {
-             const tb = document.getElementById('insumos-table').querySelector('tbody'); tb.innerHTML = '';
-             cache.insumos.forEach(i => { const custoBase = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : 0; tb.innerHTML += `<tr><td>${i.nome}</td><td>${formatMoney(custoBase)}/${i.unidade_base}</td><td>${i.estoque_atual||0}</td><td><button class="btn-delete-insumo btn btn-danger btn-small" data-id="${i.id}">🗑</button></td></tr>`; });
+            const tb = document.getElementById('insumos-table').querySelector('tbody'); tb.innerHTML = '';
+            cache.insumos.forEach(i => { const custoBase = i.qtd_embalagem_g > 0 ? (i.custo_embalagem / i.qtd_embalagem_g) : 0; tb.innerHTML += `<tr><td>${i.nome}</td><td>${formatMoney(custoBase)}/${i.unidade_base}</td><td>${i.estoque_atual||0}</td><td><button class="btn-delete-insumo btn btn-danger btn-small" data-id="${i.id}">🗑</button></td></tr>`; });
         }
-
         document.getElementById('insumo-form').addEventListener('submit', async e => {
             e.preventDefault();
-            // ... (Lógica de salvar insumo igual ao anterior) ...
-             const qtdEmb = parseFloat(document.getElementById('insumo-qtd-embalagem').value);
-            const unid = document.getElementById('insumo-unidade-embalagem').value;
-            let qtdG = qtdEmb; let base = 'un';
-            if(unid==='kg' || unid==='L') { qtdG = qtdEmb * 1000; base = (unid==='kg'?'g':'ml'); }
-            else if(unid==='g' || unid==='ml') { base = unid; }
-
-            const data = {
-                id: document.getElementById('insumo-id').value,
-                nome: document.getElementById('insumo-nome').value,
-                fornecedorId: document.getElementById('insumo-fornecedor-select').value,
-                custo_embalagem: parseFloat(document.getElementById('insumo-custo-embalagem').value),
-                quantidade_embalagem: qtdEmb,
-                unidade_embalagem: unid,
-                qtd_embalagem_g: qtdG,
-                unidade_base: base,
-                estoque_atual: parseFloat(document.getElementById('insumo-est-atual').value),
-                estoque_min: parseFloat(document.getElementById('insumo-est-min').value),
-                estoque_ideal: parseFloat(document.getElementById('insumo-est-ideal').value)
-            };
+            const qtdEmb = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unid = document.getElementById('insumo-unidade-embalagem').value;
+            let qtdG = qtdEmb, base = 'un';
+            if(unid==='kg' || unid==='L') { qtdG = qtdEmb * 1000; base = (unid==='kg'?'g':'ml'); } else if(unid==='g' || unid==='ml') { base = unid; }
+            const data = { id: document.getElementById('insumo-id').value, nome: document.getElementById('insumo-nome').value, fornecedorId: document.getElementById('insumo-fornecedor-select').value, custo_embalagem: parseFloat(document.getElementById('insumo-custo-embalagem').value), quantidade_embalagem: qtdEmb, unidade_embalagem: unid, qtd_embalagem_g: qtdG, unidade_base: base, estoque_atual: parseFloat(document.getElementById('insumo-est-atual').value), estoque_min: parseFloat(document.getElementById('insumo-est-min').value), estoque_ideal: parseFloat(document.getElementById('insumo-est-ideal').value) };
             await saveData('insumos', data);
             document.getElementById('insumo-form').reset();
-            await fetchData('insumos');
-            renderInsumos();
+            await fetchData('insumos'); renderInsumos();
             showToast('Insumo salvo!');
         });
 
-        // --- GLOBAL CLICK HANDLER (CRUCIAL PARA EXCLUSÃO FUNCIONAR EM TODAS AS TABELAS) ---
+        // --- CLICK HANDLER GLOBAL (CORRIGIDO) ---
         document.body.addEventListener('click', (e) => {
             const btn = e.target.closest('button'); 
             if (!btn) return; 
@@ -629,23 +597,21 @@
             else if (btn.matches('.btn-delete-receita')) { e.preventDefault(); confirmDelete('receitas', btn.dataset.id); }
         });
 
-        // Placeholders para evitar erros
         function renderReceitas() { const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = ''; cache.receitas.forEach(r => tb.innerHTML += `<tr><td>${r.nome}</td><td>-</td><td><button class="btn-delete-receita btn btn-danger btn-small" data-id="${r.id}">🗑</button></td></tr>`); }
         function renderCustosMensais() {}
+        
         function populateSelects() {
-            const selForn = document.getElementById('insumo-fornecedor-select'); selForn.innerHTML = '<option value="">Selecione</option>';
-            cache.fornecedores.forEach(f => selForn.innerHTML += `<option value="${f.id}">${f.nome}</option>`);
+            const selForn = document.getElementById('insumo-fornecedor-select'); 
+            const selProdForn = document.getElementById('prod-fornecedor-select'); // Novo
+            
+            const options = '<option value="">Selecione</option>' + cache.fornecedores.map(f => `<option value="${f.id}">${f.nome}</option>`).join('');
+            selForn.innerHTML = options;
+            selProdForn.innerHTML = options;
+            
+            const selPizza = document.getElementById('venda-pizza-select'); selPizza.innerHTML = '<option value="">Selecione</option>' + cache.receitas.map(r=>`<option value="${r.id}">${r.nome}</option>`).join('');
+            const selProd = document.getElementById('venda-produto-select'); selProd.innerHTML = '<option value="">Selecione</option>' + cache.produtos.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
         }
         function displayConfiguracoes() {}
-
-        // Re-add missing listeners (Product form, etc) from previous version if needed, keeping it lean here to ensure the Fix works.
-        document.getElementById('produto-form').addEventListener('submit', async e => {
-             e.preventDefault();
-             const data = { id: document.getElementById('produto-id').value, nome: document.getElementById('prod-nome').value, /* ... other fields ... */ };
-             // Simplificado para garantir que o arquivo rode sem erros de sintaxe, foquei na correção dos fornecedores
-             await saveData('produtos', data); 
-             await fetchData('produtos'); renderProdutos();
-        });
 
     });
     </script>
