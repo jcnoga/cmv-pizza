@@ -331,7 +331,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v4.1 (Monthly Sync Fix)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v4.2 (Delete/Unique Month Fix)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -373,7 +373,6 @@
         } else { isLocalMode = true; initApp(); }
 
         // --- LOGIC: PULL FROM DAILY ---
-        // CORREÇÃO 1: Implementação da lógica que faltava
         document.getElementById('btn-pull-daily')?.addEventListener('click', () => {
             const mesAno = document.getElementById('custo-mensal-mes').value; // Formato: YYYY-MM
             if (!mesAno) { showToast("Selecione o Mês/Ano primeiro.", "error"); return; }
@@ -392,12 +391,23 @@
             }
         });
 
-        // --- LOGIC: MONTHLY COSTS SAVE ---
+        // --- LOGIC: MONTHLY COSTS SAVE (WITH UNIQUE CONSTRAINT) ---
         document.getElementById('custo-mensal-form').addEventListener('submit', async e => {
             e.preventDefault();
+            const id = document.getElementById('custo-mensal-id').value;
+            const mes = document.getElementById('custo-mensal-mes').value;
+
+            // CORREÇÃO: Verificação de Duplicidade
+            // Se existe algum registro com esse mês E o ID for diferente do atual (ou seja, não é edição do mesmo)
+            const duplicado = cache.custosMensais.find(c => c.mes === mes && c.id !== id);
+            if (duplicado) {
+                showToast(`O mês ${mes} já possui um fechamento lançado! Edite o existente.`, 'error');
+                return; // Bloqueia o salvamento
+            }
+
             const data = {
-                id: document.getElementById('custo-mensal-id').value || null,
-                mes: document.getElementById('custo-mensal-mes').value,
+                id: id || null,
+                mes: mes,
                 faturamento: parseFloat(document.getElementById('custo-mensal-faturamento').value) || 0,
                 custosVariaveis: parseFloat(document.getElementById('custo-mensal-custosVariaveis').value) || 0,
                 custosFixos: parseFloat(document.getElementById('custo-mensal-custosFixos').value) || 0,
@@ -415,8 +425,7 @@
             }
         });
 
-        // --- LOGIC: RENDER MONTHLY HISTORY ---
-        // CORREÇÃO 2: Preenchendo a tabela que estava vazia
+        // --- LOGIC: RENDER MONTHLY HISTORY (WITH DELETE BUTTON) ---
         function renderCustosMensais() {
             const tbody = document.getElementById('custos-mensais-table').querySelector('tbody');
             tbody.innerHTML = '';
@@ -428,9 +437,8 @@
 
             sorted.forEach(c => {
                 const lucro = c.faturamento - (c.custosVariaveis + c.custosFixos + c.despesasOperacionais + c.impostos) + c.outrasReceitasDespesas;
-                const colorClass = lucro >= 0 ? 'stock-ok' : 'stock-warning'; // Verde se positivo, Vermelho se negativo
+                const colorClass = lucro >= 0 ? 'stock-ok' : 'stock-warning'; 
 
-                // Formata mês (2023-11 -> 11/2023)
                 const [ano, mes] = c.mes.split('-');
                 const mesFormatado = `${mes}/${ano}`;
 
@@ -441,6 +449,7 @@
                         <td class="${colorClass}" style="font-weight:bold;">${formatMoney(lucro)}</td>
                         <td>
                             <button class="btn btn-secondary btn-small btn-edit-mensal" data-id="${c.id}">✎</button>
+                            <button class="btn btn-danger btn-small btn-delete-mensal" data-id="${c.id}" style="margin-left: 5px;">🗑</button>
                         </td>
                     </tr>
                 `;
@@ -452,7 +461,6 @@
             const c = cache.custosMensais.find(x => x.id === id);
             if(!c) return;
             
-            // Preenche form
             document.getElementById('custo-mensal-id').value = c.id;
             document.getElementById('custo-mensal-mes').value = c.mes;
             document.getElementById('custo-mensal-faturamento').value = c.faturamento;
@@ -462,12 +470,8 @@
             document.getElementById('custo-mensal-impostos').value = c.impostos;
             document.getElementById('custo-mensal-outrasReceitasDespesas').value = c.outrasReceitasDespesas;
 
-            // Habilita campos para edição
             const chk = document.getElementById('enable-manual-edit');
-            if(chk) {
-                chk.checked = true;
-                chk.dispatchEvent(new Event('change'));
-            }
+            if(chk) { chk.checked = true; chk.dispatchEvent(new Event('change')); }
             
             document.getElementById('custo-mensal-form').scrollIntoView({behavior:'smooth'});
         }
@@ -496,6 +500,7 @@
                     else if(coll === 'produtos') { renderProdutos(); populateSelects(); }
                     else if(coll === 'insumos') { renderInsumos(); populateSelects(); }
                     else if(coll === 'receitas') { renderReceitas(); populateSelects(); }
+                    else if(coll === 'custosMensais') { renderCustosMensais(); } // ATUALIZA TABELA MENSAL
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
                 finally { confirmModal.style.display = 'none'; btnYes.textContent = "Sim"; btnYes.disabled = false; itemParaExcluir = null; }
@@ -662,7 +667,20 @@
         document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
 
         // GLOBAL CLICKS
-        document.body.addEventListener('click', e => { const btn = e.target.closest('button'); if (!btn) return; const id = btn.dataset.id; if(btn.classList.contains('btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(id); } else if(btn.classList.contains('btn-edit-produto')) { e.preventDefault(); editProduto(id); } else if(btn.classList.contains('btn-edit-insumo')) { e.preventDefault(); editInsumo(id); } else if(btn.classList.contains('btn-edit-receita')) { e.preventDefault(); editReceita(id); } else if(btn.classList.contains('btn-edit-mensal')) { e.preventDefault(); editMensal(id); } else if(btn.classList.contains('btn-delete-fornecedor')) { e.preventDefault(); confirmDelete('fornecedores', id); } else if(btn.classList.contains('btn-delete-insumo')) { e.preventDefault(); confirmDelete('insumos', id); } else if(btn.classList.contains('btn-delete-produto')) { e.preventDefault(); confirmDelete('produtos', id); } else if(btn.classList.contains('btn-delete-receita')) { e.preventDefault(); confirmDelete('receitas', id); } });
+        document.body.addEventListener('click', e => { const btn = e.target.closest('button'); if (!btn) return; const id = btn.dataset.id; 
+            if(btn.classList.contains('btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(id); } 
+            else if(btn.classList.contains('btn-edit-produto')) { e.preventDefault(); editProduto(id); } 
+            else if(btn.classList.contains('btn-edit-insumo')) { e.preventDefault(); editInsumo(id); } 
+            else if(btn.classList.contains('btn-edit-receita')) { e.preventDefault(); editReceita(id); } 
+            else if(btn.classList.contains('btn-edit-mensal')) { e.preventDefault(); editMensal(id); } 
+            
+            // EXCLUSÕES
+            else if(btn.classList.contains('btn-delete-fornecedor')) { e.preventDefault(); confirmDelete('fornecedores', id); } 
+            else if(btn.classList.contains('btn-delete-insumo')) { e.preventDefault(); confirmDelete('insumos', id); } 
+            else if(btn.classList.contains('btn-delete-produto')) { e.preventDefault(); confirmDelete('produtos', id); } 
+            else if(btn.classList.contains('btn-delete-receita')) { e.preventDefault(); confirmDelete('receitas', id); } 
+            else if(btn.classList.contains('btn-delete-mensal')) { e.preventDefault(); confirmDelete('custosMensais', id); } 
+        });
         function formatMoney(v) { return parseFloat(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
         function showToast(msg, type='success') { const t = document.getElementById('toast'); t.textContent=msg; t.className=`toast ${type} show`; setTimeout(()=>t.classList.remove('show'),3000); }
         function populateSelects() { const fOpts = '<option value="">Selecione</option>' + [...cache.fornecedores].sort((a,b)=>(a.nome||"").localeCompare(b.nome||"")).map(f=>`<option value="${f.id}">${f.nome}</option>`).join(''); document.getElementById('insumo-fornecedor-select').innerHTML = fOpts; document.getElementById('prod-fornecedor-select').innerHTML = fOpts; const pizzas = cache.receitas; if(pizzas.length > 0) { document.getElementById('venda-pizza-select').innerHTML = '<option value="">Selecione</option>'+pizzas.map(r=>`<option value="${r.id}">${r.nome}</option>`).join(''); } else { document.getElementById('venda-pizza-select').innerHTML = '<option value="">(Nenhuma receita cadastrada)</option>'; } const produtos = cache.produtos; if(produtos.length > 0) { document.getElementById('venda-produto-select').innerHTML = '<option value="">Selecione</option>'+produtos.map(p=>`<option value="${p.id}">${p.nome}</option>`).join(''); } else { document.getElementById('venda-produto-select').innerHTML = '<option value="">(Nenhum produto cadastrado)</option>'; } }
