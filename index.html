@@ -7,85 +7,141 @@
 
     <style>
         :root {
-            --primary-color: #D32F2F; --primary-dark: #B71C1C; --secondary-color: #FFC107;
-            --light-gray: #f4f4f4; --medium-gray: #ccc; --dark-gray: #555;
-            --text-color: #333; --white: #fff; --success-color: #4CAF50;
-            --error-color: #f44336; --info-color: #2196F3; --shadow: 0 2px 8px rgba(0,0,0,0.1);
-            --border-radius: 8px;
+            --primary-color: #00695c; /* Teal da inspiração */
+            --primary-dark: #004d40;
+            --secondary-color: #FFC107;
+            --light-gray: #f5f7fa;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #455a64;
+            --text-color: #263238;
+            --white: #fff;
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+            --info-color: #0277bd;
+            --shadow: 0 2px 5px rgba(0,0,0,0.05);
+            --border-radius: 6px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--light-gray); color: var(--text-color); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
-        header { background-color: var(--primary-color); color: var(--white); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); flex-wrap: wrap; }
-        header h1 { font-size: 1.5rem; margin-right: 2rem; }
-        #auth-container, #app-container { width: 100%; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-        .auth-form { background: var(--white); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); max-width: 450px; margin: 2rem auto; }
+        body { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--light-gray); color: var(--text-color); line-height: 1.5; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        header { background-color: var(--primary-color); color: var(--white); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); flex-wrap: wrap; }
+        header h1 { font-size: 1.4rem; margin-right: 2rem; font-weight: 600; }
+        
+        #auth-container, #app-container { width: 100%; max-width: 1250px; margin: 2rem auto; padding: 0 1rem; }
+        
+        /* Auth Form */
+        .auth-form { background: var(--white); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); max-width: 450px; margin: 2rem auto; border-top: 4px solid var(--primary-color); }
         .auth-form h2 { text-align: center; margin-bottom: 1.5rem; color: var(--primary-dark); }
+        
+        /* Forms & Inputs */
         .form-group { margin-bottom: 1.25rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--medium-gray); border-radius: var(--border-radius); font-size: 1rem; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2); }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: var(--dark-gray); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.65rem; border: 1px solid #cfd8dc; border-radius: 4px; font-size: 1rem; transition: border 0.2s; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); }
         .form-group input:disabled { background-color: #eee; color: #888; cursor: not-allowed; }
-        .btn { display: inline-block; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.3s, transform 0.1s; width: 100%; }
-        .btn:disabled { background-color: var(--medium-gray); cursor: not-allowed; }
-        .btn:active:not(:disabled) { transform: scale(0.98); }
-        .btn-primary { background-color: var(--primary-color); color: var(--white); } .btn-primary:hover:not(:disabled) { background-color: var(--primary-dark); }
-        .btn-secondary { background-color: var(--dark-gray); color: var(--white); } .btn-secondary:hover { background-color: #333; }
+        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .form-row .form-group { flex: 1; min-width: 150px; }
+
+        /* Buttons */
+        .btn { display: inline-block; padding: 0.6rem 1.2rem; font-size: 0.95rem; font-weight: 600; text-align: center; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s; width: 100%; }
+        .btn:active:not(:disabled) { transform: translateY(1px); }
+        .btn-primary { background-color: var(--primary-color); color: var(--white); } .btn-primary:hover { background-color: var(--primary-dark); }
+        .btn-secondary { background-color: var(--dark-gray); color: var(--white); } .btn-secondary:hover { background-color: #37474f; }
         .btn-success { background-color: var(--success-color); color: var(--white); }
         .btn-danger { background-color: var(--error-color); color: var(--white); }
         .btn-info { background-color: var(--info-color); color: var(--white); }
-        .btn-warning { background-color: #ff9800; color: var(--white); }
-        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; width: auto; }
+        .btn-small { padding: 0.3rem 0.7rem; font-size: 0.85rem; width: auto; }
+
         .auth-link { text-align: center; margin-top: 1rem; } .auth-link a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
-        nav { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-top: 10px; }
-        nav a, nav button { color: var(--white); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 0.5rem 1rem; border-radius: var(--border-radius); transition: background-color 0.2s; }
-        nav a:hover, nav button:hover, nav a.active { background-color: rgba(255,255,255,0.2); }
-        #logout-button { background-color: var(--secondary-color); color: var(--text-color); font-weight: bold; }
+        
+        /* Nav */
+        nav { display: flex; gap: 0.2rem; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+        nav a, nav button { color: rgba(255,255,255,0.9); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.5rem 0.8rem; border-radius: 4px; transition: background-color 0.2s; font-weight: 500; }
+        nav a:hover, nav button:hover, nav a.active { background-color: rgba(255,255,255,0.15); color: #fff; }
+        #logout-button { background-color: rgba(0,0,0,0.2); margin-left: auto; }
+
         main { flex: 1; }
-        .view { display: none; } .view.active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .card { background: var(--white); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+        .view { display: none; } .view.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .card { background: var(--white); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; border: 1px solid #eceff1; }
+        
+        /* --- NEW DASHBOARD STYLES (INSPIRED BY IMAGE) --- */
+        .dashboard-section-title {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 1.5rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0f2f1;
+        }
+
+        .kpi-card-modern {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kpi-card-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .kpi-card-modern h3 { font-size: 0.85rem; color: #546e7a; margin-bottom: 0.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-card-modern .value { font-size: 1.8rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.5rem; }
+        .kpi-card-modern .desc { font-size: 0.8rem; color: #78909c; line-height: 1.3; }
+        
+        .kpi-green { border-left-color: var(--success-color); } .kpi-green .value { color: var(--success-color); }
+        .kpi-red { border-left-color: var(--error-color); } .kpi-red .value { color: var(--error-color); }
+        .kpi-blue { border-left-color: var(--info-color); } .kpi-blue .value { color: var(--info-color); }
+
+        .action-box {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .action-title { font-weight: 700; color: var(--dark-gray); margin-bottom: 0.5rem; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        .action-sug { font-size: 0.9rem; color: #546e7a; padding-left: 1rem; border-left: 3px solid #eceff1; margin-top: 0.5rem; }
+
+        /* Grids */
         .grid-container { display: grid; gap: 1.5rem; }
-        @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: repeat(3, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
-        .kpi-card { text-align: center; }
-        .kpi-card h3 { color: var(--dark-gray); font-size: 1rem; margin-bottom: 0.5rem; }
-        .kpi-card .value { font-size: 2rem; font-weight: 700; color: var(--primary-dark); }
-        h2 { margin-bottom: 1rem; color: var(--primary-dark); border-bottom: 2px solid var(--light-gray); padding-bottom: 0.5rem; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--medium-gray); }
-        th { background-color: var(--light-gray); font-weight: 600; }
-        tr:hover { background-color: #f9f9f9; }
+        @media (min-width: 768px) { 
+            .grid-2 { grid-template-columns: repeat(2, 1fr); } 
+            .grid-3 { grid-template-columns: repeat(3, 1fr); } 
+            .grid-4 { grid-template-columns: repeat(4, 1fr); } 
+        }
+
+        /* Tables & Lists */
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.95rem; }
+        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #eceff1; }
+        th { background-color: #fafafa; font-weight: 600; color: var(--dark-gray); }
+        tr:hover { background-color: #f5f5f5; }
         .actions-cell { text-align: right; white-space: nowrap; }
-        .actions-cell .btn { margin-left: 0.5rem; }
-        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .form-row .form-group { flex: 1; min-width: 150px; }
-        #ingredients-list .ingredient-row, #sales-list .sale-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--medium-gray); }
-        #ingredients-list .ingredient-row > *, #sales-list .sale-row > * { flex: 1; }
-        .total-cost { text-align: right; font-size: 1.5rem; font-weight: bold; margin-top: 1rem; color: var(--primary-dark); }
-        .simulator-result { margin-top: 1rem; padding: 1rem; background-color: #e8f5e9; border-left: 5px solid var(--success-color); border-radius: var(--border-radius); }
-        .simulator-result p { font-size: 1.2rem; margin-bottom: 0.5rem; } .simulator-result strong { color: var(--primary-dark); }
-        .alert-item { padding: 0.75rem; border-radius: var(--border-radius); margin-bottom: 0.5rem; background-color: #fff3e0; border: 1px solid #ffe0b2; color: #e65100; }
-        .cmv-ok { color: var(--success-color); } .cmv-warn { color: #f57c00; } .cmv-danger { color: var(--error-color); }
-        .cmv-visualizer { width: 100%; background-color: var(--medium-gray); border-radius: var(--border-radius); height: 25px; overflow: hidden; margin-top: 0.5rem; }
-        .cmv-visualizer-bar { height: 100%; transition: width 0.5s; }
-        .cmv-visualizer-bar.ok { background-color: var(--success-color); } .cmv-visualizer-bar.warn { background-color: var(--secondary-color); } .cmv-visualizer-bar.danger { background-color: var(--error-color); }
-        .filter-container { margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-        .filter-container input { padding: 0.5rem; border-radius: var(--border-radius); border: 1px solid var(--medium-gray); width: 100%; max-width: 400px; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; border-radius: var(--border-radius); color: var(--white); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.5s, visibility 0.5s; }
-        .toast.show { opacity: 1; visibility: visible; }
-        .toast.success { background-color: var(--success-color); } .toast.error { background-color: var(--error-color); }
-        footer { text-align: center; padding: 1.5rem; margin-top: 2rem; background-color: #e0e0e0; color: var(--dark-gray); font-size: 0.9rem; }
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 600px; border-radius: var(--border-radius); }
-        .modal-buttons { margin-top: 20px; text-align: center; } .modal-buttons .btn { width: 120px; margin: 0 10px; }
-        .hidden { display: none; }
-        .help-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-color: var(--info-color); color: white; text-align: center; font-weight: bold; line-height: 20px; cursor: pointer; margin-left: 8px; font-style: normal; user-select: none; }
-        .checkbox-wrapper { display: flex; align-items: center; margin-bottom: 1rem; padding: 0.5rem; background: #e3f2fd; border-radius: 4px; }
-        .checkbox-wrapper input { width: auto; margin-right: 10px; cursor: pointer; }
+        .actions-cell .btn { margin-left: 0.3rem; }
+
+        /* Utils */
+        .total-cost { text-align: right; font-size: 1.3rem; font-weight: 700; margin-top: 1rem; color: var(--primary-dark); }
         .stock-warning { color: var(--error-color); font-weight: bold; }
         .stock-ok { color: var(--success-color); }
-        /* Backup Area */
-        .backup-area { border: 2px dashed var(--primary-color); padding: 20px; border-radius: 10px; margin-top: 20px; background-color: #fff3e0; }
-        .backup-area h3 { margin-top: 0; }
+        .checkbox-wrapper { display: flex; align-items: center; margin-bottom: 1rem; padding: 0.5rem; background: #e1f5fe; border-radius: 4px; color: #0277bd; }
+        .checkbox-wrapper input { width: auto; margin-right: 10px; cursor: pointer; }
+        .hidden { display: none; }
+        
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem 2rem; border-radius: 30px; color: var(--white); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; }
+        .toast.show { opacity: 1; visibility: visible; }
+        .toast.success { background-color: var(--success-color); } .toast.error { background-color: var(--error-color); }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 25px; border: none; width: 90%; max-width: 400px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
+        .modal-buttons { margin-top: 20px; display: flex; justify-content: center; gap: 10px; } 
+        .modal-buttons .btn { width: auto; min-width: 100px; }
+        
+        .backup-area { border: 2px dashed #b0bec5; padding: 20px; border-radius: 8px; margin-top: 20px; background-color: #fafafa; }
     </style>
 </head>
 <body>
@@ -116,16 +172,72 @@
         <!-- ÁREA DO APLICATIVO -->
         <div id="app-container" class="hidden">
             
-            <!-- 1. DASHBOARD -->
+            <!-- 1. DASHBOARD FINANCEIRO (RENOVADO) -->
             <section id="dashboard-view" class="view">
-                <h2>Dashboard</h2>
-                <div class="grid-container grid-4">
-                    <div class="card kpi-card"><h3>Vendas Hoje</h3><div class="value" id="dash-vendas-hoje">R$ 0,00</div></div>
-                    <div class="card kpi-card"><h3>Pizzas Hoje</h3><div class="value" id="dash-pizzas-hoje">0</div></div>
-                    <div class="card kpi-card"><h3>Itens de Estoque</h3><div class="value" id="dash-stock-count">0</div></div>
-                    <div class="card kpi-card"><h3>Receitas</h3><div class="value" id="dashboard-num-receitas">0</div></div>
+                <h2 style="border:none; text-transform:uppercase; letter-spacing:1px; font-size:1.2rem;">Indicadores Financeiros Anuais</h2>
+                
+                <!-- SEÇÃO: DESEMPENHO DE VENDAS -->
+                <div class="dashboard-section-title">Desempenho de Vendas</div>
+                <div class="grid-container grid-2">
+                    <div class="kpi-card-modern kpi-blue">
+                        <h3>Faturamento Bruto Total</h3>
+                        <div class="value" id="dash-fat-total">R$ 0,00</div>
+                        <div class="desc">Soma de todo o faturamento lançado no histórico mensal. Indica o volume total de dinheiro que entrou.</div>
+                    </div>
+                    <div class="kpi-card-modern kpi-blue">
+                        <h3>Ticket Médio Estimado</h3>
+                        <div class="value" id="dash-ticket-medio">R$ 0,00</div>
+                        <div class="desc">Valor médio gasto por venda. Calculado baseando-se no total de vendas diárias registradas.</div>
+                    </div>
                 </div>
-                <div class="card"><h3>Alertas de Estoque</h3><div id="stock-alerts"><p>Tudo certo com o estoque.</p></div></div>
+
+                <!-- SEÇÃO: RENTABILIDADE E LUCRO -->
+                <div class="dashboard-section-title">Rentabilidade e Lucro</div>
+                <div class="grid-container grid-4">
+                    <div class="kpi-card-modern kpi-green">
+                        <h3>Lucro Líquido Total</h3>
+                        <div class="value" id="dash-lucro-total">R$ 0,00</div>
+                        <div class="desc">O resultado final da empresa após todas as deduções. É o que realmente sobra para os sócios/investimento.</div>
+                    </div>
+                    <div class="kpi-card-modern kpi-green">
+                        <h3>Margem Líquida (%)</h3>
+                        <div class="value" id="dash-margem">0,00%</div>
+                        <div class="desc">A porcentagem de cada real de faturamento que se transforma em lucro líquido real.</div>
+                    </div>
+                    <div class="kpi-card-modern">
+                        <h3>CMV Total (Custo Variável)</h3>
+                        <div class="value" id="dash-cmv-total">R$ 0,00</div>
+                        <div class="desc">Custos que variam diretamente com o volume de vendas (Insumos, embalagens, comissões).</div>
+                    </div>
+                    <div class="kpi-card-modern">
+                        <h3>Custo Fixo Total</h3>
+                        <div class="value" id="dash-custo-fixo">R$ 0,00</div>
+                        <div class="desc">Total gasto com aluguel, funcionários fixos e despesas que não dependem da venda.</div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO: PLANO DE AÇÃO -->
+                <div class="dashboard-section-title">💡 Plano de Ação Personalizado</div>
+                <div id="action-plan-container">
+                    <!-- Preenchido via JS -->
+                </div>
+
+                <!-- OPERACIONAL -->
+                <div class="dashboard-section-title">Operacional & Alertas</div>
+                <div class="grid-container grid-2">
+                    <div class="card">
+                        <h3>Resumo de Cadastros</h3>
+                        <ul style="list-style: none; padding:0; margin-top:10px;">
+                            <li>🍕 Sabores de Pizza: <strong id="dashboard-num-receitas">0</strong></li>
+                            <li>📦 Itens em Estoque: <strong id="dash-stock-count">0</strong></li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>⚠️ Alertas de Estoque</h3>
+                        <div id="stock-alerts" style="margin-top:10px;"></div>
+                    </div>
+                </div>
+
             </section>
 
             <!-- 2. VENDAS DIÁRIAS -->
@@ -188,10 +300,7 @@
                 <div class="card">
                     <h2>Fechamento Mensal</h2>
                     <form id="custo-mensal-form"><input type="hidden" id="custo-mensal-id"><div class="form-row"><div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div><div class="form-group" style="display:flex; align-items:end;"><button type="button" id="btn-pull-daily" class="btn btn-info">🔄 Puxar do Diário</button></div></div>
-                    
-                    <!-- CHECKBOX DE EDIÇÃO MANUAL -->
                     <div class="checkbox-wrapper"><input type="checkbox" id="enable-manual-edit"><label for="enable-manual-edit"><strong>Habilitar Edição Manual</strong></label></div>
-                    
                     <div class="form-row"><div class="form-group"><label>Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required disabled></div><div class="form-group"><label>Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01" disabled></div><div class="form-group"><label>Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01" disabled></div><div class="form-group"><label>Outras Rec/Desp (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" disabled></div></div><button type="submit" class="btn btn-primary">Salvar Mês</button></form>
                 </div>
                 <div class="card"><h2>Histórico Mensal</h2><table id="custos-mensais-table"><thead><tr><th>Mês</th><th>Faturamento</th><th>Lucro Líquido</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
@@ -262,7 +371,7 @@
                 <div class="card"><h2>Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="Filtrar..."></div><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo Base</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 7. RECEITAS (Com Cálculo Automático e Preço de Venda) -->
+            <!-- 7. RECEITAS -->
             <section id="receitas-view" class="view">
                 <div class="card"><h2>Criar Receita</h2>
                     <form id="receita-form">
@@ -331,7 +440,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v4.6 (Dashboard Active)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v5.0 (Professional Financial Dashboard)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -359,10 +468,7 @@
         let cache = { fornecedores:[], insumos:[], receitas:[], produtos:[], vendasDiarias:[], custosMensais:[] };
         let configCache = {};
         let itemParaExcluir = null;
-        
-        // BUFFER PARA VENDAS
         let dailySalesBuffer = [];
-
         const COLLECTIONS_LIST = ['fornecedores', 'insumos', 'produtos', 'receitas', 'vendasDiarias', 'custosMensais'];
 
         if (firebaseConfig.apiKey) {
@@ -408,13 +514,12 @@
                     const coll = itemParaExcluir.collection;
                     if (!isLocalMode) cache[coll] = cache[coll].filter(i => i.id !== itemParaExcluir.id);
                     await fetchData(coll);
-                    // ATUALIZA O DASHBOARD IMEDIATAMENTE APÓS QUALQUER EXCLUSÃO
                     if(coll === 'fornecedores') { renderFornecedoresTable(); populateSelects(); }
                     else if(coll === 'produtos') { renderProdutos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'insumos') { renderInsumos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'receitas') { renderReceitas(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'custosMensais') { renderCustosMensais(); }
-                    else if(coll === 'vendasDiarias') { updateDashboard(); } // Se excluir venda, atualiza dash
+                    else if(coll === 'custosMensais') { renderCustosMensais(); updateDashboard(); }
+                    else if(coll === 'vendasDiarias') { updateDashboard(); }
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
                 finally { confirmModal.style.display = 'none'; btnYes.textContent = "Sim"; btnYes.disabled = false; itemParaExcluir = null; }
@@ -439,40 +544,91 @@
         // RENDERS
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); populateSelects(); updateDashboard(); }
 
-        // DASHBOARD LOGIC (UPDATED)
+        // ======================================================
+        // REVISED DASHBOARD LOGIC (FINANCIAL INDICATORS)
+        // ======================================================
         function updateDashboard() {
-            // 1. Counts
+            // 1. OPERATIONAL
             document.getElementById('dashboard-num-receitas').textContent = cache.receitas.length;
             document.getElementById('dash-stock-count').textContent = cache.insumos.length + cache.produtos.length;
 
-            // 2. Sales Today
-            const today = new Date().toISOString().split('T')[0];
-            const salesToday = cache.vendasDiarias.filter(s => s.data === today);
-            
-            const totalVal = salesToday.reduce((acc, item) => acc + (parseFloat(item.valor)||0), 0);
-            const totalPizzas = salesToday.filter(s => s.tipo === 'Pizza').reduce((acc, item) => acc + (parseFloat(item.qtd)||0), 0);
-
-            document.getElementById('dash-vendas-hoje').textContent = formatMoney(totalVal);
-            document.getElementById('dash-pizzas-hoje').textContent = totalPizzas;
-
-            // 3. Alerts
+            // 2. STOCK ALERTS
             const alertsDiv = document.getElementById('stock-alerts');
             let alertsHtml = '';
-
-            cache.insumos.forEach(i => {
-                if((parseFloat(i.estoque_atual)||0) <= (parseFloat(i.estoque_min)||0)) {
-                    alertsHtml += `<div class="alert-item cmv-danger">⚠️ Insumo <strong>${i.nome}</strong> está baixo (Atual: ${i.estoque_atual})</div>`;
-                }
-            });
-            cache.produtos.forEach(p => {
-                 if((parseFloat(p.estoque_atual)||0) <= (parseFloat(p.estoque_min)||0)) {
-                    alertsHtml += `<div class="alert-item cmv-danger">⚠️ Produto <strong>${p.nome}</strong> está baixo (Atual: ${p.estoque_atual})</div>`;
-                }
-            });
-
+            cache.insumos.forEach(i => { if((parseFloat(i.estoque_atual)||0) <= (parseFloat(i.estoque_min)||0)) alertsHtml += `<div class="alert-item cmv-danger">⚠️ Insumo <strong>${i.nome}</strong> baixo (Atual: ${i.estoque_atual})</div>`; });
+            cache.produtos.forEach(p => { if((parseFloat(p.estoque_atual)||0) <= (parseFloat(p.estoque_min)||0)) alertsHtml += `<div class="alert-item cmv-danger">⚠️ Produto <strong>${p.nome}</strong> baixo (Atual: ${p.estoque_atual})</div>`; });
             if(alertsHtml === '') alertsHtml = '<p class="stock-ok">✅ Tudo certo com o estoque.</p>';
             alertsDiv.innerHTML = alertsHtml;
+
+            // 3. FINANCIAL INDICATORS (ANNUAL AGGREGATE FROM MONTHLY HISTORY)
+            const costs = cache.custosMensais;
+            
+            // Sum of all months
+            const totalFat = costs.reduce((acc, c) => acc + (c.faturamento||0), 0);
+            const totalVar = costs.reduce((acc, c) => acc + (c.custosVariaveis||0), 0);
+            const totalFix = costs.reduce((acc, c) => acc + (c.custosFixos||0) + (c.despesasOperacionais||0) + (c.impostos||0), 0); // Includes Ops + Taxes
+            const totalOutras = costs.reduce((acc, c) => acc + (c.outrasReceitasDespesas||0), 0);
+            
+            // Net Profit
+            const totalLucro = totalFat - (totalVar + totalFix) + totalOutras;
+            
+            // Margin
+            const margem = totalFat > 0 ? ((totalLucro / totalFat) * 100) : 0;
+
+            // Ticket Médio (From Daily Sales)
+            // Sum of all daily sales value / count of transactions (or pizzas)
+            // Here we use total sales value / total items sold count for a rough average
+            const totalVendasValor = cache.vendasDiarias.reduce((acc, v) => acc + (parseFloat(v.valor)||0), 0);
+            const totalItensQtd = cache.vendasDiarias.reduce((acc, v) => acc + (parseFloat(v.qtd)||0), 0);
+            const ticketMedio = totalItensQtd > 0 ? (totalVendasValor / totalItensQtd) : 0;
+
+            // Update DOM
+            document.getElementById('dash-fat-total').textContent = formatMoney(totalFat);
+            document.getElementById('dash-lucro-total').textContent = formatMoney(totalLucro);
+            document.getElementById('dash-margem').textContent = margem.toFixed(2) + '%';
+            document.getElementById('dash-cmv-total').textContent = formatMoney(totalVar);
+            document.getElementById('dash-custo-fixo').textContent = formatMoney(totalFix);
+            document.getElementById('dash-ticket-medio').textContent = formatMoney(ticketMedio);
+
+            // Colors for Profit/Margin
+            const lucroEl = document.getElementById('dash-lucro-total');
+            const margemEl = document.getElementById('dash-margem');
+            if(totalLucro >= 0) { lucroEl.style.color = 'var(--success-color)'; margemEl.style.color = 'var(--success-color)'; }
+            else { lucroEl.style.color = 'var(--error-color)'; margemEl.style.color = 'var(--error-color)'; }
+
+            // 4. ACTION PLAN GENERATOR
+            const actionContainer = document.getElementById('action-plan-container');
+            let actions = '';
+
+            if(margem < 15 && totalFat > 0) {
+                actions += `<div class="action-box">
+                    <div class="action-title">📉 Margem Líquida Abaixo da Meta</div>
+                    <p>Sua margem atual é de <strong>${margem.toFixed(2)}%</strong> (Meta sugerida: >15%).</p>
+                    <div class="action-sug"><strong>Ação Sugerida:</strong> Revise o CMV (Custo de Mercadoria). Verifique se os preços de insumos subiram e reajuste o preço de venda das pizzas ou negocie com fornecedores.</div>
+                </div>`;
+            }
+            
+            const cmvPerc = totalFat > 0 ? (totalVar / totalFat) * 100 : 0;
+            if(cmvPerc > 40) {
+                actions += `<div class="action-box">
+                    <div class="action-title">⚠️ Custos Variáveis Elevados (CMV)</div>
+                    <p>Seus custos variáveis representam <strong>${cmvPerc.toFixed(2)}%</strong> do faturamento.</p>
+                    <div class="action-sug"><strong>Ação Sugerida:</strong> Controle o desperdício na cozinha. Verifique o porcionamento das receitas (fichas técnicas) para garantir que não está sendo usado mais ingrediente do que o planejado.</div>
+                </div>`;
+            }
+
+            if(totalLucro > 0 && margem > 20) {
+                actions += `<div class="action-box" style="border-left: 4px solid var(--success-color);">
+                    <div class="action-title">🚀 Excelente Desempenho</div>
+                    <p>Parabéns! Sua operação está saudável com margem de <strong>${margem.toFixed(2)}%</strong>.</p>
+                    <div class="action-sug"><strong>Ação Sugerida:</strong> Considere reinvestir parte do lucro em marketing para aumentar o volume de vendas (Ticket Médio) ou criar um fundo de reserva.</div>
+                </div>`;
+            }
+
+            if(actions === '') actions = '<p style="color:#777; font-style:italic;">Nenhum alerta crítico no momento. Continue registrando seus dados mensalmente.</p>';
+            actionContainer.innerHTML = actions;
         }
+
 
         // --- LOGIC: PULL FROM DAILY & SAVE MONTHLY ---
         document.getElementById('btn-pull-daily')?.addEventListener('click', () => {
@@ -494,7 +650,7 @@
             const duplicado = cache.custosMensais.find(c => c.mes === mes && c.id !== id);
             if (duplicado) { showToast(`O mês ${mes} já possui um fechamento lançado! Edite o existente.`, 'error'); return; }
             const data = { id: id || null, mes: mes, faturamento: parseFloat(document.getElementById('custo-mensal-faturamento').value) || 0, custosVariaveis: parseFloat(document.getElementById('custo-mensal-custosVariaveis').value) || 0, custosFixos: parseFloat(document.getElementById('custo-mensal-custosFixos').value) || 0, despesasOperacionais: parseFloat(document.getElementById('custo-mensal-despesasOperacionais').value) || 0, impostos: parseFloat(document.getElementById('custo-mensal-impostos').value) || 0, outrasReceitasDespesas: parseFloat(document.getElementById('custo-mensal-outrasReceitasDespesas').value) || 0 };
-            if(await saveData('custosMensais', data)) { await fetchData('custosMensais'); renderCustosMensais(); document.getElementById('custo-mensal-form').reset(); document.getElementById('custo-mensal-id').value=''; showToast('Fechamento salvo!'); }
+            if(await saveData('custosMensais', data)) { await fetchData('custosMensais'); renderCustosMensais(); updateDashboard(); document.getElementById('custo-mensal-form').reset(); document.getElementById('custo-mensal-id').value=''; showToast('Fechamento salvo!'); }
         });
 
         function renderCustosMensais() {
