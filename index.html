@@ -7,9 +7,9 @@
 
     <style>
         :root {
-            --primary-color: #00695c; /* Teal da inspiração */
+            --primary-color: #00695c; 
             --primary-dark: #004d40;
-            --header-blue: #005b96; /* Azul do anexo */
+            --header-blue: #005b96;
             --secondary-color: #FFC107;
             --light-gray: #f5f7fa;
             --medium-gray: #e0e0e0;
@@ -30,11 +30,9 @@
         
         #auth-container, #app-container { width: 100%; max-width: 1250px; margin: 2rem auto; padding: 0 1rem; }
         
-        /* Auth Form */
         .auth-form { background: var(--white); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); max-width: 450px; margin: 2rem auto; border-top: 4px solid var(--primary-color); }
         .auth-form h2 { text-align: center; margin-bottom: 1.5rem; color: var(--primary-dark); }
         
-        /* Forms & Inputs */
         .form-group { margin-bottom: 1.25rem; }
         .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: var(--dark-gray); }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.65rem; border: 1px solid #cfd8dc; border-radius: 4px; font-size: 1rem; transition: border 0.2s; }
@@ -43,7 +41,6 @@
         .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
         .form-row .form-group { flex: 1; min-width: 150px; }
 
-        /* Buttons */
         .btn { display: inline-block; padding: 0.6rem 1.2rem; font-size: 0.95rem; font-weight: 600; text-align: center; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s; width: 100%; }
         .btn:active:not(:disabled) { transform: translateY(1px); }
         .btn-primary { background-color: var(--primary-color); color: var(--white); } .btn-primary:hover { background-color: var(--primary-dark); }
@@ -54,13 +51,11 @@
         .btn-warning { background-color: #ff9800; color: var(--white); }
         .btn-small { padding: 0.3rem 0.7rem; font-size: 0.85rem; width: auto; }
         
-        /* Export Buttons */
         .btn-export { background-color: #fff; border: 1px solid #ccc; color: #333; font-weight: 500; display: inline-flex; align-items: center; gap: 5px; padding: 0.4rem 0.8rem; }
         .btn-export:hover { background-color: #f5f5f5; border-color: #bbb; }
 
         .auth-link { text-align: center; margin-top: 1rem; } .auth-link a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
         
-        /* Nav */
         nav { display: flex; gap: 0.2rem; align-items: center; flex-wrap: wrap; margin-top: 10px; }
         nav a, nav button { color: rgba(255,255,255,0.9); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.5rem 0.8rem; border-radius: 4px; transition: background-color 0.2s; font-weight: 500; }
         nav a:hover, nav button:hover, nav a.active { background-color: rgba(255,255,255,0.15); color: #fff; }
@@ -72,7 +67,6 @@
         
         .card { background: var(--white); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; border: 1px solid #eceff1; }
         
-        /* --- KPI CARDS --- */
         .dashboard-section-title { font-size: 1.1rem; color: var(--primary-color); font-weight: 700; margin: 1.5rem 0 1rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #e0f2f1; }
 
         .kpi-card-modern {
@@ -91,11 +85,9 @@
         .action-title { font-weight: 700; color: var(--dark-gray); margin-bottom: 0.5rem; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
         .action-sug { font-size: 0.9rem; color: #546e7a; padding-left: 1rem; border-left: 3px solid #eceff1; margin-top: 0.5rem; }
 
-        /* Grids */
         .grid-container { display: grid; gap: 1.5rem; }
         @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: repeat(3, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
 
-        /* Tables */
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.95rem; }
         th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #eceff1; }
         th { background-color: #fafafa; font-weight: 600; color: var(--dark-gray); }
@@ -103,7 +95,6 @@
         .actions-cell { text-align: right; white-space: nowrap; }
         .actions-cell .btn { margin-left: 0.3rem; }
 
-        /* Special Table for Indicadores Mensais (Inspired by Image) */
         #ind-mensais-table thead tr th {
             background-color: var(--header-blue);
             color: #fff;
@@ -111,15 +102,12 @@
             text-transform: uppercase;
             font-size: 0.85rem;
         }
-        #ind-mensais-table tbody tr td {
-            border: 1px solid #e0e0e0;
-        }
+        #ind-mensais-table tbody tr td { border: 1px solid #e0e0e0; }
         #ind-mensais-table tbody tr:nth-child(odd) { background-color: #fff; }
         #ind-mensais-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
         .ind-val-blue { color: #0d47a1; font-weight: 700; }
         .ind-val-white { background-color: var(--primary-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;}
 
-        /* Utils */
         .total-cost { text-align: right; font-size: 1.3rem; font-weight: 700; margin-top: 1rem; color: var(--primary-dark); }
         .stock-warning { color: var(--error-color); font-weight: bold; }
         .stock-ok { color: var(--success-color); }
@@ -131,7 +119,6 @@
         .toast.show { opacity: 1; visibility: visible; }
         .toast.success { background-color: var(--success-color); } .toast.error { background-color: var(--error-color); }
 
-        /* Modal */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
         .modal-content { background-color: #fefefe; margin: 15% auto; padding: 25px; border: none; width: 90%; max-width: 400px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
         .modal-buttons { margin-top: 20px; display: flex; justify-content: center; gap: 10px; } 
@@ -171,110 +158,43 @@
         <!-- ÁREA DO APLICATIVO -->
         <div id="app-container" class="hidden">
             
-            <!-- 1. INDICADORES ANUAIS (ANTIGO DASHBOARD) -->
+            <!-- 1. INDICADORES ANUAIS -->
             <section id="dashboard-view" class="view">
                 <h2 style="border:none; text-transform:uppercase; letter-spacing:1px; font-size:1.2rem;">Indicadores Financeiros Anuais (Dashboard)</h2>
-                
-                <!-- SEÇÃO: DESEMPENHO DE VENDAS -->
                 <div class="dashboard-section-title">Desempenho de Vendas</div>
                 <div class="grid-container grid-2">
-                    <div class="kpi-card-modern kpi-blue">
-                        <h3>Faturamento Bruto Total</h3>
-                        <div class="value" id="dash-fat-total">R$ 0,00</div>
-                        <div class="desc">Soma de todo o faturamento lançado no histórico mensal.</div>
-                    </div>
-                    <div class="kpi-card-modern kpi-blue">
-                        <h3>Ticket Médio Estimado</h3>
-                        <div class="value" id="dash-ticket-medio">R$ 0,00</div>
-                        <div class="desc">Valor médio gasto por venda (baseado em vendas diárias).</div>
-                    </div>
+                    <div class="kpi-card-modern kpi-blue"><h3>Faturamento Bruto Total</h3><div class="value" id="dash-fat-total">R$ 0,00</div><div class="desc">Soma de todo o faturamento lançado no histórico mensal.</div></div>
+                    <div class="kpi-card-modern kpi-blue"><h3>Ticket Médio Estimado</h3><div class="value" id="dash-ticket-medio">R$ 0,00</div><div class="desc">Valor médio gasto por venda (baseado em vendas diárias).</div></div>
                 </div>
-
-                <!-- SEÇÃO: RENTABILIDADE E LUCRO -->
                 <div class="dashboard-section-title">Rentabilidade e Lucro</div>
                 <div class="grid-container grid-4">
-                    <div class="kpi-card-modern kpi-green">
-                        <h3>Lucro Líquido Total</h3>
-                        <div class="value" id="dash-lucro-total">R$ 0,00</div>
-                        <div class="desc">Resultado final acumulado do ano.</div>
-                    </div>
-                    <div class="kpi-card-modern kpi-green">
-                        <h3>Margem Líquida (%)</h3>
-                        <div class="value" id="dash-margem">0,00%</div>
-                        <div class="desc">Eficiência real do negócio.</div>
-                    </div>
-                    <div class="kpi-card-modern">
-                        <h3>CMV Total (Custo Variável)</h3>
-                        <div class="value" id="dash-cmv-total">R$ 0,00</div>
-                        <div class="desc">Total gasto com insumos e produção.</div>
-                    </div>
-                    <div class="kpi-card-modern">
-                        <h3>Custo Fixo Total</h3>
-                        <div class="value" id="dash-custo-fixo">R$ 0,00</div>
-                        <div class="desc">Despesas fixas acumuladas.</div>
-                    </div>
+                    <div class="kpi-card-modern kpi-green"><h3>Lucro Líquido Total</h3><div class="value" id="dash-lucro-total">R$ 0,00</div><div class="desc">Resultado final acumulado do ano.</div></div>
+                    <div class="kpi-card-modern kpi-green"><h3>Margem Líquida (%)</h3><div class="value" id="dash-margem">0,00%</div><div class="desc">Eficiência real do negócio.</div></div>
+                    <div class="kpi-card-modern"><h3>CMV Total (Custo Variável)</h3><div class="value" id="dash-cmv-total">R$ 0,00</div><div class="desc">Total gasto com insumos e produção.</div></div>
+                    <div class="kpi-card-modern"><h3>Custo Fixo Total</h3><div class="value" id="dash-custo-fixo">R$ 0,00</div><div class="desc">Despesas fixas acumuladas.</div></div>
                 </div>
-
-                <!-- SEÇÃO: PLANO DE AÇÃO -->
-                <div class="dashboard-section-title">💡 Plano de Ação Personalizado</div>
-                <div id="action-plan-container"></div>
-
-                <!-- OPERACIONAL -->
+                <div class="dashboard-section-title">💡 Plano de Ação Personalizado</div><div id="action-plan-container"></div>
                 <div class="dashboard-section-title">Operacional & Alertas</div>
                 <div class="grid-container grid-2">
-                    <div class="card">
-                        <h3>Resumo de Cadastros</h3>
-                        <ul style="list-style: none; padding:0; margin-top:10px;">
-                            <li>🍕 Sabores de Pizza: <strong id="dashboard-num-receitas">0</strong></li>
-                            <li>📦 Itens em Estoque: <strong id="dash-stock-count">0</strong></li>
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <h3>⚠️ Alertas de Estoque</h3>
-                        <div id="stock-alerts" style="margin-top:10px;"></div>
-                    </div>
+                    <div class="card"><h3>Resumo de Cadastros</h3><ul style="list-style: none; padding:0; margin-top:10px;"><li>🍕 Sabores de Pizza: <strong id="dashboard-num-receitas">0</strong></li><li>📦 Itens em Estoque: <strong id="dash-stock-count">0</strong></li></ul></div>
+                    <div class="card"><h3>⚠️ Alertas de Estoque</h3><div id="stock-alerts" style="margin-top:10px;"></div></div>
                 </div>
             </section>
 
-            <!-- 2. NOVO: INDICADORES MENSAIS (INSPIRADO NO ANEXO) -->
+            <!-- 2. INDICADORES MENSAIS -->
             <section id="indicadores-mensais-view" class="view">
-                <div class="flex-header">
-                    <div class="title-blue-bg">Indicadores Financeiros Mensais</div>
-                    <div>
-                        <button id="btn-export-pdf" class="btn btn-export">📄 Baixar PDF</button>
-                        <button id="btn-export-excel" class="btn btn-export">📊 Baixar Excel</button>
-                    </div>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table id="ind-mensais-table">
-                        <thead>
-                            <tr>
-                                <th>Mês</th>
-                                <th>Lucro Líquido</th>
-                                <th>Margem Líquida (%)</th>
-                                <th>Markup Realizado (%)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Preenchido via JS -->
-                        </tbody>
-                    </table>
-                </div>
+                <div class="flex-header"><div class="title-blue-bg">Indicadores Financeiros Mensais</div><div><button id="btn-export-pdf" class="btn btn-export">📄 Baixar PDF</button><button id="btn-export-excel" class="btn btn-export">📊 Baixar Excel</button></div></div>
+                <div style="overflow-x: auto;"><table id="ind-mensais-table"><thead><tr><th>Mês</th><th>Lucro Líquido</th><th>Margem Líquida (%)</th><th>Markup Realizado (%)</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- 3. VENDAS DIÁRIAS -->
             <section id="vendas-diarias-view" class="view">
-                <div class="card">
-                    <h2>Registrar Vendas do Dia</h2>
-                    <div class="form-group"><label>Data do Movimento</label><input type="date" id="venda-data" required></div>
+                <div class="card"><h2>Registrar Vendas do Dia</h2><div class="form-group"><label>Data do Movimento</label><input type="date" id="venda-data" required></div>
                     <div class="grid-container grid-2">
                         <div style="background: #fff3e0; padding: 15px; border-radius: 8px;"><h3>🍕 Venda de Pizzas</h3><div class="form-group"><label>Sabor (Receita)</label><select id="venda-pizza-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-pizza-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-pizza-valor" step="0.01"></div></div><button class="btn btn-primary" id="btn-add-pizza-sale">Adicionar Pizza</button></div>
                         <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;"><h3>🥤 Venda de Produtos (Revenda)</h3><div class="form-group"><label>Produto</label><select id="venda-produto-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-produto-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-produto-valor" step="0.01"></div></div><button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button></div>
                     </div>
-                    <h3 style="margin-top: 20px;">Itens lançados no dia <span id="display-data-selecionada"></span>:</h3>
-                    <table id="sales-table"><thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead><tbody></tbody></table>
-                    <div class="total-cost" id="daily-total-display">Total do Dia: R$ 0,00</div>
-                    <button class="btn btn-success" id="btn-save-day" style="margin-top: 15px;">💾 Salvar Movimento do Dia</button>
+                    <h3 style="margin-top: 20px;">Itens lançados no dia <span id="display-data-selecionada"></span>:</h3><table id="sales-table"><thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead><tbody></tbody></table><div class="total-cost" id="daily-total-display">Total do Dia: R$ 0,00</div><button class="btn btn-success" id="btn-save-day" style="margin-top: 15px;">💾 Salvar Movimento do Dia</button>
                 </div>
             </section>
 
@@ -282,64 +202,36 @@
             <section id="custos-mensais-view" class="view">
                 <div class="card">
                     <h2>Fechamento Mensal (Dados Brutos)</h2>
-                    <form id="custo-mensal-form"><input type="hidden" id="custo-mensal-id"><div class="form-row"><div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div><div class="form-group" style="display:flex; align-items:end;"><button type="button" id="btn-pull-daily" class="btn btn-info">🔄 Puxar do Diário</button></div></div>
-                    <div class="checkbox-wrapper"><input type="checkbox" id="enable-manual-edit"><label for="enable-manual-edit"><strong>Habilitar Edição Manual</strong></label></div>
-                    <div class="form-row"><div class="form-group"><label>Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required disabled></div><div class="form-group"><label>Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01" disabled></div><div class="form-group"><label>Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01" disabled></div><div class="form-group"><label>Outras Rec/Desp (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" disabled></div></div><button type="submit" class="btn btn-primary">Salvar Mês</button></form>
+                    <!-- Adicionado ID ao form -->
+                    <form id="custo-mensal-form">
+                        <input type="hidden" id="custo-mensal-id">
+                        <div class="form-row">
+                            <div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div>
+                            <div class="form-group" style="display:flex; align-items:end;"><button type="button" id="btn-pull-daily" class="btn btn-info">🔄 Puxar do Diário</button></div>
+                        </div>
+                        <div class="checkbox-wrapper"><input type="checkbox" id="enable-manual-edit"><label for="enable-manual-edit"><strong>Habilitar Edição Manual</strong></label></div>
+                        <div class="form-row"><div class="form-group"><label>Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required disabled></div><div class="form-group"><label>Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01" disabled></div><div class="form-group"><label>Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01" disabled></div><div class="form-group"><label>Outras Rec/Desp (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" disabled></div></div><button type="submit" class="btn btn-primary">Salvar Mês</button>
+                    </form>
                 </div>
                 <div class="card"><h2>Histórico Mensal</h2><table id="custos-mensais-table"><thead><tr><th>Mês</th><th>Faturamento</th><th>Lucro Líquido</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- 5. LISTA DE COMPRAS -->
-            <section id="lista-compras-view" class="view">
-                <div class="card"><h2>🛒 Sugestão de Compras</h2><div class="filter-container"><button id="btn-generate-shopping" class="btn btn-primary">Gerar Lista Atualizada</button><button id="btn-print-shopping" class="btn btn-secondary">Imprimir PDF</button></div><table id="shopping-list-table"><thead><tr><th>Item</th><th>Tipo</th><th>Estoque Atual</th><th>Mínimo</th><th>Ideal</th><th>Comprar</th></tr></thead><tbody></tbody></table></div>
-            </section>
-
+            <section id="lista-compras-view" class="view"><div class="card"><h2>🛒 Sugestão de Compras</h2><div class="filter-container"><button id="btn-generate-shopping" class="btn btn-primary">Gerar Lista Atualizada</button><button id="btn-print-shopping" class="btn btn-secondary">Imprimir PDF</button></div><table id="shopping-list-table"><thead><tr><th>Item</th><th>Tipo</th><th>Estoque Atual</th><th>Mínimo</th><th>Ideal</th><th>Comprar</th></tr></thead><tbody></tbody></table></div></section>
             <!-- 6. PRODUTOS -->
-            <section id="produtos-view" class="view">
-                <div class="card"><h2>Cadastrar Produto (Revenda)</h2>
-                    <form id="produto-form"><input type="hidden" id="produto-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="prod-nome" required></div><div class="form-group"><label>Categoria</label><select id="prod-categoria"><option value="Bebida">Bebida</option><option value="Sobremesa">Sobremesa</option><option value="Outro">Outro</option></select></div></div><div class="form-row"><div class="form-group"><label>Fornecedor</label><select id="prod-fornecedor-select"><option value="">Selecione</option></select></div></div><div class="form-row"><div class="form-group"><label>Preço Compra (R$)</label><input type="number" id="prod-custo" step="0.01" required></div><div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="prod-venda" step="0.01" required></div><div class="form-group"><label>Unidade</label><select id="prod-unidade"><option value="un">Unidade</option><option value="lt">Lata</option><option value="gf">Garrafa</option></select></div></div><h3>Controle de Estoque</h3><div class="form-row"><div class="form-group"><label>Atual</label><input type="number" id="prod-est-atual" value="0"></div><div class="form-group"><label>Mínimo</label><input type="number" id="prod-est-min" value="10"></div><div class="form-group"><label>Ideal</label><input type="number" id="prod-est-ideal" value="50"></div></div><button type="submit" class="btn btn-primary">Salvar Produto</button><button type="button" id="cancel-edit-produto" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form>
-                </div>
-                <div class="card"><h2>Lista de Produtos</h2><table id="produtos-table"><thead><tr><th>Nome</th><th>Fornecedor</th><th>Venda</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
-            </section>
-
+            <section id="produtos-view" class="view"><div class="card"><h2>Cadastrar Produto (Revenda)</h2><form id="produto-form"><input type="hidden" id="produto-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="prod-nome" required></div><div class="form-group"><label>Categoria</label><select id="prod-categoria"><option value="Bebida">Bebida</option><option value="Sobremesa">Sobremesa</option><option value="Outro">Outro</option></select></div></div><div class="form-row"><div class="form-group"><label>Fornecedor</label><select id="prod-fornecedor-select"><option value="">Selecione</option></select></div></div><div class="form-row"><div class="form-group"><label>Preço Compra (R$)</label><input type="number" id="prod-custo" step="0.01" required></div><div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="prod-venda" step="0.01" required></div><div class="form-group"><label>Unidade</label><select id="prod-unidade"><option value="un">Unidade</option><option value="lt">Lata</option><option value="gf">Garrafa</option></select></div></div><h3>Controle de Estoque</h3><div class="form-row"><div class="form-group"><label>Atual</label><input type="number" id="prod-est-atual" value="0"></div><div class="form-group"><label>Mínimo</label><input type="number" id="prod-est-min" value="10"></div><div class="form-group"><label>Ideal</label><input type="number" id="prod-est-ideal" value="50"></div></div><button type="submit" class="btn btn-primary">Salvar Produto</button><button type="button" id="cancel-edit-produto" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form></div><div class="card"><h2>Lista de Produtos</h2><table id="produtos-table"><thead><tr><th>Nome</th><th>Fornecedor</th><th>Venda</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div></section>
             <!-- 7. INSUMOS -->
-            <section id="insumos-view" class="view">
-                <div class="card"><h2>Cadastrar Insumo</h2>
-                    <form id="insumo-form"><input type="hidden" id="insumo-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="insumo-nome" required></div><div class="form-group"><label>Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div></div><div class="form-row"><div class="form-group"><label>Custo Emb. (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div><div class="form-group"><label>Qtd. Emb.</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div><div class="form-group"><label>Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div></div><h3 style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">Controle de Estoque</h3><div class="form-row"><div class="form-group"><label>Atual</label><input type="number" id="insumo-est-atual" value="0"></div><div class="form-group"><label>Mínimo</label><input type="number" id="insumo-est-min" value="0"></div><div class="form-group"><label>Ideal</label><input type="number" id="insumo-est-ideal" value="0"></div></div><div class="form-row"><div class="form-group"><label>Validade</label><input type="date" id="insumo-validade"></div></div><button type="submit" class="btn btn-primary">Salvar Insumo</button><button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form>
-                </div>
-                <div class="card"><h2>Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="Filtrar..."></div><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo Base</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
-            </section>
-
+            <section id="insumos-view" class="view"><div class="card"><h2>Cadastrar Insumo</h2><form id="insumo-form"><input type="hidden" id="insumo-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="insumo-nome" required></div><div class="form-group"><label>Fornecedor</label><select id="insumo-fornecedor-select" required><option value="">-- Selecione --</option></select></div></div><div class="form-row"><div class="form-group"><label>Custo Emb. (R$)</label><input type="number" id="insumo-custo-embalagem" step="0.01" required></div><div class="form-group"><label>Qtd. Emb.</label><input type="number" id="insumo-qtd-embalagem" step="0.01" required></div><div class="form-group"><label>Unidade</label><select id="insumo-unidade-embalagem" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="un">un</option></select></div></div><h3 style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">Controle de Estoque</h3><div class="form-row"><div class="form-group"><label>Atual</label><input type="number" id="insumo-est-atual" value="0"></div><div class="form-group"><label>Mínimo</label><input type="number" id="insumo-est-min" value="0"></div><div class="form-group"><label>Ideal</label><input type="number" id="insumo-est-ideal" value="0"></div></div><div class="form-row"><div class="form-group"><label>Validade</label><input type="date" id="insumo-validade"></div></div><button type="submit" class="btn btn-primary">Salvar Insumo</button><button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form></div><div class="card"><h2>Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="Filtrar..."></div><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo Base</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div></section>
             <!-- 8. RECEITAS -->
-            <section id="receitas-view" class="view">
-                <div class="card"><h2>Criar Receita</h2>
-                    <form id="receita-form"><input type="hidden" id="receita-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div><div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="receita-venda" step="0.01"></div></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div class="total-cost" id="custo-total-ingredientes">Custo: R$ 0,00</div><button type="submit" class="btn btn-primary" style="margin-top:10px;">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar Edição</button></form>
-                </div>
-                <div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Venda</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
-            </section>
-
+            <section id="receitas-view" class="view"><div class="card"><h2>Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div><div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="receita-venda" step="0.01"></div></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div class="total-cost" id="custo-total-ingredientes">Custo: R$ 0,00</div><button type="submit" class="btn btn-primary" style="margin-top:10px;">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar Edição</button></form></div><div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Venda</th><th>Ações</th></tr></thead><tbody></tbody></table></div></section>
             <!-- 9. FORNECEDORES -->
-            <section id="fornecedores-view" class="view">
-                <div class="card">
-                    <h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2>
-                    <form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div><div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div></div><div class="form-row"><div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div><div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div></div><div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form>
-                </div>
-                <div class="card"><h2>Lista de Fornecedores</h2><div class="table-container"><table id="fornecedores-table"><thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Endereço</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div></div>
-                <div class="card" style="margin-top:20px;border:1px solid red;"><h3 style="color:red;">Zona de Perigo</h3><p>Apagar TODOS os fornecedores?</p><button id="btn-zerar-fornecedores" class="btn btn-danger">ZERAR TODOS OS FORNECEDORES</button></div>
-            </section>
-
+            <section id="fornecedores-view" class="view"><div class="card"><h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div><div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div></div><div class="form-row"><div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div><div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div></div><div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form></div><div class="card"><h2>Lista de Fornecedores</h2><div class="table-container"><table id="fornecedores-table"><thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Endereço</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div></div><div class="card" style="margin-top:20px;border:1px solid red;"><h3 style="color:red;">Zona de Perigo</h3><p>Apagar TODOS os fornecedores?</p><button id="btn-zerar-fornecedores" class="btn btn-danger">ZERAR TODOS OS FORNECEDORES</button></div></section>
             <!-- 10. CONFIGURAÇÕES -->
-            <section id="configuracoes-view" class="view">
-                <div class="card">
-                    <h2>Configurações Gerais</h2>
-                    <form id="configuracoes-form"><div class="form-group"><label>Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label>Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label>Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label>Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form>
-                </div>
-                <div class="card backup-area"><h3>💾 Backup e Restauração</h3><p>Salve seus dados no computador ou restaure um backup.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button><button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button><input type="file" id="backup-file-input" accept=".json" class="hidden"></div></div>
-            </section>
+            <section id="configuracoes-view" class="view"><div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label>Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label>Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label>Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label>Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div><div class="card backup-area"><h3>💾 Backup e Restauração</h3><p>Salve seus dados no computador ou restaure um backup.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button><button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button><input type="file" id="backup-file-input" accept=".json" class="hidden"></div></div></section>
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v6.1 (Menu Reordered)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v6.2 (Auto Fill Month)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -380,71 +272,65 @@
         const chkManual = document.getElementById('enable-manual-edit');
         if(chkManual) { chkManual.addEventListener('change', (e) => { const fields = ['custo-mensal-faturamento', 'custo-mensal-custosVariaveis','custo-mensal-custosFixos', 'custo-mensal-despesasOperacionais', 'custo-mensal-impostos', 'custo-mensal-outrasReceitasDespesas']; fields.forEach(id => { const el = document.getElementById(id); if(el) el.disabled = !e.target.checked; }); }); }
 
-        // --- NEW LOGIC: INDICADORES MENSAIS (TABLE) ---
+        // --- NEW LOGIC: AUTO FILL MONTHLY FORM ---
+        document.getElementById('custo-mensal-mes')?.addEventListener('change', (e) => {
+            const selectedMes = e.target.value;
+            if (!selectedMes) return;
+
+            // Check if record exists
+            const record = cache.custosMensais.find(c => c.mes === selectedMes);
+            const chk = document.getElementById('enable-manual-edit');
+
+            if (record) {
+                // Populate
+                document.getElementById('custo-mensal-id').value = record.id;
+                document.getElementById('custo-mensal-faturamento').value = record.faturamento;
+                document.getElementById('custo-mensal-custosVariaveis').value = record.custosVariaveis;
+                document.getElementById('custo-mensal-custosFixos').value = record.custosFixos;
+                document.getElementById('custo-mensal-despesasOperacionais').value = record.despesasOperacionais;
+                document.getElementById('custo-mensal-impostos').value = record.impostos;
+                document.getElementById('custo-mensal-outrasReceitasDespesas').value = record.outrasReceitasDespesas;
+                showToast(`Dados de ${selectedMes} carregados.`);
+            } else {
+                // Reset
+                document.getElementById('custo-mensal-id').value = '';
+                document.getElementById('custo-mensal-faturamento').value = '';
+                document.getElementById('custo-mensal-custosVariaveis').value = '';
+                document.getElementById('custo-mensal-custosFixos').value = '';
+                document.getElementById('custo-mensal-despesasOperacionais').value = '';
+                document.getElementById('custo-mensal-impostos').value = '';
+                document.getElementById('custo-mensal-outrasReceitasDespesas').value = '';
+                // Check if there are daily sales for this new month to help user
+                const hasSales = cache.vendasDiarias.some(v => v.data && v.data.startsWith(selectedMes));
+                if(hasSales) showToast("Novo mês. Clique em 'Puxar do Diário' para importar o faturamento.");
+            }
+
+            // Reset/Set Checkbox
+            if(chk) {
+                chk.checked = false; // Reset to disabled by default for safety
+                chk.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // --- INDICADORES MENSAIS TABLE ---
         function renderIndicadoresMensais() {
             const tbody = document.getElementById('ind-mensais-table').querySelector('tbody');
             tbody.innerHTML = '';
             if (!cache.custosMensais.length) { tbody.innerHTML = '<tr><td colspan="4">Nenhum registro mensal.</td></tr>'; return; }
-            
-            // Sort Chronologically (Jan to Dec)
             const sorted = [...cache.custosMensais].sort((a,b) => a.mes.localeCompare(b.mes));
-            
             sorted.forEach(c => {
                 const [ano, mes] = c.mes.split('-');
                 const mesFormatado = `${mes}/${ano}`;
-                
                 const custoTotal = (c.custosVariaveis||0) + (c.custosFixos||0) + (c.despesasOperacionais||0) + (c.impostos||0);
                 const lucro = (c.faturamento||0) - custoTotal + (c.outrasReceitasDespesas||0);
                 const margem = c.faturamento > 0 ? (lucro / c.faturamento) * 100 : 0;
-                
-                // Markup Realizado: How much above total cost was the revenue?
-                // Formula: ((Revenue - Total Cost) / Total Cost) * 100 OR (Revenue/Cost - 1)*100
-                // If total cost is 0, avoid division by zero.
                 const markup = custoTotal > 0 ? (((c.faturamento - custoTotal) / custoTotal) * 100) : 0;
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="ind-val-white">${mesFormatado}</td>
-                        <td class="ind-val-blue">${formatMoney(lucro)}</td>
-                        <td class="ind-val-blue">${margem.toFixed(2)}%</td>
-                        <td class="ind-val-blue">${markup.toFixed(2)}%</td>
-                    </tr>
-                `;
+                tbody.innerHTML += `<tr><td class="ind-val-white">${mesFormatado}</td><td class="ind-val-blue">${formatMoney(lucro)}</td><td class="ind-val-blue">${margem.toFixed(2)}%</td><td class="ind-val-blue">${markup.toFixed(2)}%</td></tr>`;
             });
         }
 
-        // EXPORT BUTTONS FOR INDICADORES MENSAIS
-        document.getElementById('btn-export-pdf')?.addEventListener('click', () => {
-             const { jsPDF } = window.jspdf;
-             const doc = new jsPDF();
-             doc.text("Indicadores Mensais - Pizzaria Cost Control", 14, 15);
-             doc.autoTable({ html: '#ind-mensais-table', startY: 20, theme: 'striped', headStyles: { fillColor: [0, 91, 150] } });
-             doc.save('indicadores_mensais.pdf');
-        });
-
-        document.getElementById('btn-export-excel')?.addEventListener('click', () => {
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Mes;Lucro Liquido;Margem Liquida;Markup Realizado\r\n";
-            
-            const sorted = [...cache.custosMensais].sort((a,b) => a.mes.localeCompare(b.mes));
-            sorted.forEach(c => {
-                const custoTotal = (c.custosVariaveis||0) + (c.custosFixos||0) + (c.despesasOperacionais||0) + (c.impostos||0);
-                const lucro = (c.faturamento||0) - custoTotal + (c.outrasReceitasDespesas||0);
-                const margem = c.faturamento > 0 ? (lucro / c.faturamento) * 100 : 0;
-                const markup = custoTotal > 0 ? (((c.faturamento - custoTotal) / custoTotal) * 100) : 0;
-                
-                const row = `${c.mes};${lucro.toFixed(2)};${margem.toFixed(2)}%;${markup.toFixed(2)}%`;
-                csvContent += row + "\r\n";
-            });
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "indicadores_mensais.csv");
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        });
+        document.getElementById('btn-export-pdf')?.addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.text("Indicadores Mensais - Pizzaria Cost Control", 14, 15); doc.autoTable({ html: '#ind-mensais-table', startY: 20, theme: 'striped', headStyles: { fillColor: [0, 91, 150] } }); doc.save('indicadores_mensais.pdf'); });
+        document.getElementById('btn-export-excel')?.addEventListener('click', () => { let csvContent = "data:text/csv;charset=utf-8,Mes;Lucro Liquido;Margem Liquida;Markup Realizado\r\n"; const sorted = [...cache.custosMensais].sort((a,b) => a.mes.localeCompare(b.mes)); sorted.forEach(c => { const custoTotal = (c.custosVariaveis||0) + (c.custosFixos||0) + (c.despesasOperacionais||0) + (c.impostos||0); const lucro = (c.faturamento||0) - custoTotal + (c.outrasReceitasDespesas||0); const margem = c.faturamento > 0 ? (lucro / c.faturamento) * 100 : 0; const markup = custoTotal > 0 ? (((c.faturamento - custoTotal) / custoTotal) * 100) : 0; const row = `${c.mes};${lucro.toFixed(2)};${margem.toFixed(2)}%;${markup.toFixed(2)}%`; csvContent += row + "\r\n"; }); const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", "indicadores_mensais.csv"); document.body.appendChild(link); link.click(); link.remove(); });
 
         // --- CORE FUNCTIONS ---
         const confirmModal = document.getElementById('confirm-modal');
@@ -462,7 +348,7 @@
                     else if(coll === 'produtos') { renderProdutos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'insumos') { renderInsumos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'receitas') { renderReceitas(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); } // Update all indicators
+                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); }
                     else if(coll === 'vendasDiarias') { updateDashboard(); }
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
