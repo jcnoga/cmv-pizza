@@ -134,8 +134,47 @@
                     <h2>Registrar Vendas do Dia</h2>
                     <div class="form-group"><label>Data do Movimento</label><input type="date" id="venda-data" required></div>
                     <div class="grid-container grid-2">
-                        <div style="background: #fff3e0; padding: 15px; border-radius: 8px;"><h3>🍕 Venda de Pizzas</h3><div class="form-group"><label>Sabor (Receita)</label><select id="venda-pizza-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Tamanho</label><select id="venda-pizza-tamanho"><option value="G">Grande</option><option value="M">Média</option><option value="P">Pequena</option></select></div><div class="form-group"><label>Qtd</label><input type="number" id="venda-pizza-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-pizza-valor" step="0.01"></div></div><button class="btn btn-primary" id="btn-add-pizza-sale">Adicionar Pizza</button></div>
-                        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;"><h3>🥤 Venda de Produtos (Revenda)</h3><div class="form-group"><label>Produto</label><select id="venda-produto-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-produto-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-produto-valor" step="0.01"></div></div><button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button></div>
+                        
+                        <!-- ÁREA DA PIZZA (MODIFICADA: REMOVIDO TAMANHO) -->
+                        <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
+                            <h3>🍕 Venda de Pizzas</h3>
+                            <div class="form-group">
+                                <label>Sabor (Receita)</label>
+                                <select id="venda-pizza-select"><option value="">Selecione...</option></select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Qtd</label>
+                                    <input type="number" id="venda-pizza-qtd" value="1" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor Total (R$)</label>
+                                    <input type="number" id="venda-pizza-valor" step="0.01">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" id="btn-add-pizza-sale">Adicionar Pizza</button>
+                        </div>
+
+                        <!-- ÁREA DO PRODUTO -->
+                        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                            <h3>🥤 Venda de Produtos (Revenda)</h3>
+                            <div class="form-group">
+                                <label>Produto</label>
+                                <select id="venda-produto-select"><option value="">Selecione...</option></select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Qtd</label>
+                                    <input type="number" id="venda-produto-qtd" value="1" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor Total (R$)</label>
+                                    <input type="number" id="venda-produto-valor" step="0.01">
+                                </div>
+                            </div>
+                            <button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button>
+                        </div>
+
                     </div>
                     <h3 style="margin-top: 20px;">Itens lançados hoje:</h3>
                     <table id="sales-table"><thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead><tbody></tbody></table>
@@ -223,12 +262,16 @@
                 <div class="card"><h2>Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="Filtrar..."></div><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo Base</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 7. RECEITAS (Com Cálculo Automático) -->
+            <!-- 7. RECEITAS (Com Cálculo Automático e Preço de Venda) -->
             <section id="receitas-view" class="view">
                 <div class="card"><h2>Criar Receita</h2>
                     <form id="receita-form">
                         <input type="hidden" id="receita-id">
-                        <div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div>
+                            <!-- NOVO CAMPO: PREÇO DE VENDA -->
+                            <div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="receita-venda" step="0.01"></div>
+                        </div>
                         <h3>Ingredientes</h3>
                         <div id="ingredients-list"></div>
                         <button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button>
@@ -237,7 +280,7 @@
                         <button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar Edição</button>
                     </form>
                 </div>
-                <div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
+                <div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Venda</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
             <!-- 8. FORNECEDORES -->
@@ -288,7 +331,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v3.6 (Cálculo Correto)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v3.7 (Auto Venda & Fix Selects)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -317,7 +360,6 @@
         let configCache = {};
         let itemParaExcluir = null;
 
-        // LISTA OFICIAL DE COLEÇÕES
         const COLLECTIONS_LIST = ['fornecedores', 'insumos', 'produtos', 'receitas', 'vendasDiarias', 'custosMensais'];
 
         if (firebaseConfig.apiKey) {
@@ -330,7 +372,6 @@
             } catch (e) { console.error(e); isLocalMode = true; initApp(); }
         } else { isLocalMode = true; initApp(); }
 
-        // CHECKBOX DE EDIÇÃO MANUAL
         const chkManual = document.getElementById('enable-manual-edit');
         if(chkManual) {
             chkManual.addEventListener('change', (e) => {
@@ -346,7 +387,7 @@
             });
         }
 
-        // --- MODAL DE EXCLUSÃO ---
+        // MODAL
         const confirmModal = document.getElementById('confirm-modal');
         const btnYes = document.getElementById('confirm-modal-yes');
         const btnNo = document.getElementById('confirm-modal-no');
@@ -359,10 +400,10 @@
                     const coll = itemParaExcluir.collection;
                     if (!isLocalMode) cache[coll] = cache[coll].filter(i => i.id !== itemParaExcluir.id);
                     await fetchData(coll);
-                    // Re-renderiza de acordo com a coleção
+                    // Re-renderiza e popula selects
                     if(coll === 'fornecedores') { renderFornecedoresTable(); populateSelects(); }
-                    else if(coll === 'produtos') renderProdutos();
-                    else if(coll === 'insumos') renderInsumos();
+                    else if(coll === 'produtos') { renderProdutos(); populateSelects(); }
+                    else if(coll === 'insumos') { renderInsumos(); populateSelects(); } // para receitas
                     else if(coll === 'receitas') { renderReceitas(); populateSelects(); }
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) {
@@ -384,7 +425,7 @@
             confirmModal.style.display = 'block';
         }
 
-        // --- AUTH ---
+        // AUTH
         function setupAuthListeners() {
             auth.onAuthStateChanged(user => {
                 if(user) { currentUser = user; document.getElementById('auth-container').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('app-nav').classList.remove('hidden'); initApp(); }
@@ -394,7 +435,7 @@
             document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         }
 
-        // --- DATA ---
+        // DATA
         async function initApp() {
             if(isLocalMode) currentUser = {uid:'local'};
             await Promise.all([
@@ -437,10 +478,50 @@
             return true;
         }
 
-        // --- RENDERS ---
+        // RENDERS
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); populateSelects(); updateDashboard(); }
 
-        // --- 1. FORNECEDORES ---
+        // =========================================================
+        // LÓGICA DE SUGESTÃO DE PREÇO NA VENDA
+        // =========================================================
+        
+        // Pizza
+        const pizzaSelect = document.getElementById('venda-pizza-select');
+        const pizzaQtd = document.getElementById('venda-pizza-qtd');
+        const pizzaVal = document.getElementById('venda-pizza-valor');
+
+        function calcPizzaTotal() {
+            const id = pizzaSelect.value;
+            const qtd = parseFloat(pizzaQtd.value) || 0;
+            if(!id) { pizzaVal.value = ''; return; }
+            
+            const receita = cache.receitas.find(r => r.id === id);
+            if(receita && receita.preco_venda) {
+                pizzaVal.value = (parseFloat(receita.preco_venda) * qtd).toFixed(2);
+            }
+        }
+        pizzaSelect.addEventListener('change', calcPizzaTotal);
+        pizzaQtd.addEventListener('input', calcPizzaTotal);
+
+        // Produto
+        const prodSelect = document.getElementById('venda-produto-select');
+        const prodQtd = document.getElementById('venda-produto-qtd');
+        const prodVal = document.getElementById('venda-produto-valor');
+
+        function calcProdTotal() {
+            const id = prodSelect.value;
+            const qtd = parseFloat(prodQtd.value) || 0;
+            if(!id) { prodVal.value = ''; return; }
+
+            const produto = cache.produtos.find(p => p.id === id);
+            if(produto && produto.preco_venda) {
+                prodVal.value = (parseFloat(produto.preco_venda) * qtd).toFixed(2);
+            }
+        }
+        prodSelect.addEventListener('change', calcProdTotal);
+        prodQtd.addEventListener('input', calcProdTotal);
+
+        // 1. FORNECEDORES
         function renderFornecedoresTable() {
             const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = '';
             if (!cache.fornecedores.length) { tbody.innerHTML = '<tr><td colspan="5">Vazio.</td></tr>'; return; }
@@ -483,7 +564,7 @@
         });
         document.getElementById('cancel-edit-fornecedor').addEventListener('click', () => { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value=''; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); });
 
-        // --- 2. PRODUTOS ---
+        // 2. PRODUTOS
         function renderProdutos() {
             const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
             cache.produtos.forEach(p => { 
@@ -529,7 +610,7 @@
             document.getElementById('produto-form').reset(); 
             document.getElementById('produto-id').value='';
             document.getElementById('cancel-edit-produto').classList.add('hidden');
-            await fetchData('produtos'); renderProdutos(); showToast('Salvo!'); 
+            await fetchData('produtos'); renderProdutos(); populateSelects(); showToast('Salvo!'); 
         });
         document.getElementById('cancel-edit-produto').addEventListener('click', () => {
             document.getElementById('produto-form').reset();
@@ -537,7 +618,7 @@
             document.getElementById('cancel-edit-produto').classList.add('hidden');
         });
 
-        // --- 3. INSUMOS ---
+        // 3. INSUMOS
         function renderInsumos() {
             const tb = document.getElementById('insumos-table').querySelector('tbody'); tb.innerHTML = '';
             cache.insumos.forEach(i => { 
@@ -586,7 +667,7 @@
             document.getElementById('insumo-form').reset(); 
             document.getElementById('insumo-id').value='';
             document.getElementById('cancel-edit-insumo').classList.add('hidden');
-            await fetchData('insumos'); renderInsumos(); showToast('Salvo!'); 
+            await fetchData('insumos'); renderInsumos(); populateSelects(); showToast('Salvo!'); 
         });
         document.getElementById('cancel-edit-insumo').addEventListener('click', () => {
             document.getElementById('insumo-form').reset();
@@ -594,18 +675,14 @@
             document.getElementById('cancel-edit-insumo').classList.add('hidden');
         });
 
-        // --- 4. RECEITAS (Com Cálculo Dinâmico e Edição) ---
-        
-        // Função para atualizar custo total em tempo real
+        // 4. RECEITAS
         function updateReceitaTotal() {
             let total = 0;
             document.querySelectorAll('.ingredient-row').forEach(row => {
                 const id = row.querySelector('.ing-select').value;
                 const qty = parseFloat(row.querySelector('.ing-qtd').value) || 0;
                 const insumo = cache.insumos.find(i => i.id === id);
-                
                 if (insumo && insumo.qtd_embalagem_g > 0) {
-                    // Custo por unidade base (ex: custo por grama)
                     const pricePerUnit = insumo.custo_embalagem / insumo.qtd_embalagem_g;
                     total += pricePerUnit * qty;
                 }
@@ -623,20 +700,15 @@
                 <input type="number" class="ing-qtd" placeholder="Qtd (g/ml/un)" value="${qtyVal}">
                 <button type="button" class="btn btn-danger btn-small remove-ing-btn">X</button>
             `;
-            
             if(ingId) div.querySelector('.ing-select').value = ingId;
-            
-            // Event Listeners para recálculo
             const select = div.querySelector('.ing-select');
             const input = div.querySelector('.ing-qtd');
             const btn = div.querySelector('.remove-ing-btn');
-            
             select.addEventListener('change', updateReceitaTotal);
             input.addEventListener('input', updateReceitaTotal);
             btn.addEventListener('click', () => { div.remove(); updateReceitaTotal(); });
-            
             document.getElementById('ingredients-list').appendChild(div);
-            updateReceitaTotal(); // Calcula ao adicionar
+            updateReceitaTotal();
         }
 
         document.getElementById('add-ingredient-btn').addEventListener('click', () => addReceitaRow());
@@ -644,7 +716,6 @@
         function renderReceitas() { 
             const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = ''; 
             cache.receitas.forEach(r => {
-                // Calcular Custo da Receita para exibição na Tabela
                 let custoReceita = 0;
                 if(r.ingredientes) {
                     r.ingredientes.forEach(ing => {
@@ -655,12 +726,16 @@
                         }
                     });
                 }
-
-                tb.innerHTML += `<tr><td>${r.nome}</td><td>${formatMoney(custoReceita)}</td>
-                <td class="actions-cell">
-                    <button class="btn btn-secondary btn-small btn-edit-receita" data-id="${r.id}">✎</button> 
-                    <button class="btn btn-danger btn-small btn-delete-receita" data-id="${r.id}">🗑</button>
-                </td></tr>`;
+                // Mostra Custo e Preço de Venda
+                tb.innerHTML += `<tr>
+                    <td>${r.nome}</td>
+                    <td>${formatMoney(custoReceita)}</td>
+                    <td>${formatMoney(r.preco_venda)}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn-secondary btn-small btn-edit-receita" data-id="${r.id}">✎</button> 
+                        <button class="btn btn-danger btn-small btn-delete-receita" data-id="${r.id}">🗑</button>
+                    </td>
+                </tr>`;
             }); 
         }
 
@@ -668,21 +743,18 @@
             const r = cache.receitas.find(x => x.id === id);
             if (!r) return;
             showView('receitas');
-            
             document.getElementById('receita-id').value = r.id;
             document.getElementById('receita-nome').value = r.nome;
+            document.getElementById('receita-venda').value = r.preco_venda || ''; // Popula preço venda
             
             const list = document.getElementById('ingredients-list');
             list.innerHTML = '';
-            
             if (r.ingredientes && Array.isArray(r.ingredientes)) {
                 r.ingredientes.forEach(ing => {
                     addReceitaRow(ing.id, ing.qtd);
                 });
             }
-            
-            updateReceitaTotal(); // Calcula total ao abrir edição
-
+            updateReceitaTotal();
             document.getElementById('cancel-edit-receita').classList.remove('hidden');
             document.getElementById('receita-form').scrollIntoView({behavior:'smooth'});
         }
@@ -699,6 +771,7 @@
             await saveData('receitas', {
                 id: document.getElementById('receita-id').value || null,
                 nome: document.getElementById('receita-nome').value,
+                preco_venda: parseFloat(document.getElementById('receita-venda').value) || 0,
                 ingredientes: ings
             });
             
@@ -795,10 +868,15 @@
             setTimeout(()=>t.classList.remove('show'),3000);
         }
         function populateSelects() {
+            // Insumos para Receita e Produtos (Fornecedor)
             const fOpts = '<option value="">Selecione</option>' + [...cache.fornecedores].sort((a,b)=>(a.nome||"").localeCompare(b.nome||"")).map(f=>`<option value="${f.id}">${f.nome}</option>`).join('');
             document.getElementById('insumo-fornecedor-select').innerHTML = fOpts;
             document.getElementById('prod-fornecedor-select').innerHTML = fOpts;
+
+            // Venda Pizza
             document.getElementById('venda-pizza-select').innerHTML = '<option value="">Selecione</option>'+cache.receitas.map(r=>`<option value="${r.id}">${r.nome}</option>`).join('');
+            
+            // Venda Produto
             document.getElementById('venda-produto-select').innerHTML = '<option value="">Selecione</option>'+cache.produtos.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
         }
         function updateDashboard() { document.getElementById('dash-stock-count').textContent=cache.insumos.length+cache.produtos.length; }
@@ -806,7 +884,6 @@
         function showView(id) { document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(id+'-view')?.classList.add('active'); }
         navLinks.forEach(l=>l.addEventListener('click', e=>{e.preventDefault(); showView(e.target.dataset.view);}));
         
-        // ZERAR (Mantido)
         document.getElementById('btn-zerar-fornecedores')?.addEventListener('click', async () => {
              if(!confirm("Apagar TODOS?")) return;
              const s = await db.collection('fornecedores').where('userId','==',currentUser.uid).get();
