@@ -150,7 +150,7 @@
                     <h2>Fechamento Mensal</h2>
                     <form id="custo-mensal-form"><input type="hidden" id="custo-mensal-id"><div class="form-row"><div class="form-group"><label for="custo-mensal-mes">Mês/Ano</label><input type="month" id="custo-mensal-mes" required></div><div class="form-group" style="display:flex; align-items:end;"><button type="button" id="btn-pull-daily" class="btn btn-info">🔄 Puxar do Diário</button></div></div>
                     
-                    <!-- CHECKBOX CORRIGIDO NA LÓGICA -->
+                    <!-- CHECKBOX DE EDIÇÃO MANUAL -->
                     <div class="checkbox-wrapper"><input type="checkbox" id="enable-manual-edit"><label for="enable-manual-edit"><strong>Habilitar Edição Manual</strong></label></div>
                     
                     <div class="form-row"><div class="form-group"><label>Faturamento (R$)</label><input type="number" id="custo-mensal-faturamento" step="0.01" required disabled></div><div class="form-group"><label>Custos Variáveis (R$)</label><input type="number" id="custo-mensal-custosVariaveis" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Custos Fixos (R$)</label><input type="number" id="custo-mensal-custosFixos" step="0.01" disabled></div><div class="form-group"><label>Desp. Operacionais (R$)</label><input type="number" id="custo-mensal-despesasOperacionais" step="0.01" disabled></div></div><div class="form-row"><div class="form-group"><label>Impostos (R$)</label><input type="number" id="custo-mensal-impostos" step="0.01" disabled></div><div class="form-group"><label>Outras Rec/Desp (R$)</label><input type="number" id="custo-mensal-outrasReceitasDespesas" step="0.01" disabled></div></div><button type="submit" class="btn btn-primary">Salvar Mês</button></form>
@@ -220,7 +220,7 @@
                     <h3>💾 Backup e Restauração (Segurança)</h3>
                     <p>Salve seus dados no computador ou restaure um backup. <strong>Cuidado: Restaurar apaga os dados atuais do banco.</strong></p>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup</button>
+                        <button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button>
                         <button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button>
                         <input type="file" id="backup-file-input" accept=".json" class="hidden">
                     </div>
@@ -229,7 +229,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v3.2 (Fixed)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v3.3 (Full Fixed)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -258,6 +258,9 @@
         let configCache = {};
         let itemParaExcluir = null;
 
+        // LISTA OFICIAL DE COLEÇÕES
+        const COLLECTIONS_LIST = ['fornecedores', 'insumos', 'produtos', 'receitas', 'vendasDiarias', 'custosMensais'];
+
         if (firebaseConfig.apiKey) {
             try { 
                 firebaseApp = firebase.initializeApp(firebaseConfig); 
@@ -268,7 +271,7 @@
             } catch (e) { console.error(e); isLocalMode = true; initApp(); }
         } else { isLocalMode = true; initApp(); }
 
-        // --- CORREÇÃO 1: LÓGICA DO CHECKBOX DE EDIÇÃO MANUAL ---
+        // CHECKBOX DE EDIÇÃO MANUAL
         const chkManual = document.getElementById('enable-manual-edit');
         if(chkManual) {
             chkManual.addEventListener('change', (e) => {
@@ -334,29 +337,35 @@
         // --- DATA ---
         async function initApp() {
             if(isLocalMode) currentUser = {uid:'local'};
-            // Corrigida a ordem de carregamento
+            
+            // Carrega todas as coleções necessárias para a UI
             await Promise.all([
                 fetchConfiguracoes(), 
-                fetchData('fornecedores'), 
-                fetchData('insumos'), 
-                fetchData('receitas'), 
-                fetchData('produtos'), 
-                fetchData('custosMensais'),
-                fetchData('vendasDiarias')
+                ...COLLECTIONS_LIST.map(c => fetchData(c))
             ]);
             renderAll();
         }
+
         async function fetchData(coll) {
-            if(isLocalMode) { cache[coll] = localData[coll]; return; }
+            if(isLocalMode) { cache[coll] = localData[coll] || []; return; }
             cache[coll] = [];
             const snap = await db.collection(coll).where('userId','==',currentUser.uid).get();
             cache[coll] = snap.docs.map(d => ({id:d.id, ...d.data()}));
         }
+
+        // Função Auxiliar para Backup (Busca Forçada)
+        async function fetchFullDataForBackup(coll) {
+            if(isLocalMode) return localData[coll] || [];
+            const snap = await db.collection(coll).where('userId','==',currentUser.uid).get();
+            return snap.docs.map(d => ({id:d.id, ...d.data()}));
+        }
+
         async function saveData(coll, data) {
             data.userId = currentUser.uid;
             try {
                 if(isLocalMode) {
-                    if(data.id) { const idx = localData[coll].findIndex(i=>i.id===data.id); localData[coll][idx] = data; }
+                    if(!localData[coll]) localData[coll] = [];
+                    if(data.id) { const idx = localData[coll].findIndex(i=>i.id===data.id); if(idx>-1) localData[coll][idx] = data; else localData[coll].push(data); }
                     else { data.id = Date.now().toString(); localData[coll].push(data); }
                 } else {
                     if(data.id) await db.collection(coll).doc(data.id).set(data, { merge: true });
@@ -442,13 +451,46 @@
             configCache=data; showToast("Salvo!");
         });
 
-        // --- CORREÇÃO 2: BACKUP E RESTAURAÇÃO ---
-        document.getElementById('btn-backup-restore-click').addEventListener('click', () => { 
-            if(confirm("Restaurar apaga dados atuais. OK?")) document.getElementById('backup-file-input').click(); 
+        // --------------------------------------------------------------------------
+        // SISTEMA DE BACKUP E RESTAURAÇÃO CORRIGIDO
+        // --------------------------------------------------------------------------
+
+        // DOWNLOAD (BACKUP)
+        document.getElementById('btn-backup-download').addEventListener('click', async () => {
+             if(!currentUser && !isLocalMode) return;
+             
+             // Forçar busca de dados mais recentes do banco (não usar cache)
+             const backupPayload = { 
+                 timestamp: new Date(), 
+                 configuracoes: configCache || {} 
+             };
+
+             // Buscar cada coleção explicitamente
+             for(const coll of COLLECTIONS_LIST) {
+                 backupPayload[coll] = await fetchFullDataForBackup(coll);
+             }
+
+             const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload));
+             const a = document.createElement('a'); 
+             a.href = url; 
+             a.download = `backup_pizzaria_${new Date().toISOString().split('T')[0]}.json`; 
+             document.body.appendChild(a); 
+             a.click(); 
+             a.remove();
         });
 
+        // TRIGGER DE RESTAURAÇÃO
+        document.getElementById('btn-backup-restore-click').addEventListener('click', () => { 
+            if(confirm("ATENÇÃO: Restaurar o backup apagará os dados atuais e substituirá pelo arquivo. Deseja continuar?")) {
+                document.getElementById('backup-file-input').click(); 
+            }
+        });
+
+        // PROCESSO DE RESTAURAÇÃO
         document.getElementById('backup-file-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0]; if(!file) return;
+            const file = e.target.files[0]; 
+            if(!file) return;
+            
             const reader = new FileReader();
             
             reader.onload = async (ev) => {
@@ -456,52 +498,48 @@
                     const d = JSON.parse(ev.target.result);
                     
                     // Validação básica
-                    if(!d.fornecedores && !d.produtos) throw new Error("Arquivo inválido.");
+                    if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio.");
                     
+                    showToast("Iniciando restauração...", "info");
+
                     if(!isLocalMode) {
-                        const colls = ['fornecedores','insumos','produtos','receitas','vendasDiarias','custosMensais'];
-                        
-                        // 1. Limpar dados antigos
-                        for(const c of colls) { 
-                            const s = await db.collection(c).where('userId','==',currentUser.uid).get(); 
-                            if (!s.empty) {
-                                const b = db.batch(); 
-                                s.docs.forEach(doc=>b.delete(doc.ref)); 
-                                await b.commit(); 
-                            }
-                        }
-                        
-                        // 2. Config
+                        // 1. Restaurar Configurações
                         if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes);
                         
-                        // 3. Inserir novos dados
-                        for(const c of colls) { 
-                            if(d[c] && Array.isArray(d[c])) {
-                                for(const item of d[c]) { 
-                                    item.userId=currentUser.uid; 
-                                    if(item.id) await db.collection(c).doc(item.id).set(item); 
-                                    else await db.collection(c).add(item); 
-                                } 
+                        // 2. Restaurar Coleções (Loop Seguro)
+                        for(const collName of COLLECTIONS_LIST) {
+                            // Limpeza segura: Verifica se existe antes de deletar em lote
+                            const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get();
+                            if (!snapshot.empty) {
+                                const batch = db.batch();
+                                snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                                await batch.commit();
+                            }
+
+                            // Inserção: Verifica se há dados no backup para esta coleção
+                            if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) {
+                                for(const item of d[collName]) {
+                                    item.userId = currentUser.uid;
+                                    // Usa set com merge para evitar duplicidade de IDs se o backup tiver IDs fixos
+                                    if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true});
+                                    else await db.collection(collName).add(item);
+                                }
                             }
                         }
                     } else { 
-                        // Modo Local: Mapeamento explicito para garantir estrutura
-                        localData = {
-                            fornecedores: d.fornecedores || [],
-                            insumos: d.insumos || [],
-                            produtos: d.produtos || [],
-                            receitas: d.receitas || [],
-                            vendasDiarias: d.vendasDiarias || [],
-                            custosMensais: d.custosMensais || [],
-                            configuracoes: d.configuracoes || {}
-                        }; 
+                        // Modo Local
+                        localData.configuracoes = d.configuracoes || {};
+                        for(const collName of COLLECTIONS_LIST) {
+                            localData[collName] = d[collName] || [];
+                        }
                     }
                     
                     await initApp(); 
-                    showToast("Restaurado com sucesso!", "success");
+                    showToast("Restauração concluída com sucesso!", "success");
+
                 } catch(err){ 
                     console.error(err);
-                    showToast("Erro: "+err.message,"error"); 
+                    showToast("Erro na restauração: " + err.message, "error"); 
                 } finally {
                     // Limpar input para permitir recarregar o mesmo arquivo se necessário
                     e.target.value = '';
@@ -509,27 +547,6 @@
             };
             reader.readAsText(file);
         });
-
-        document.getElementById('btn-backup-download').addEventListener('click', async () => {
-             if(!currentUser && !isLocalMode) return;
-             const dlData = { 
-                 timestamp: new Date(), 
-                 fornecedores: await fetchFull('fornecedores'), 
-                 insumos: await fetchFull('insumos'), 
-                 produtos: await fetchFull('produtos'), 
-                 receitas: await fetchFull('receitas'), 
-                 custosMensais: await fetchFull('custosMensais'), 
-                 vendasDiarias: await fetchFull('vendasDiarias'), 
-                 configuracoes: configCache 
-             };
-             const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dlData));
-             const a = document.createElement('a'); a.href=url; a.download="backup_pizzaria.json"; document.body.appendChild(a); a.click(); a.remove();
-        });
-        async function fetchFull(coll) { 
-            if(isLocalMode) return localData[coll] || []; 
-            const s=await db.collection(coll).where('userId','==',currentUser.uid).get(); 
-            return s.docs.map(d=>({id:d.id,...d.data()})); 
-        }
 
         // GLOBAL CLICKS
         document.body.addEventListener('click', e => {
