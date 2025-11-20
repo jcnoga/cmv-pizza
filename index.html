@@ -96,6 +96,7 @@
             <a href="#" class="nav-link" data-view="insumos">Insumos</a>
             <a href="#" class="nav-link" data-view="receitas">Receitas</a>
             <a href="#" class="nav-link" data-view="fornecedores">Fornecedores</a>
+            
             <a href="#" class="nav-link" data-view="configuracoes">⚙️</a>
             <button id="logout-button">Sair</button>
         </nav>
@@ -235,9 +236,10 @@
                             <div class="form-group"><label>Nome</label><input type="text" id="prod-nome" required></div>
                             <div class="form-group"><label>Categoria</label><select id="prod-categoria"><option value="Bebida">Bebida</option><option value="Sobremesa">Sobremesa</option><option value="Outro">Outro</option></select></div>
                         </div>
-                         <div class="form-row">
+                        <div class="form-row">
+                             <!-- NOVO CAMPO FORNECEDOR -->
                             <div class="form-group"><label>Fornecedor</label><select id="prod-fornecedor-select"><option value="">Selecione</option></select></div>
-                         </div>
+                        </div>
                         <div class="form-row">
                             <div class="form-group"><label>Preço Compra (R$)</label><input type="number" id="prod-custo" step="0.01" required></div>
                             <div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="prod-venda" step="0.01" required></div>
@@ -281,21 +283,36 @@
                 <div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 8. FORNECEDORES -->
+            <!-- 8. FORNECEDORES (CORRIGIDO E COMPLETO) -->
             <section id="fornecedores-view" class="view">
                 <div class="card">
                     <h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2>
                     <form id="fornecedor-form">
                         <input type="hidden" id="fornecedor-id">
                         <div class="form-row">
-                            <div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div>
-                            <div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div>
+                            <div class="form-group">
+                                <label for="fornecedor-nome">Nome da Empresa</label>
+                                <input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos">
+                            </div>
+                            <div class="form-group">
+                                <label for="fornecedor-contato">Pessoa de Contato</label>
+                                <input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João">
+                            </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div>
-                            <div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div>
+                            <div class="form-group">
+                                <label for="fornecedor-telefone">Telefone / WhatsApp</label>
+                                <input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999">
+                            </div>
+                            <div class="form-group">
+                                <label for="fornecedor-email">Email</label>
+                                <input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com">
+                            </div>
                         </div>
-                        <div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div>
+                        <div class="form-group">
+                            <label for="fornecedor-endereco">Endereço Completo</label>
+                            <input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade">
+                        </div>
                         <button type="submit" class="btn btn-primary">Salvar Fornecedor</button>
                         <button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
                     </form>
@@ -304,7 +321,18 @@
                 <div class="card">
                     <h2>Lista de Fornecedores</h2>
                     <div class="table-container">
-                        <table id="fornecedores-table"><thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Endereço</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table>
+                        <table id="fornecedores-table">
+                            <thead>
+                                <tr>
+                                    <th>Empresa</th>
+                                    <th>Contato</th>
+                                    <th>Telefone</th>
+                                    <th>Endereço</th>
+                                    <th class="actions-cell">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody><!-- Preenchido via JS --></tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -322,7 +350,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v2.6</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v2.7</p></footer>
     <div id="toast" class="toast"></div>
     
     <!-- MODAL AJUDA -->
@@ -355,7 +383,7 @@
         let cache = { fornecedores:[], insumos:[], receitas:[], produtos:[], vendasDiarias:[], custosMensais:[] };
         let configCache = {};
         
-        // GLOBAL VAR FOR DELETION
+        // VARIÁVEL GLOBAL PARA CONTROLE DE EXCLUSÃO
         let itemParaExcluir = null;
 
         if (firebaseConfig.apiKey) {
@@ -367,7 +395,7 @@
             } catch (e) { console.error(e); isLocalMode = true; initApp(); }
         } else { isLocalMode = true; initApp(); }
 
-        // --- MODAL DE EXCLUSÃO (CORRIGIDO) ---
+        // --- MODAL DE EXCLUSÃO (LÓGICA CORRIGIDA E PROTEGIDA) ---
         const confirmModal = document.getElementById('confirm-modal');
         const btnYes = document.getElementById('confirm-modal-yes');
         const btnNo = document.getElementById('confirm-modal-no');
@@ -375,27 +403,53 @@
         btnYes.addEventListener('click', async () => {
             if (itemParaExcluir) {
                 btnYes.textContent = "Excluindo...";
+                // Proteção: desabilita o botão para evitar duplo clique
+                btnYes.disabled = true;
+                
                 try {
                     await deleteData(itemParaExcluir.collection, itemParaExcluir.id);
-                    // Reload data to reflect changes
+                    
+                    // Atualiza a tabela específica
                     if (itemParaExcluir.collection === 'fornecedores') {
-                        await fetchData('fornecedores'); renderFornecedoresTable();
+                        await fetchData('fornecedores');
+                        renderFornecedoresTable();
+                        // Também atualiza selects pois eles dependem de fornecedores
+                        populateSelects();
+                    } else if (itemParaExcluir.collection === 'produtos') {
+                        await fetchData('produtos');
+                        renderProdutos();
+                    } else if (itemParaExcluir.collection === 'insumos') {
+                         await fetchData('insumos');
+                         renderInsumos();
                     } else {
-                        await fetchData(itemParaExcluir.collection); renderAll();
+                        // Fallback
+                        await fetchData(itemParaExcluir.collection);
+                        renderAll();
                     }
+
                     showToast('Item excluído com sucesso!', 'success');
-                } catch (e) { showToast('Erro ao excluir', 'error'); }
-                finally {
+                } catch (e) {
+                    console.error(e);
+                    showToast('Erro ao excluir. Verifique o console.', 'error');
+                } finally {
+                    // Reset do Modal
                     confirmModal.style.display = 'none';
                     btnYes.textContent = "Sim";
+                    btnYes.disabled = false;
                     itemParaExcluir = null;
                 }
-            } else { confirmModal.style.display = 'none'; }
+            } else {
+                confirmModal.style.display = 'none';
+            }
         });
 
-        btnNo.addEventListener('click', () => { confirmModal.style.display = 'none'; itemParaExcluir = null; });
+        btnNo.addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+            itemParaExcluir = null;
+        });
 
         function confirmDelete(coll, id) {
+            if (!id) { console.error("ID inválido para exclusão"); return; }
             itemParaExcluir = { collection: coll, id: id };
             document.getElementById('confirm-modal-text').textContent = "Tem certeza que deseja excluir permanentemente?";
             confirmModal.style.display = 'block';
@@ -446,6 +500,7 @@
             return true;
         }
         async function deleteData(coll, id) {
+            if(!id) return false;
             if(isLocalMode) localData[coll] = localData[coll].filter(i=>i.id!==id);
             else await db.collection(coll).doc(id).delete();
             return true;
@@ -464,7 +519,7 @@
             document.getElementById('stock-alerts').innerHTML = alerts.length ? alerts.join('') : '<p class="stock-ok">Estoque OK.</p>';
         }
 
-        // --- FORNECEDORES ---
+        // --- FORNECEDORES (CORRIGIDO) ---
         function renderFornecedoresTable() {
             const tbody = document.getElementById('fornecedores-table').querySelector('tbody');
             tbody.innerHTML = '';
@@ -472,24 +527,40 @@
             const sorted = [...cache.fornecedores].sort((a, b) => a.nome.localeCompare(b.nome));
             sorted.forEach(f => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td><strong>${f.nome}</strong></td><td>${f.contato || '-'}</td><td>${f.telefone || '-'}</td><td style="font-size:0.9em;">${f.endereco || '-'}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}" title="Editar">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}" title="Excluir">🗑</button></td>`;
+                tr.innerHTML = `
+                    <td><strong>${f.nome}</strong></td>
+                    <td>${f.contato || '-'}</td>
+                    <td>${f.telefone || '-'}</td>
+                    <td style="font-size:0.9em;">${f.endereco || '-'}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}" title="Editar">✎</button>
+                        <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}" title="Excluir">🗑</button>
+                    </td>
+                `;
                 tbody.appendChild(tr);
             });
         }
 
         function editFornecedor(id) {
             const f = cache.fornecedores.find(i => i.id === id);
-            if (!f) return;
-            showView('fornecedores');
+            if (!f) { console.error('Fornecedor não encontrado no cache local', id); return; }
+            
+            showView('fornecedores'); // Garante que a aba está visível
+            
+            // Preenche campos
             document.getElementById('fornecedor-id').value = f.id;
             document.getElementById('fornecedor-nome').value = f.nome;
             document.getElementById('fornecedor-contato').value = f.contato || '';
             document.getElementById('fornecedor-telefone').value = f.telefone || '';
             document.getElementById('fornecedor-email').value = f.email || '';
             document.getElementById('fornecedor-endereco').value = f.endereco || '';
+            
+            // Muda UI para edição
             document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor';
             document.querySelector('#fornecedor-form button[type="submit"]').textContent = 'Atualizar Fornecedor';
             document.getElementById('cancel-edit-fornecedor').classList.remove('hidden');
+            
+            // Rola para o topo
             document.getElementById('fornecedor-form').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -505,6 +576,7 @@
             e.preventDefault();
             const button = e.currentTarget.querySelector('button[type="submit"]');
             button.disabled = true; button.textContent = 'Salvando...';
+            
             const data = {
                 id: document.getElementById('fornecedor-id').value || null,
                 nome: document.getElementById('fornecedor-nome').value,
@@ -513,14 +585,22 @@
                 email: document.getElementById('fornecedor-email').value,
                 endereco: document.getElementById('fornecedor-endereco').value
             };
+            
             const success = await saveData('fornecedores', data);
             if (success) { 
-                await fetchData('fornecedores'); renderFornecedoresTable(); populateSelects(); resetFornecedorForm(); showToast('Fornecedor salvo!'); 
+                await fetchData('fornecedores'); 
+                renderFornecedoresTable(); 
+                populateSelects(); 
+                resetFornecedorForm(); 
+                showToast('Fornecedor salvo com sucesso!'); 
+            } else {
+                showToast('Erro ao salvar fornecedor', 'error');
             }
             button.disabled = false; button.textContent = 'Salvar Fornecedor';
         });
         document.getElementById('cancel-edit-fornecedor').addEventListener('click', resetFornecedorForm);
 
+        // Zerar fornecedores
         document.getElementById('btn-zerar-fornecedores')?.addEventListener('click', async () => {
             if(!confirm("ATENÇÃO: Isso apagará TODOS os seus fornecedores. Não tem volta. Tem certeza?")) return;
             const btn = document.getElementById('btn-zerar-fornecedores');
@@ -539,7 +619,7 @@
             btn.textContent = "ZERAR TODOS OS FORNECEDORES"; btn.disabled = false;
         });
 
-        // --- PRODUTOS ---
+        // --- PRODUTOS (REVENDA) ---
         function renderProdutos() {
             const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
             cache.produtos.forEach(p => { 
@@ -553,7 +633,7 @@
                 id: document.getElementById('produto-id').value,
                 nome: document.getElementById('prod-nome').value,
                 categoria: document.getElementById('prod-categoria').value,
-                fornecedorId: document.getElementById('prod-fornecedor-select').value, // NEW
+                fornecedorId: document.getElementById('prod-fornecedor-select').value,
                 preco_compra: parseFloat(document.getElementById('prod-custo').value),
                 preco_venda: parseFloat(document.getElementById('prod-venda').value),
                 unidade: document.getElementById('prod-unidade').value,
@@ -584,7 +664,7 @@
             showToast('Insumo salvo!');
         });
 
-        // --- CLICK HANDLER GLOBAL (CORRIGIDO) ---
+        // --- CLICK HANDLER GLOBAL ---
         document.body.addEventListener('click', (e) => {
             const btn = e.target.closest('button'); 
             if (!btn) return; 
@@ -602,9 +682,12 @@
         
         function populateSelects() {
             const selForn = document.getElementById('insumo-fornecedor-select'); 
-            const selProdForn = document.getElementById('prod-fornecedor-select'); // Novo
+            const selProdForn = document.getElementById('prod-fornecedor-select'); 
             
-            const options = '<option value="">Selecione</option>' + cache.fornecedores.map(f => `<option value="${f.id}">${f.nome}</option>`).join('');
+            // Filtra nulos e ordena por nome
+            const sortedForns = [...cache.fornecedores].filter(f => f && f.nome).sort((a,b) => a.nome.localeCompare(b.nome));
+            
+            const options = '<option value="">Selecione</option>' + sortedForns.map(f => `<option value="${f.id}">${f.nome}</option>`).join('');
             selForn.innerHTML = options;
             selProdForn.innerHTML = options;
             
