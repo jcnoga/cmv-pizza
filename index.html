@@ -331,7 +331,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v4.2 (Delete/Unique Month Fix)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v4.3 (Ascending History)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -397,12 +397,11 @@
             const id = document.getElementById('custo-mensal-id').value;
             const mes = document.getElementById('custo-mensal-mes').value;
 
-            // CORREÇÃO: Verificação de Duplicidade
-            // Se existe algum registro com esse mês E o ID for diferente do atual (ou seja, não é edição do mesmo)
+            // Verificação de Duplicidade
             const duplicado = cache.custosMensais.find(c => c.mes === mes && c.id !== id);
             if (duplicado) {
                 showToast(`O mês ${mes} já possui um fechamento lançado! Edite o existente.`, 'error');
-                return; // Bloqueia o salvamento
+                return;
             }
 
             const data = {
@@ -425,15 +424,15 @@
             }
         });
 
-        // --- LOGIC: RENDER MONTHLY HISTORY (WITH DELETE BUTTON) ---
+        // --- LOGIC: RENDER MONTHLY HISTORY (ORDER FIXED: ASCENDING) ---
         function renderCustosMensais() {
             const tbody = document.getElementById('custos-mensais-table').querySelector('tbody');
             tbody.innerHTML = '';
             
             if (!cache.custosMensais.length) { tbody.innerHTML = '<tr><td colspan="4">Nenhum registro.</td></tr>'; return; }
 
-            // Ordena por mês (decrescente)
-            const sorted = [...cache.custosMensais].sort((a,b) => b.mes.localeCompare(a.mes));
+            // Ordena por mês (CRESCENTE: a.mes.localeCompare(b.mes))
+            const sorted = [...cache.custosMensais].sort((a,b) => a.mes.localeCompare(b.mes));
 
             sorted.forEach(c => {
                 const lucro = c.faturamento - (c.custosVariaveis + c.custosFixos + c.despesasOperacionais + c.impostos) + c.outrasReceitasDespesas;
@@ -500,7 +499,7 @@
                     else if(coll === 'produtos') { renderProdutos(); populateSelects(); }
                     else if(coll === 'insumos') { renderInsumos(); populateSelects(); }
                     else if(coll === 'receitas') { renderReceitas(); populateSelects(); }
-                    else if(coll === 'custosMensais') { renderCustosMensais(); } // ATUALIZA TABELA MENSAL
+                    else if(coll === 'custosMensais') { renderCustosMensais(); }
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
                 finally { confirmModal.style.display = 'none'; btnYes.textContent = "Sim"; btnYes.disabled = false; itemParaExcluir = null; }
@@ -623,10 +622,10 @@
             if(!dataMov) { showToast("Selecione a data", "error"); return; }
             for(const item of dailySalesBuffer) { await saveData('vendasDiarias', { ...item, data: dataMov }); }
             dailySalesBuffer = []; renderDailySalesTable(); showToast("Movimento do dia salvo com sucesso!");
-            await fetchData('vendasDiarias'); // Atualiza cache para o botão "Puxar do Diário" funcionar imediatamente
+            await fetchData('vendasDiarias'); 
         });
 
-        // CRUD FUNCTIONS (Fornecedor, Produto, Insumo, Receita)
+        // CRUD FUNCTIONS
         function renderFornecedoresTable() {
             const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = '';
             if (!cache.fornecedores.length) { tbody.innerHTML = '<tr><td colspan="5">Vazio.</td></tr>'; return; }
@@ -673,8 +672,6 @@
             else if(btn.classList.contains('btn-edit-insumo')) { e.preventDefault(); editInsumo(id); } 
             else if(btn.classList.contains('btn-edit-receita')) { e.preventDefault(); editReceita(id); } 
             else if(btn.classList.contains('btn-edit-mensal')) { e.preventDefault(); editMensal(id); } 
-            
-            // EXCLUSÕES
             else if(btn.classList.contains('btn-delete-fornecedor')) { e.preventDefault(); confirmDelete('fornecedores', id); } 
             else if(btn.classList.contains('btn-delete-insumo')) { e.preventDefault(); confirmDelete('insumos', id); } 
             else if(btn.classList.contains('btn-delete-produto')) { e.preventDefault(); confirmDelete('produtos', id); } 
