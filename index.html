@@ -187,7 +187,6 @@
                             <div class="form-group"><label>Ideal</label><input type="number" id="prod-est-ideal" value="50"></div>
                         </div>
                         <button type="submit" class="btn btn-primary">Salvar Produto</button>
-                        <!-- Botão de cancelar edição -->
                         <button type="button" id="cancel-edit-produto" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
                     </form>
                 </div>
@@ -218,16 +217,26 @@
                             <div class="form-group"><label>Validade</label><input type="date" id="insumo-validade"></div>
                         </div>
                         <button type="submit" class="btn btn-primary">Salvar Insumo</button>
-                        <!-- Botão de cancelar edição -->
                         <button type="button" id="cancel-edit-insumo" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
                     </form>
                 </div>
                 <div class="card"><h2>Insumos</h2><div class="filter-container"><input type="text" id="insumos-filter" placeholder="Filtrar..."></div><table id="insumos-table"><thead><tr><th>Nome</th><th>Custo Base</th><th>Estoque</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 7. RECEITAS -->
+            <!-- 7. RECEITAS (Com Cálculo Automático) -->
             <section id="receitas-view" class="view">
-                <div class="card"><h2>Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div class="total-cost" id="custo-total-ingredientes">Custo: R$ 0,00</div><button type="submit" class="btn btn-primary" style="margin-top:10px;">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar Edição</button></form></div>
+                <div class="card"><h2>Criar Receita</h2>
+                    <form id="receita-form">
+                        <input type="hidden" id="receita-id">
+                        <div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div>
+                        <h3>Ingredientes</h3>
+                        <div id="ingredients-list"></div>
+                        <button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button>
+                        <div class="total-cost" id="custo-total-ingredientes">Custo: R$ 0,00</div>
+                        <button type="submit" class="btn btn-primary" style="margin-top:10px;">Salvar Receita</button>
+                        <button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar Edição</button>
+                    </form>
+                </div>
                 <div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Ações</th></tr></thead><tbody></tbody></table></div>
             </section>
 
@@ -279,7 +288,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v3.5 (Edição Produtos/Insumos)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v3.6 (Cálculo Correto)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -474,12 +483,11 @@
         });
         document.getElementById('cancel-edit-fornecedor').addEventListener('click', () => { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value=''; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); });
 
-        // --- 2. PRODUTOS (Com Edição) ---
+        // --- 2. PRODUTOS ---
         function renderProdutos() {
             const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
             cache.produtos.forEach(p => { 
                 const f=cache.fornecedores.find(x=>x.id===p.fornecedorId)?.nome||'-'; 
-                // Botões de Editar e Excluir
                 tb.innerHTML += `<tr><td>${p.nome}</td><td>${f}</td><td>${formatMoney(p.preco_venda)}</td><td>${p.estoque_atual||0}</td>
                 <td class="actions-cell">
                     <button class="btn btn-secondary btn-small btn-edit-produto" data-id="${p.id}">✎</button> 
@@ -487,8 +495,6 @@
                 </td></tr>`; 
             });
         }
-        
-        // Função Lógica para carregar dados no formulário
         function editProduto(id) {
             const p = cache.produtos.find(i => i.id === id);
             if (!p) return;
@@ -503,13 +509,9 @@
             document.getElementById('prod-est-atual').value = p.estoque_atual;
             document.getElementById('prod-est-min').value = p.estoque_min;
             document.getElementById('prod-est-ideal').value = p.estoque_ideal;
-            
-            // Mostrar botão cancelar
             document.getElementById('cancel-edit-produto').classList.remove('hidden');
-            // Rolar até o formulário
             document.getElementById('produto-form').scrollIntoView({behavior:'smooth'});
         }
-
         document.getElementById('produto-form').addEventListener('submit', async e => { 
             e.preventDefault(); 
             await saveData('produtos', {
@@ -529,20 +531,17 @@
             document.getElementById('cancel-edit-produto').classList.add('hidden');
             await fetchData('produtos'); renderProdutos(); showToast('Salvo!'); 
         });
-
-        // Botão Cancelar Edição Produto
         document.getElementById('cancel-edit-produto').addEventListener('click', () => {
             document.getElementById('produto-form').reset();
             document.getElementById('produto-id').value='';
             document.getElementById('cancel-edit-produto').classList.add('hidden');
         });
 
-        // --- 3. INSUMOS (Com Edição) ---
+        // --- 3. INSUMOS ---
         function renderInsumos() {
             const tb = document.getElementById('insumos-table').querySelector('tbody'); tb.innerHTML = '';
             cache.insumos.forEach(i => { 
                 const cb = i.qtd_embalagem_g>0?(i.custo_embalagem/i.qtd_embalagem_g):0; 
-                // Botões de Editar e Excluir
                 tb.innerHTML += `<tr><td>${i.nome}</td><td>${formatMoney(cb)}/${i.unidade_base}</td><td>${i.estoque_atual||0}</td>
                 <td class="actions-cell">
                     <button class="btn btn-secondary btn-small btn-edit-insumo" data-id="${i.id}">✎</button> 
@@ -550,8 +549,6 @@
                 </td></tr>`; 
             });
         }
-
-        // Função Lógica para carregar dados no formulário de Insumo
         function editInsumo(id) {
             const i = cache.insumos.find(x => x.id === id);
             if (!i) return;
@@ -566,13 +563,9 @@
             document.getElementById('insumo-est-min').value = i.estoque_min;
             document.getElementById('insumo-est-ideal').value = i.estoque_ideal;
             if(i.validade) document.getElementById('insumo-validade').value = i.validade;
-
-            // Mostrar botão cancelar
             document.getElementById('cancel-edit-insumo').classList.remove('hidden');
-            // Rolar até o formulário
             document.getElementById('insumo-form').scrollIntoView({behavior:'smooth'});
         }
-
         document.getElementById('insumo-form').addEventListener('submit', async e => { 
             e.preventDefault(); 
             const q=parseFloat(document.getElementById('insumo-qtd-embalagem').value), u=document.getElementById('insumo-unidade-embalagem').value; 
@@ -595,21 +588,55 @@
             document.getElementById('cancel-edit-insumo').classList.add('hidden');
             await fetchData('insumos'); renderInsumos(); showToast('Salvo!'); 
         });
-
-        // Botão Cancelar Edição Insumo
         document.getElementById('cancel-edit-insumo').addEventListener('click', () => {
             document.getElementById('insumo-form').reset();
             document.getElementById('insumo-id').value='';
             document.getElementById('cancel-edit-insumo').classList.add('hidden');
         });
 
-        // --- 4. RECEITAS (Com Edição) ---
+        // --- 4. RECEITAS (Com Cálculo Dinâmico e Edição) ---
+        
+        // Função para atualizar custo total em tempo real
+        function updateReceitaTotal() {
+            let total = 0;
+            document.querySelectorAll('.ingredient-row').forEach(row => {
+                const id = row.querySelector('.ing-select').value;
+                const qty = parseFloat(row.querySelector('.ing-qtd').value) || 0;
+                const insumo = cache.insumos.find(i => i.id === id);
+                
+                if (insumo && insumo.qtd_embalagem_g > 0) {
+                    // Custo por unidade base (ex: custo por grama)
+                    const pricePerUnit = insumo.custo_embalagem / insumo.qtd_embalagem_g;
+                    total += pricePerUnit * qty;
+                }
+            });
+            document.getElementById('custo-total-ingredientes').textContent = 'Custo: ' + formatMoney(total);
+        }
+
         function addReceitaRow(ingId = '', qtyVal = 1) {
             const div = document.createElement('div'); div.className='ingredient-row';
-            div.innerHTML = `<select class="ing-select"><option value="">Insumo...</option>${cache.insumos.map(i=>`<option value="${i.id}">${i.nome}</option>`).join('')}</select><input type="number" class="ing-qtd" placeholder="Qtd (g/ml/un)" value="${qtyVal}"><button type="button" class="btn btn-danger btn-small remove-ing-btn">X</button>`;
+            div.innerHTML = `
+                <select class="ing-select">
+                    <option value="">Insumo...</option>
+                    ${cache.insumos.map(i=>`<option value="${i.id}">${i.nome}</option>`).join('')}
+                </select>
+                <input type="number" class="ing-qtd" placeholder="Qtd (g/ml/un)" value="${qtyVal}">
+                <button type="button" class="btn btn-danger btn-small remove-ing-btn">X</button>
+            `;
+            
             if(ingId) div.querySelector('.ing-select').value = ingId;
-            div.querySelector('.remove-ing-btn').addEventListener('click',()=>div.remove());
+            
+            // Event Listeners para recálculo
+            const select = div.querySelector('.ing-select');
+            const input = div.querySelector('.ing-qtd');
+            const btn = div.querySelector('.remove-ing-btn');
+            
+            select.addEventListener('change', updateReceitaTotal);
+            input.addEventListener('input', updateReceitaTotal);
+            btn.addEventListener('click', () => { div.remove(); updateReceitaTotal(); });
+            
             document.getElementById('ingredients-list').appendChild(div);
+            updateReceitaTotal(); // Calcula ao adicionar
         }
 
         document.getElementById('add-ingredient-btn').addEventListener('click', () => addReceitaRow());
@@ -617,7 +644,23 @@
         function renderReceitas() { 
             const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = ''; 
             cache.receitas.forEach(r => {
-                tb.innerHTML += `<tr><td>${r.nome}</td><td>-</td><td><button class="btn btn-secondary btn-small btn-edit-receita" data-id="${r.id}">✎</button> <button class="btn-delete-receita btn btn-danger btn-small" data-id="${r.id}">🗑</button></td></tr>`;
+                // Calcular Custo da Receita para exibição na Tabela
+                let custoReceita = 0;
+                if(r.ingredientes) {
+                    r.ingredientes.forEach(ing => {
+                        const ins = cache.insumos.find(i => i.id === ing.id);
+                        if(ins && ins.qtd_embalagem_g > 0) {
+                             const unitCost = ins.custo_embalagem / ins.qtd_embalagem_g;
+                             custoReceita += unitCost * ing.qtd;
+                        }
+                    });
+                }
+
+                tb.innerHTML += `<tr><td>${r.nome}</td><td>${formatMoney(custoReceita)}</td>
+                <td class="actions-cell">
+                    <button class="btn btn-secondary btn-small btn-edit-receita" data-id="${r.id}">✎</button> 
+                    <button class="btn btn-danger btn-small btn-delete-receita" data-id="${r.id}">🗑</button>
+                </td></tr>`;
             }); 
         }
 
@@ -637,6 +680,8 @@
                     addReceitaRow(ing.id, ing.qtd);
                 });
             }
+            
+            updateReceitaTotal(); // Calcula total ao abrir edição
 
             document.getElementById('cancel-edit-receita').classList.remove('hidden');
             document.getElementById('receita-form').scrollIntoView({behavior:'smooth'});
@@ -661,6 +706,7 @@
             document.getElementById('receita-id').value = '';
             document.getElementById('ingredients-list').innerHTML = '';
             document.getElementById('cancel-edit-receita').classList.add('hidden');
+            document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00';
             
             await fetchData('receitas'); 
             renderReceitas(); 
@@ -673,6 +719,7 @@
             document.getElementById('receita-id').value = '';
             document.getElementById('ingredients-list').innerHTML = '';
             document.getElementById('cancel-edit-receita').classList.add('hidden');
+            document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00';
         });
 
         // CONFIGS
@@ -727,18 +774,14 @@
             reader.readAsText(file);
         });
 
-        // GLOBAL CLICKS - GESTÃO DE EVENTOS DE BOTÕES DE EDIÇÃO
+        // GLOBAL CLICKS
         document.body.addEventListener('click', e => {
             const btn = e.target.closest('button'); if (!btn) return; 
             const id = btn.dataset.id;
-            
-            // DETECÇÃO DE EDIÇÕES
             if(btn.classList.contains('btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(id); }
-            else if(btn.classList.contains('btn-edit-produto')) { e.preventDefault(); editProduto(id); } // Edição de Produto
-            else if(btn.classList.contains('btn-edit-insumo')) { e.preventDefault(); editInsumo(id); }   // Edição de Insumo
+            else if(btn.classList.contains('btn-edit-produto')) { e.preventDefault(); editProduto(id); }
+            else if(btn.classList.contains('btn-edit-insumo')) { e.preventDefault(); editInsumo(id); }
             else if(btn.classList.contains('btn-edit-receita')) { e.preventDefault(); editReceita(id); }
-            
-            // DETECÇÃO DE EXCLUSÕES
             else if(btn.classList.contains('btn-delete-fornecedor')) { e.preventDefault(); confirmDelete('fornecedores', id); }
             else if(btn.classList.contains('btn-delete-insumo')) { e.preventDefault(); confirmDelete('insumos', id); }
             else if(btn.classList.contains('btn-delete-produto')) { e.preventDefault(); confirmDelete('produtos', id); }
