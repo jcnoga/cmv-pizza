@@ -32,6 +32,7 @@
         .btn-success { background-color: var(--success-color); color: var(--white); }
         .btn-danger { background-color: var(--error-color); color: var(--white); }
         .btn-info { background-color: var(--info-color); color: var(--white); }
+        .btn-warning { background-color: #ff9800; color: var(--white); }
         .btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; width: auto; }
         .auth-link { text-align: center; margin-top: 1rem; } .auth-link a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
         nav { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-top: 10px; }
@@ -81,7 +82,6 @@
         .checkbox-wrapper input { width: auto; margin-right: 10px; }
         .stock-warning { color: var(--error-color); font-weight: bold; }
         .stock-ok { color: var(--success-color); }
-        
         /* Backup Area */
         .backup-area { border: 2px dashed var(--primary-color); padding: 20px; border-radius: 10px; margin-top: 20px; background-color: #fff3e0; }
         .backup-area h3 { margin-top: 0; }
@@ -177,14 +177,29 @@
 
             <!-- 8. FORNECEDORES -->
             <section id="fornecedores-view" class="view">
-                <div class="card"><h2>Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required></div><div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato"></div></div><div class="form-row"><div class="form-group"><label>Telefone</label><input type="tel" id="fornecedor-telefone"></div><div class="form-group"><label>Email</label><input type="email" id="fornecedor-email"></div></div><div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden">Cancelar Edição</button></form></div>
+                <div class="card">
+                    <h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2>
+                    <form id="fornecedor-form">
+                        <input type="hidden" id="fornecedor-id">
+                        <div class="form-row">
+                            <div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div>
+                            <div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div>
+                            <div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div>
+                        </div>
+                        <div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div>
+                        <button type="submit" class="btn btn-primary">Salvar Fornecedor</button>
+                        <button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button>
+                    </form>
+                </div>
                 <div class="card"><h2>Lista de Fornecedores</h2><div class="table-container"><table id="fornecedores-table"><thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Endereço</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div></div>
                 <div class="card" style="margin-top:20px;border:1px solid red;"><h3 style="color:red;">Zona de Perigo</h3><p>Apagar TODOS os fornecedores?</p><button id="btn-zerar-fornecedores" class="btn btn-danger">ZERAR TODOS OS FORNECEDORES</button></div>
             </section>
 
             <!-- CONFIGURAÇÕES & BACKUP -->
             <section id="configuracoes-view" class="view">
-                <!-- Formulário de Configurações (CORRIGIDO O SUBMIT) -->
                 <div class="card">
                     <h2>Configurações Gerais</h2>
                     <form id="configuracoes-form">
@@ -195,8 +210,6 @@
                         <button type="submit" class="btn btn-primary">Salvar Configurações</button>
                     </form>
                 </div>
-                
-                <!-- Área de Backup -->
                 <div class="card backup-area">
                     <h3>💾 Backup e Restauração (Segurança)</h3>
                     <p>Salve seus dados no computador ou restaure um backup. <strong>Cuidado: Restaurar apaga os dados atuais do banco.</strong></p>
@@ -210,7 +223,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v3.1 (Fixed)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v3.2 (Full Fix)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -249,27 +262,49 @@
             } catch (e) { console.error(e); isLocalMode = true; initApp(); }
         } else { isLocalMode = true; initApp(); }
 
-        // --- MODALS ---
+        // --- MODAL DE EXCLUSÃO ---
         const confirmModal = document.getElementById('confirm-modal');
         const btnYes = document.getElementById('confirm-modal-yes');
         const btnNo = document.getElementById('confirm-modal-no');
+
         btnYes.addEventListener('click', async () => {
             if (itemParaExcluir && itemParaExcluir.id) {
                 btnYes.textContent = "Excluindo..."; btnYes.disabled = true;
                 try {
                     await deleteData(itemParaExcluir.collection, itemParaExcluir.id);
-                    await fetchData(itemParaExcluir.collection);
-                    renderAll(); // Update everything to be safe
-                    showToast('Item excluído!', 'success');
-                } catch (e) { console.error(e); showToast('Erro ao excluir.', 'error'); } 
-                finally { confirmModal.style.display = 'none'; btnYes.textContent = "Sim"; btnYes.disabled = false; itemParaExcluir = null; }
+                    
+                    // RESTAURAÇÃO DE CACHE E TELA IMEDIATA (CRUCIAL)
+                    const coll = itemParaExcluir.collection;
+                    
+                    // 1. Atualiza Cache local imediatamente para feedback visual instantâneo
+                    if (!isLocalMode) cache[coll] = cache[coll].filter(i => i.id !== itemParaExcluir.id);
+
+                    // 2. Busca dados reais para garantir sincronia
+                    await fetchData(coll);
+
+                    // 3. Redesenha a tela correta
+                    if(coll === 'fornecedores') { renderFornecedoresTable(); populateSelects(); }
+                    else if(coll === 'produtos') renderProdutos();
+                    else if(coll === 'insumos') renderInsumos();
+                    else if(coll === 'receitas') { renderReceitas(); populateSelects(); }
+
+                    showToast('Excluído com sucesso!', 'success');
+                } catch (e) {
+                    console.error(e);
+                    showToast('Erro: ' + e.message, 'error');
+                } finally {
+                    confirmModal.style.display = 'none';
+                    btnYes.textContent = "Sim";
+                    btnYes.disabled = false;
+                    itemParaExcluir = null;
+                }
             }
         });
         btnNo.addEventListener('click', () => { confirmModal.style.display = 'none'; itemParaExcluir = null; });
         function confirmDelete(coll, id) {
             if (!id) return;
             itemParaExcluir = { collection: coll, id: id };
-            document.getElementById('confirm-modal-text').textContent = "Tem certeza que deseja excluir?";
+            document.getElementById('confirm-modal-text').textContent = "Tem certeza?";
             confirmModal.style.display = 'block';
         }
 
@@ -280,27 +315,20 @@
                 else { currentUser = null; document.getElementById('auth-container').classList.remove('hidden'); document.getElementById('app-container').classList.add('hidden'); }
             });
             document.getElementById('login-form').addEventListener('submit', e => { e.preventDefault(); auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value).catch(e=>showToast(e.message,'error')); });
-            document.getElementById('register-form').addEventListener('submit', e => { e.preventDefault(); const p = document.getElementById('register-password').value; if(p.length<6){showToast("Mínimo 6 caracteres",'error');return;} auth.createUserWithEmailAndPassword(document.getElementById('register-email').value, p).catch(e=>showToast(e.message,'error')); });
             document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
         }
 
-        // --- DATA & SYNC ---
+        // --- DATA ---
         async function initApp() {
             if(isLocalMode) currentUser = {uid:'local'};
             await Promise.all([fetchConfiguracoes(), fetchData('fornecedores'), fetchData('insumos'), fetchData('receitas'), fetchData('produtos'), fetchData('custosMensais')]);
             renderAll();
         }
-
         async function fetchData(coll) {
             if(isLocalMode) { cache[coll] = localData[coll]; return; }
             cache[coll] = [];
             const snap = await db.collection(coll).where('userId','==',currentUser.uid).get();
-            cache[coll] = snap.docs.map(d => { const dt = d.data(); dt.id = d.id; return dt; });
-        }
-        async function fetchConfiguracoes() {
-            if(isLocalMode) { configCache = localData.configuracoes || {}; }
-            else { try { const doc = await db.collection('configuracoes').doc(currentUser.uid).get(); configCache = doc.exists ? doc.data() : {}; } catch(e){} }
-            displayConfiguracoes();
+            cache[coll] = snap.docs.map(d => ({id:d.id, ...d.data()}));
         }
         async function saveData(coll, data) {
             data.userId = currentUser.uid;
@@ -322,48 +350,34 @@
             return true;
         }
 
-        // --- RENDERERS ---
+        // --- RENDERS ---
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); populateSelects(); updateDashboard(); }
-        
-        // Fornecedores
+
+        // --- FORNECEDORES ---
         function renderFornecedoresTable() {
             const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = '';
             if (!cache.fornecedores.length) { tbody.innerHTML = '<tr><td colspan="5">Vazio.</td></tr>'; return; }
             [...cache.fornecedores].sort((a,b)=>(a.nome||"").localeCompare(b.nome||"")).forEach(f => {
                 if(!f.id) return;
-                tbody.innerHTML += `<tr><td>${f.nome}</td><td>${f.contato||'-'}</td><td>${f.telefone||'-'}</td><td style="font-size:0.9em">${f.endereco||'-'}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td></tr>`;
+                tbody.innerHTML += `<tr><td>${f.nome}</td><td>${f.contato||''}</td><td>${f.telefone||''}</td><td>${f.endereco||''}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td></tr>`;
             });
         }
-        // Insumos
-        function renderInsumos() {
-            const tb = document.getElementById('insumos-table').querySelector('tbody'); tb.innerHTML = '';
-            cache.insumos.forEach(i => { if(!i.id) return; const cb = i.qtd_embalagem_g>0?(i.custo_embalagem/i.qtd_embalagem_g):0; tb.innerHTML += `<tr><td>${i.nome}</td><td>${formatMoney(cb)}/${i.unidade_base}</td><td>${i.estoque_atual||0}</td><td><button class="btn btn-delete-insumo btn btn-danger btn-small" data-id="${i.id}">🗑</button></td></tr>`; });
+        function editFornecedor(id) {
+            const f = cache.fornecedores.find(i => i.id === id);
+            if (!f) return;
+            showView('fornecedores');
+            document.getElementById('fornecedor-id').value = f.id;
+            document.getElementById('fornecedor-nome').value = f.nome;
+            document.getElementById('fornecedor-contato').value = f.contato||'';
+            document.getElementById('fornecedor-telefone').value = f.telefone||'';
+            document.getElementById('fornecedor-email').value = f.email||'';
+            document.getElementById('fornecedor-endereco').value = f.endereco||'';
+            document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor';
+            document.getElementById('cancel-edit-fornecedor').classList.remove('hidden');
+            document.getElementById('fornecedor-form').scrollIntoView({behavior:'smooth'});
         }
-        // Produtos
-        function renderProdutos() {
-            const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
-            cache.produtos.forEach(p => { if(!p.id) return; const fn=cache.fornecedores.find(f=>f.id===p.fornecedorId)?.nome||'-'; tb.innerHTML += `<tr><td>${p.nome}</td><td>${fn}</td><td>${formatMoney(p.preco_venda)}</td><td>${p.estoque_atual||0}</td><td><button class="btn-delete-produto btn btn-danger btn-small" data-id="${p.id}">🗑</button></td></tr>`; });
-        }
-        // Receitas
-        function renderReceitas() {
-            const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = '';
-            cache.receitas.forEach(r => { if(!r.id) return; tb.innerHTML += `<tr><td>${r.nome}</td><td>-</td><td><button class="btn-delete-receita btn btn-danger btn-small" data-id="${r.id}">🗑</button></td></tr>`; });
-        }
-        function renderCustosMensais(){} // Placeholder
-
-        function updateDashboard() {
-             document.getElementById('dash-stock-count').textContent = cache.insumos.length + cache.produtos.length;
-             document.getElementById('dashboard-num-receitas').textContent = cache.receitas.length;
-             const alerts=[]; [...cache.insumos, ...cache.produtos].forEach(i=>{ if((parseFloat(i.estoque_atual)||0) <= (parseFloat(i.estoque_min)||0)) alerts.push(`<p class="stock-warning">Baixo: ${i.nome}</p>`); });
-             document.getElementById('stock-alerts').innerHTML = alerts.length ? alerts.join('') : '<p class="stock-ok">OK</p>';
-        }
-
-        // --- FORMS (Listeners) ---
-        
-        // FORNECEDOR FORM
         document.getElementById('fornecedor-form').addEventListener('submit', async e => {
             e.preventDefault();
-            const btn = e.currentTarget.querySelector('button[type="submit"]'); btn.disabled=true; btn.textContent='Salvando...';
             const data = {
                 id: document.getElementById('fornecedor-id').value || null,
                 nome: document.getElementById('fornecedor-nome').value,
@@ -373,64 +387,42 @@
                 endereco: document.getElementById('fornecedor-endereco').value
             };
             if(await saveData('fornecedores', data)) {
-                await fetchData('fornecedores'); renderAll();
+                await fetchData('fornecedores'); renderFornecedoresTable(); populateSelects();
                 document.getElementById('fornecedor-form').reset();
                 document.getElementById('fornecedor-id').value='';
                 document.getElementById('cancel-edit-fornecedor').classList.add('hidden');
-                btn.textContent='Salvar Fornecedor';
                 showToast('Salvo!');
             }
-            btn.disabled=false; 
         });
+        document.getElementById('cancel-edit-fornecedor').addEventListener('click', () => { document.getElementById('fornecedor-form').reset(); document.getElementById('fornecedor-id').value=''; document.getElementById('cancel-edit-fornecedor').classList.add('hidden'); });
 
-        // PRODUTO FORM
-        document.getElementById('produto-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const data = { id: document.getElementById('produto-id').value||null, nome: document.getElementById('prod-nome').value, categoria: document.getElementById('prod-categoria').value, fornecedorId: document.getElementById('prod-fornecedor-select').value, preco_compra: parseFloat(document.getElementById('prod-custo').value), preco_venda: parseFloat(document.getElementById('prod-venda').value), unidade: document.getElementById('prod-unidade').value, estoque_atual: parseFloat(document.getElementById('prod-est-atual').value), estoque_min: parseFloat(document.getElementById('prod-est-min').value), estoque_ideal: parseFloat(document.getElementById('prod-est-ideal').value) };
-            await saveData('produtos', data); document.getElementById('produto-form').reset(); await fetchData('produtos'); renderProdutos(); showToast('Salvo!');
-        });
-        
-        // INSUMO FORM
-        document.getElementById('insumo-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const qtdEmb = parseFloat(document.getElementById('insumo-qtd-embalagem').value), unid = document.getElementById('insumo-unidade-embalagem').value;
-            let qtdG = qtdEmb, base = 'un'; if(unid==='kg' || unid==='L') { qtdG = qtdEmb * 1000; base = (unid==='kg'?'g':'ml'); } else if(unid==='g' || unid==='ml') { base = unid; }
-            const data = { id: document.getElementById('insumo-id').value||null, nome: document.getElementById('insumo-nome').value, fornecedorId: document.getElementById('insumo-fornecedor-select').value, custo_embalagem: parseFloat(document.getElementById('insumo-custo-embalagem').value), quantidade_embalagem: qtdEmb, unidade_embalagem: unid, qtd_embalagem_g: qtdG, unidade_base: base, estoque_atual: parseFloat(document.getElementById('insumo-est-atual').value), estoque_min: parseFloat(document.getElementById('insumo-est-min').value), estoque_ideal: parseFloat(document.getElementById('insumo-est-ideal').value) };
-            await saveData('insumos', data); document.getElementById('insumo-form').reset(); await fetchData('insumos'); renderInsumos(); showToast('Salvo!');
-        });
-
-        // CONFIG FORM (CORRIGIDO O REFRESH)
-        const configForm = document.getElementById('configuracoes-form');
-        if(configForm) {
-            configForm.addEventListener('submit', async (e) => {
-                e.preventDefault(); // PREVINE REFRESH
-                const btn = e.currentTarget.querySelector('button'); btn.disabled=true; btn.textContent="Salvando...";
-                const data = {
-                    custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value),
-                    rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value),
-                    meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value),
-                    alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value)
-                };
-                try {
-                    if(isLocalMode) { localData.configuracoes = data; }
-                    else { await db.collection('configuracoes').doc(currentUser.uid).set(data); }
-                    configCache = data; 
-                    showToast("Configurações salvas!");
-                } catch(err) { console.error(err); showToast("Erro ao salvar config", "error"); }
-                finally { btn.disabled=false; btn.textContent="Salvar Configurações"; }
-            });
+        // --- OTHER FORMS (Simplified) ---
+        // Produtos
+        function renderProdutos() {
+            const tb = document.getElementById('produtos-table').querySelector('tbody'); tb.innerHTML = '';
+            cache.produtos.forEach(p => { const f=cache.fornecedores.find(x=>x.id===p.fornecedorId)?.nome||'-'; tb.innerHTML += `<tr><td>${p.nome}</td><td>${f}</td><td>${formatMoney(p.preco_venda)}</td><td>${p.estoque_atual||0}</td><td><button class="btn-delete-produto btn btn-danger btn-small" data-id="${p.id}">🗑</button></td></tr>`; });
         }
+        document.getElementById('produto-form').addEventListener('submit', async e => { e.preventDefault(); await saveData('produtos', {id:document.getElementById('produto-id').value||null, nome:document.getElementById('prod-nome').value, categoria:document.getElementById('prod-categoria').value, fornecedorId:document.getElementById('prod-fornecedor-select').value, preco_compra:parseFloat(document.getElementById('prod-custo').value), preco_venda:parseFloat(document.getElementById('prod-venda').value), unidade:document.getElementById('prod-unidade').value, estoque_atual:parseFloat(document.getElementById('prod-est-atual').value), estoque_min:parseFloat(document.getElementById('prod-est-min').value), estoque_ideal:parseFloat(document.getElementById('prod-est-ideal').value)}); document.getElementById('produto-form').reset(); await fetchData('produtos'); renderProdutos(); showToast('Salvo!'); });
 
-        // --- BACKUP & RESTORE ---
-        document.getElementById('btn-backup-download').addEventListener('click', async () => {
-            if(!currentUser && !isLocalMode) return;
-            const backupData = { timestamp: new Date().toISOString(), user: currentUser?.email||'local', fornecedores: cache.fornecedores, insumos: cache.insumos, produtos: cache.produtos, receitas: cache.receitas, vendasDiarias: await fetchFullCollection('vendasDiarias'), custosMensais: await fetchFullCollection('custosMensais'), configuracoes: configCache };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
-            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "backup_pizzaria.json"); document.body.appendChild(dl); dl.click(); dl.remove();
+        // Insumos
+        function renderInsumos() {
+            const tb = document.getElementById('insumos-table').querySelector('tbody'); tb.innerHTML = '';
+            cache.insumos.forEach(i => { const cb = i.qtd_embalagem_g>0?(i.custo_embalagem/i.qtd_embalagem_g):0; tb.innerHTML += `<tr><td>${i.nome}</td><td>${formatMoney(cb)}/${i.unidade_base}</td><td>${i.estoque_atual||0}</td><td><button class="btn-delete-insumo btn btn-danger btn-small" data-id="${i.id}">🗑</button></td></tr>`; });
+        }
+        document.getElementById('insumo-form').addEventListener('submit', async e => { e.preventDefault(); const q=parseFloat(document.getElementById('insumo-qtd-embalagem').value), u=document.getElementById('insumo-unidade-embalagem').value; let qg=q, b='un'; if(u==='kg'||u==='L'){qg=q*1000;b=u==='kg'?'g':'ml'} else if(u==='g'||u==='ml'){b=u} await saveData('insumos', {id:document.getElementById('insumo-id').value||null, nome:document.getElementById('insumo-nome').value, fornecedorId:document.getElementById('insumo-fornecedor-select').value, custo_embalagem:parseFloat(document.getElementById('insumo-custo-embalagem').value), quantidade_embalagem:q, unidade_embalagem:u, qtd_embalagem_g:qg, unidade_base:b, estoque_atual:parseFloat(document.getElementById('insumo-est-atual').value), estoque_min:parseFloat(document.getElementById('insumo-est-min').value), estoque_ideal:parseFloat(document.getElementById('insumo-est-ideal').value)}); document.getElementById('insumo-form').reset(); await fetchData('insumos'); renderInsumos(); showToast('Salvo!'); });
+
+        // CONFIGS
+        async function fetchConfiguracoes(){if(isLocalMode)configCache=localData.configuracoes||{};else{try{const doc=await db.collection('configuracoes').doc(currentUser.uid).get();configCache=doc.exists?doc.data():{};}catch(e){}}displayConfiguracoes();}
+        function displayConfiguracoes(){Object.keys(configCache).forEach(k=>{const el=document.getElementById(`config-${k.replace(/_/g,'-')}`);if(el)el.value=configCache[k];});}
+        document.getElementById('configuracoes-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) };
+            if(isLocalMode) localData.configuracoes=data; else await db.collection('configuracoes').doc(currentUser.uid).set(data);
+            configCache=data; showToast("Salvo!");
         });
-        async function fetchFullCollection(coll) { if(isLocalMode) return localData[coll]; const s = await db.collection(coll).where('userId','==',currentUser.uid).get(); return s.docs.map(d=>({id:d.id,...d.data()})); }
-        
-        document.getElementById('btn-backup-restore-click').addEventListener('click', () => { if(confirm("Restaurar backup apagará dados atuais. Continuar?")) document.getElementById('backup-file-input').click(); });
+
+        // BACKUP
+        document.getElementById('btn-backup-restore-click').addEventListener('click', () => { if(confirm("Restaurar apaga dados atuais. OK?")) document.getElementById('backup-file-input').click(); });
         document.getElementById('backup-file-input').addEventListener('change', async (e) => {
             const file = e.target.files[0]; if(!file) return;
             const reader = new FileReader();
@@ -438,7 +430,6 @@
                 try {
                     const d = JSON.parse(ev.target.result);
                     if(!d.fornecedores) throw new Error("Inválido");
-                    showToast("Restaurando...","info");
                     if(!isLocalMode) {
                         const colls = ['fornecedores','insumos','produtos','receitas','vendasDiarias','custosMensais'];
                         for(const c of colls) { const s = await db.collection(c).where('userId','==',currentUser.uid).get(); const b = db.batch(); s.docs.forEach(doc=>b.delete(doc.ref)); await b.commit(); }
@@ -450,47 +441,23 @@
             };
             reader.readAsText(file);
         });
+        document.getElementById('btn-backup-download').addEventListener('click', async () => {
+             if(!currentUser && !isLocalMode) return;
+             const dlData = { timestamp: new Date(), fornecedores: cache.fornecedores, insumos: cache.insumos, produtos: cache.produtos, receitas: cache.receitas, custosMensais: await fetchFull('custosMensais'), vendasDiarias: await fetchFull('vendasDiarias'), configuracoes: configCache };
+             const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dlData));
+             const a = document.createElement('a'); a.href=url; a.download="backup.json"; document.body.appendChild(a); a.click(); a.remove();
+        });
+        async function fetchFull(coll) { if(isLocalMode) return localData[coll]; const s=await db.collection(coll).where('userId','==',currentUser.uid).get(); return s.docs.map(d=>({id:d.id,...d.data()})); }
 
-        // --- GLOBAL ACTIONS ---
+        // GLOBAL CLICKS
         document.body.addEventListener('click', e => {
-            const btn = e.target.closest('button'); if(!btn) return;
+            const btn = e.target.closest('button'); if (!btn) return; 
             const id = btn.dataset.id;
-            if(btn.classList.contains('btn-edit-fornecedor')) {
-                e.preventDefault();
-                const f = cache.fornecedores.find(i=>i.id===id);
-                if(f) {
-                    showView('fornecedores');
-                    document.getElementById('fornecedor-id').value = f.id;
-                    document.getElementById('fornecedor-nome').value = f.nome;
-                    document.getElementById('fornecedor-contato').value = f.contato||'';
-                    document.getElementById('fornecedor-telefone').value = f.telefone||'';
-                    document.getElementById('fornecedor-email').value = f.email||'';
-                    document.getElementById('fornecedor-endereco').value = f.endereco||'';
-                    document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor';
-                    document.querySelector('#fornecedor-form button[type="submit"]').textContent = 'Atualizar';
-                    document.getElementById('cancel-edit-fornecedor').classList.remove('hidden');
-                    document.getElementById('fornecedor-form').scrollIntoView({behavior:'smooth'});
-                }
-            }
-            else if(btn.classList.contains('btn-delete-fornecedor')) confirmDelete('fornecedores', id);
-            else if(btn.classList.contains('btn-delete-insumo')) confirmDelete('insumos', id);
-            else if(btn.classList.contains('btn-delete-produto')) confirmDelete('produtos', id);
-            else if(btn.classList.contains('btn-delete-receita')) confirmDelete('receitas', id);
-        });
-
-        document.getElementById('cancel-edit-fornecedor').addEventListener('click', () => {
-            document.getElementById('fornecedor-form').reset();
-            document.getElementById('fornecedor-id').value='';
-            document.getElementById('fornecedor-form-title').textContent='Cadastrar Fornecedor';
-            document.getElementById('cancel-edit-fornecedor').classList.add('hidden');
-            document.querySelector('#fornecedor-form button[type="submit"]').textContent='Salvar Fornecedor';
-        });
-        
-        document.getElementById('btn-zerar-fornecedores')?.addEventListener('click', async () => {
-             if(!confirm("Apagar TODOS os fornecedores?")) return;
-             const s = await db.collection('fornecedores').where('userId','==',currentUser.uid).get();
-             const b = db.batch(); s.docs.forEach(d=>b.delete(d.ref)); await b.commit();
-             await fetchData('fornecedores'); renderAll(); showToast('Apagado');
+            if(btn.classList.contains('btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(id); }
+            else if(btn.classList.contains('btn-delete-fornecedor')) { e.preventDefault(); confirmDelete('fornecedores', id); }
+            else if(btn.classList.contains('btn-delete-insumo')) { e.preventDefault(); confirmDelete('insumos', id); }
+            else if(btn.classList.contains('btn-delete-produto')) { e.preventDefault(); confirmDelete('produtos', id); }
+            else if(btn.classList.contains('btn-delete-receita')) { e.preventDefault(); confirmDelete('receitas', id); }
         });
 
         // Helpers
@@ -501,10 +468,20 @@
             document.getElementById('venda-pizza-select').innerHTML = '<option value="">Selecione</option>'+cache.receitas.map(r=>`<option value="${r.id}">${r.nome}</option>`).join('');
             document.getElementById('venda-produto-select').innerHTML = '<option value="">Selecione</option>'+cache.produtos.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
         }
-        function displayConfiguracoes() { Object.keys(configCache).forEach(k=>{ const el=document.getElementById(`config-${k.replace(/_/g,'-')}`); if(el) el.value=configCache[k]; }); }
+        function updateDashboard() { document.getElementById('dash-stock-count').textContent=cache.insumos.length+cache.produtos.length; }
         const navLinks = document.querySelectorAll('.nav-link');
         function showView(id) { document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(id+'-view')?.classList.add('active'); }
         navLinks.forEach(l=>l.addEventListener('click', e=>{e.preventDefault(); showView(e.target.dataset.view);}));
+        function renderReceitas() { const tb = document.getElementById('receitas-table').querySelector('tbody'); tb.innerHTML = ''; cache.receitas.forEach(r => tb.innerHTML += `<tr><td>${r.nome}</td><td>-</td><td><button class="btn-delete-receita btn btn-danger btn-small" data-id="${r.id}">🗑</button></td></tr>`); }
+        function renderCustosMensais() {}
+        
+        // ZERAR (Mantido)
+        document.getElementById('btn-zerar-fornecedores')?.addEventListener('click', async () => {
+             if(!confirm("Apagar TODOS?")) return;
+             const s = await db.collection('fornecedores').where('userId','==',currentUser.uid).get();
+             const b = db.batch(); s.docs.forEach(d=>b.delete(d.ref)); await b.commit();
+             await fetchData('fornecedores'); renderAll(); showToast('Apagado');
+        });
     });
     </script>
 </body>
