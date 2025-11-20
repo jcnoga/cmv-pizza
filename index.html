@@ -135,7 +135,7 @@
                     <div class="form-group"><label>Data do Movimento</label><input type="date" id="venda-data" required></div>
                     <div class="grid-container grid-2">
                         
-                        <!-- ÁREA DA PIZZA (Corrigido: Tamanho removido) -->
+                        <!-- ÁREA DA PIZZA -->
                         <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
                             <h3>🍕 Venda de Pizzas</h3>
                             <div class="form-group">
@@ -331,7 +331,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v3.8 (Fixed Sync)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v4.0 (Grid Fix)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -359,6 +359,9 @@
         let cache = { fornecedores:[], insumos:[], receitas:[], produtos:[], vendasDiarias:[], custosMensais:[] };
         let configCache = {};
         let itemParaExcluir = null;
+        
+        // Buffer para itens adicionados no grid antes de salvar
+        let dailySalesBuffer = [];
 
         const COLLECTIONS_LIST = ['fornecedores', 'insumos', 'produtos', 'receitas', 'vendasDiarias', 'custosMensais'];
 
@@ -481,44 +484,118 @@
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); populateSelects(); updateDashboard(); }
 
         // =========================================================
-        // LÓGICA DE SUGESTÃO DE PREÇO NA VENDA
+        // VENDAS DIÁRIAS (LÓGICA CORRIGIDA)
         // =========================================================
         
-        // Pizza
+        // Sugestão Preço Pizza
         const pizzaSelect = document.getElementById('venda-pizza-select');
         const pizzaQtd = document.getElementById('venda-pizza-qtd');
         const pizzaVal = document.getElementById('venda-pizza-valor');
-
         function calcPizzaTotal() {
             const id = pizzaSelect.value;
             const qtd = parseFloat(pizzaQtd.value) || 0;
             if(!id) { pizzaVal.value = ''; return; }
-            
             const receita = cache.receitas.find(r => r.id === id);
-            if(receita && receita.preco_venda) {
-                pizzaVal.value = (parseFloat(receita.preco_venda) * qtd).toFixed(2);
-            }
+            if(receita && receita.preco_venda) { pizzaVal.value = (parseFloat(receita.preco_venda) * qtd).toFixed(2); }
         }
         pizzaSelect.addEventListener('change', calcPizzaTotal);
         pizzaQtd.addEventListener('input', calcPizzaTotal);
 
-        // Produto
+        // Sugestão Preço Produto
         const prodSelect = document.getElementById('venda-produto-select');
         const prodQtd = document.getElementById('venda-produto-qtd');
         const prodVal = document.getElementById('venda-produto-valor');
-
         function calcProdTotal() {
             const id = prodSelect.value;
             const qtd = parseFloat(prodQtd.value) || 0;
             if(!id) { prodVal.value = ''; return; }
-
             const produto = cache.produtos.find(p => p.id === id);
-            if(produto && produto.preco_venda) {
-                prodVal.value = (parseFloat(produto.preco_venda) * qtd).toFixed(2);
-            }
+            if(produto && produto.preco_venda) { prodVal.value = (parseFloat(produto.preco_venda) * qtd).toFixed(2); }
         }
         prodSelect.addEventListener('change', calcProdTotal);
         prodQtd.addEventListener('input', calcProdTotal);
+
+        // --- ADICIONAR AO GRID DE VENDAS ---
+        function renderDailySalesTable() {
+            const tbody = document.getElementById('sales-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            let total = 0;
+            dailySalesBuffer.forEach((item, index) => {
+                total += item.valor;
+                tbody.innerHTML += `<tr>
+                    <td>${item.tipo}</td>
+                    <td>${item.nome}</td>
+                    <td>${item.qtd}</td>
+                    <td>${formatMoney(item.valor)}</td>
+                    <td><button class="btn btn-danger btn-small" onclick="removeSaleItem(${index})">X</button></td>
+                </tr>`;
+            });
+            document.getElementById('daily-total-display').textContent = 'Total do Dia: ' + formatMoney(total);
+        }
+
+        // Tornar função global para o onclick funcionar
+        window.removeSaleItem = function(index) {
+            dailySalesBuffer.splice(index, 1);
+            renderDailySalesTable();
+        };
+
+        document.getElementById('btn-add-pizza-sale').addEventListener('click', () => {
+            const id = pizzaSelect.value;
+            const qtd = parseFloat(pizzaQtd.value);
+            const val = parseFloat(pizzaVal.value);
+            if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; }
+            
+            const receita = cache.receitas.find(r => r.id === id);
+            dailySalesBuffer.push({
+                tipo: 'Pizza',
+                itemId: id,
+                nome: receita ? receita.nome : '?',
+                qtd: qtd,
+                valor: val
+            });
+            
+            pizzaSelect.value = ''; pizzaQtd.value = 1; pizzaVal.value = '';
+            renderDailySalesTable();
+        });
+
+        document.getElementById('btn-add-prod-sale').addEventListener('click', () => {
+            const id = prodSelect.value;
+            const qtd = parseFloat(prodQtd.value);
+            const val = parseFloat(prodVal.value);
+            if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; }
+            
+            const produto = cache.produtos.find(p => p.id === id);
+            dailySalesBuffer.push({
+                tipo: 'Produto',
+                itemId: id,
+                nome: produto ? produto.nome : '?',
+                qtd: qtd,
+                valor: val
+            });
+
+            prodSelect.value = ''; prodQtd.value = 1; prodVal.value = '';
+            renderDailySalesTable();
+        });
+
+        document.getElementById('btn-save-day').addEventListener('click', async () => {
+            if(dailySalesBuffer.length === 0) { showToast("Nenhum item para salvar", "error"); return; }
+            
+            const dataMov = document.getElementById('venda-data').value;
+            if(!dataMov) { showToast("Selecione a data", "error"); return; }
+
+            // Salvar cada item no banco
+            for(const item of dailySalesBuffer) {
+                await saveData('vendasDiarias', {
+                    ...item,
+                    data: dataMov
+                });
+            }
+
+            dailySalesBuffer = [];
+            renderDailySalesTable();
+            showToast("Movimento do dia salvo com sucesso!");
+        });
+
 
         // 1. FORNECEDORES
         function renderFornecedoresTable() {
@@ -872,7 +949,7 @@
             document.getElementById('insumo-fornecedor-select').innerHTML = fOpts;
             document.getElementById('prod-fornecedor-select').innerHTML = fOpts;
 
-            // Venda Pizza (Correção: mostra aviso se vazio)
+            // Venda Pizza
             const pizzas = cache.receitas;
             if(pizzas.length > 0) {
                 document.getElementById('venda-pizza-select').innerHTML = '<option value="">Selecione</option>'+pizzas.map(r=>`<option value="${r.id}">${r.nome}</option>`).join('');
@@ -880,7 +957,7 @@
                 document.getElementById('venda-pizza-select').innerHTML = '<option value="">(Nenhuma receita cadastrada)</option>';
             }
             
-            // Venda Produto (Correção: mostra aviso se vazio)
+            // Venda Produto
             const produtos = cache.produtos;
             if(produtos.length > 0) {
                 document.getElementById('venda-produto-select').innerHTML = '<option value="">Selecione</option>'+produtos.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
