@@ -134,7 +134,7 @@
     <header>
         <h1>🍕 Pizzaria Cost Control Pro</h1>
         <nav id="app-nav" class="hidden">
-            <a href="#" class="nav-link" data-view="vendas-diarias">Vendas Diárias</a>
+            <a href="#" class="nav-link" data-view="vendas-diarias">Pedidos/Venda Diários</a>
             <a href="#" class="nav-link" data-view="custos-mensais">Mensal</a>
             <a href="#" class="nav-link" data-view="indicadores-mensais">Indicadores Mensais</a>
             <a href="#" class="nav-link" data-view="dashboard">Indicadores Anuais</a>
@@ -189,7 +189,7 @@
 
             <!-- 3. VENDAS DIÁRIAS -->
             <section id="vendas-diarias-view" class="view">
-                <div class="card"><h2>Registrar Vendas do Dia</h2><div class="form-group"><label>Data do Movimento</label><input type="date" id="venda-data" required></div>
+                <div class="card"><h2>Registrar Pedidos/Venda Diários</h2><div class="form-group"><label>Data do Movimento</label><input type="date" id="venda-data" required></div>
                     <div class="grid-container grid-2">
                         <div style="background: #fff3e0; padding: 15px; border-radius: 8px;"><h3>🍕 Venda de Pizzas</h3><div class="form-group"><label>Sabor (Receita)</label><select id="venda-pizza-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-pizza-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-pizza-valor" step="0.01"></div></div><button class="btn btn-primary" id="btn-add-pizza-sale">Adicionar Pizza</button></div>
                         <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;"><h3>🥤 Venda de Produtos (Revenda)</h3><div class="form-group"><label>Produto</label><select id="venda-produto-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-produto-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-produto-valor" step="0.01"></div></div><button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button></div>
@@ -227,11 +227,30 @@
             <!-- 9. FORNECEDORES -->
             <section id="fornecedores-view" class="view"><div class="card"><h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div><div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div></div><div class="form-row"><div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div><div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div></div><div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form></div><div class="card"><h2>Lista de Fornecedores</h2><div class="table-container"><table id="fornecedores-table"><thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Endereço</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div></div><div class="card" style="margin-top:20px;border:1px solid red;"><h3 style="color:red;">Zona de Perigo</h3><p>Apagar TODOS os fornecedores?</p><button id="btn-zerar-fornecedores" class="btn btn-danger">ZERAR TODOS OS FORNECEDORES</button></div></section>
             <!-- 10. CONFIGURAÇÕES -->
-            <section id="configuracoes-view" class="view"><div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label>Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label>Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label>Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label>Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div><div class="card backup-area"><h3>💾 Backup e Restauração</h3><p>Salve seus dados no computador ou restaure um backup.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button><button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button><input type="file" id="backup-file-input" accept=".json" class="hidden"></div></div></section>
+            <section id="configuracoes-view" class="view">
+                <div class="card">
+                    <h2>Configurações Gerais</h2>
+                    <form id="configuracoes-form">
+                        <div class="form-group"><label>Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div>
+                        <div class="form-group"><label>Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div>
+                        <div class="form-group"><label>Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div>
+                        <div class="form-group"><label>Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div>
+                        
+                        <!-- NOVA CONFIGURAÇÃO DE BLOQUEIO DE ESTOQUE -->
+                        <div class="checkbox-wrapper" style="background-color: #fff3e0; border: 1px solid #ffcc80; color: #d84315;">
+                            <input type="checkbox" id="config-controlar-estoque">
+                            <label for="config-controlar-estoque"><strong>🚫 Bloquear Venda se Estoque Insuficiente</strong></label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+                    </form>
+                </div>
+                <div class="card backup-area"><h3>💾 Backup e Restauração</h3><p>Salve seus dados no computador ou restaure um backup.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button><button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button><input type="file" id="backup-file-input" accept=".json" class="hidden"></div></div>
+            </section>
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v4.7 (Smart Stock)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v6.4 (Stock Block)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -372,7 +391,52 @@
 
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); renderIndicadoresMensais(); populateSelects(); updateDashboard(); }
 
-        // --- SMART STOCK LOGIC (NEW v4.7) ---
+        // --- SMART STOCK LOGIC (NEW v6.4) ---
+        // Validation Function (Dry Run)
+        function checkStockAvailability(buffer) {
+            let needs = {}; // Key: 'p_'+id or 'i_'+id, Value: qty needed
+
+            // 1. Aggregate needs
+            for(let item of buffer) {
+                if(item.tipo === 'Produto') {
+                    let key = 'p_' + item.itemId;
+                    needs[key] = (needs[key] || 0) + parseFloat(item.qtd);
+                } else if (item.tipo === 'Pizza') {
+                    let recipe = cache.receitas.find(r => r.id === item.itemId);
+                    if(recipe && recipe.ingredientes) {
+                        for(let ing of recipe.ingredientes) {
+                            let key = 'i_' + ing.id;
+                            needs[key] = (needs[key] || 0) + (parseFloat(ing.qtd) * parseFloat(item.qtd));
+                        }
+                    }
+                }
+            }
+
+            // 2. Check against current stock
+            let missing = [];
+            for(let key in needs) {
+                let needed = needs[key];
+                let type = key.charAt(0); // 'p' or 'i'
+                let id = key.substring(2);
+
+                if(type === 'p') {
+                    let p = cache.produtos.find(x => x.id === id);
+                    let current = p ? (parseFloat(p.estoque_atual) || 0) : 0;
+                    if(current < needed) {
+                        missing.push(`Produto: ${p ? p.nome : 'Desc.'} (Atual: ${current} / Nec: ${needed})`);
+                    }
+                } else {
+                    let i = cache.insumos.find(x => x.id === id);
+                    let current = i ? (parseFloat(i.estoque_atual) || 0) : 0;
+                    if(current < needed) {
+                        missing.push(`Insumo: ${i ? i.nome : 'Desc.'} (Atual: ${current} / Nec: ${needed})`);
+                    }
+                }
+            }
+            return missing;
+        }
+
+
         async function deductStock(item) {
             if(item.tipo === 'Produto') {
                 const prod = cache.produtos.find(p => p.id === item.itemId);
@@ -509,7 +573,6 @@
         prodSelect.addEventListener('change', calcProdTotal); prodQtd.addEventListener('input', calcProdTotal);
         function renderDailySalesTable() { const tbody = document.getElementById('sales-table').querySelector('tbody'); tbody.innerHTML = ''; let total = 0; dailySalesBuffer.forEach((item, index) => { total += item.valor; tbody.innerHTML += `<tr><td>${item.tipo}</td><td>${item.nome}</td><td>${item.qtd}</td><td>${formatMoney(item.valor)}</td><td><button class="btn btn-danger btn-small" onclick="removeSaleItem(${index})">X</button></td></tr>`; }); document.getElementById('daily-total-display').textContent = 'Total do Dia: ' + formatMoney(total); }
         
-        // --- UPDATED REMOVE SALE ITEM ---
         window.removeSaleItem = async function(index) { 
             const item = dailySalesBuffer[index]; 
             if(item.id) { 
@@ -527,17 +590,25 @@
         document.getElementById('btn-add-pizza-sale').addEventListener('click', () => { const id = pizzaSelect.value; const qtd = parseFloat(pizzaQtd.value); const val = parseFloat(pizzaVal.value); if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; } const receita = cache.receitas.find(r => r.id === id); dailySalesBuffer.push({ tipo: 'Pizza', itemId: id, nome: receita ? receita.nome : '?', qtd: qtd, valor: val }); pizzaSelect.value = ''; pizzaQtd.value = 1; pizzaVal.value = ''; renderDailySalesTable(); });
         document.getElementById('btn-add-prod-sale').addEventListener('click', () => { const id = prodSelect.value; const qtd = parseFloat(prodQtd.value); const val = parseFloat(prodVal.value); if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; } const produto = cache.produtos.find(p => p.id === id); dailySalesBuffer.push({ tipo: 'Produto', itemId: id, nome: produto ? produto.nome : '?', qtd: qtd, valor: val }); prodSelect.value = ''; prodQtd.value = 1; prodVal.value = ''; renderDailySalesTable(); });
         
-        // --- UPDATED SAVE DAY ---
+        // --- UPDATED SAVE DAY WITH STOCK CHECK (NEW v6.4) ---
         document.getElementById('btn-save-day').addEventListener('click', async () => { 
             if(dailySalesBuffer.length === 0) { showToast("Nenhum item para salvar", "error"); return; } 
             const dataMov = document.getElementById('venda-data').value; 
             if(!dataMov) { showToast("Selecione a data", "error"); return; } 
+
+            // CHECK IF STOCK CONTROL IS ENABLED
+            if(configCache.controlar_estoque) {
+                const missing = checkStockAvailability(dailySalesBuffer);
+                if(missing.length > 0) {
+                    alert("⚠️ ESTOQUE INSUFICIENTE!\n\n" + missing.join("\n") + "\n\nA venda foi cancelada. Ajuste o estoque ou desative a configuração.");
+                    return; // STOP SAVING
+                }
+            }
             
             for(const item of dailySalesBuffer) { 
-                // Save only new items (no ID) to avoid re-deducting
                 if(!item.id) {
                     await saveData('vendasDiarias', { ...item, data: dataMov }); 
-                    await deductStock(item); // NEW: Deduct Stock
+                    await deductStock(item); 
                 }
             } 
             await fetchData('vendasDiarias'); 
@@ -566,6 +637,8 @@
         function editReceita(id) { const r = cache.receitas.find(x => x.id === id); if (!r) return; showView('receitas'); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-venda').value = r.preco_venda || ''; const list = document.getElementById('ingredients-list'); list.innerHTML = ''; if (r.ingredientes && Array.isArray(r.ingredientes)) { r.ingredientes.forEach(ing => { addReceitaRow(ing.id, ing.qtd); }); } updateReceitaTotal(); document.getElementById('cancel-edit-receita').classList.remove('hidden'); document.getElementById('receita-form').scrollIntoView({behavior:'smooth'}); }
         document.getElementById('receita-form').addEventListener('submit', async e => { e.preventDefault(); const rows = document.querySelectorAll('.ingredient-row'); const ings = []; rows.forEach(r => { const id = r.querySelector('.ing-select').value; const qtd = parseFloat(r.querySelector('.ing-qtd').value); if(id && qtd>0) ings.push({id, qtd}); }); await saveData('receitas', { id: document.getElementById('receita-id').value || null, nome: document.getElementById('receita-nome').value, preco_venda: parseFloat(document.getElementById('receita-venda').value) || 0, ingredientes: ings }); document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('cancel-edit-receita').classList.add('hidden'); document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; await fetchData('receitas'); renderReceitas(); populateSelects(); updateDashboard(); showToast('Salvo!'); });
         document.getElementById('cancel-edit-receita').addEventListener('click', () => { document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('cancel-edit-receita').classList.add('hidden'); document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; });
+        
+        // --- CONFIGURATIONS (FIXED v6.3 + New Checkbox) ---
         async function fetchConfiguracoes(){
             if(isLocalMode) configCache=localData.configuracoes||{};
             else{
@@ -577,7 +650,10 @@
             Object.keys(configCache).forEach(k => {
                 const id = `config-${k.replace(/_/g,'-')}`;
                 const el = document.getElementById(id);
-                if(el) el.value=configCache[k];
+                if(el) {
+                    if(el.type === 'checkbox') el.checked = configCache[k];
+                    else el.value=configCache[k];
+                }
             });
         }
         document.getElementById('configuracoes-form').addEventListener('submit', async e => {
@@ -586,13 +662,19 @@
                 custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value) || 0,
                 rateio_despesas_fixas: parseFloat(document.getElementById('config-rateio-despesas-fixas').value) || 0,
                 meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value) || 0,
-                alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) || 0
+                alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) || 0,
+                // NEW CONFIG
+                controlar_estoque: document.getElementById('config-controlar-estoque').checked
             };
+
             if(isLocalMode) localData.configuracoes=data; 
             else await db.collection('configuracoes').doc(currentUser.uid).set(data);
+            
             configCache=data; 
             showToast("Salvo!");
         });
+        // ------------------------------------
+
         document.getElementById('btn-backup-download').addEventListener('click', async () => { if(!currentUser && !isLocalMode) return; const backupPayload = { timestamp: new Date(), configuracoes: configCache || {} }; for(const coll of COLLECTIONS_LIST) { backupPayload[coll] = await fetchFullDataForBackup(coll); } const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload)); const a = document.createElement('a'); a.href = url; a.download = `backup_pizzaria_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove(); });
         document.getElementById('btn-backup-restore-click').addEventListener('click', () => { if(confirm("ATENÇÃO: Restaurar o backup apagará os dados atuais e substituirá pelo arquivo. Deseja continuar?")) { document.getElementById('backup-file-input').click(); } });
         document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
