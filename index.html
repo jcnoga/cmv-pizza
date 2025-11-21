@@ -251,7 +251,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v6.9 (Local Mode Auto Fix)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v6.10 (Auth Restored + Immediate Logic)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -264,18 +264,7 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- FIREBASE CONFIGURATION ---
-        // Se você tiver suas chaves, coloque-as aqui. Caso contrário, o código abaixo
-        // forçará o Modo Local automaticamente.
-        const firebaseConfig = { 
-            apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo", 
-            authDomain: "cmv-pizza.firebaseapp.com", 
-            projectId: "cmv-pizza", 
-            storageBucket: "cmv-pizza.firebasestorage.app", 
-            messagingSenderId: "1022435006716", 
-            appId: "1:1022435006716:web:ec39f22702097beca25f79" 
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyBDB5DaXGXRWQQKVgG1bh_1WcsbfZti6uo", authDomain: "cmv-pizza.firebaseapp.com", projectId: "cmv-pizza", storageBucket: "cmv-pizza.firebasestorage.app", messagingSenderId: "1022435006716", appId: "1:1022435006716:web:ec39f22702097beca25f79" };
         let firebaseApp, auth, db, currentUser;
         let isLocalMode = false;
         let localData = { fornecedores:[], insumos:[], receitas:[], produtos:[], vendasDiarias:[], custosMensais:[] };
@@ -285,77 +274,9 @@
         let dailySalesBuffer = [];
         const COLLECTIONS_LIST = ['fornecedores', 'insumos', 'produtos', 'receitas', 'vendasDiarias', 'custosMensais'];
 
-        // --- INITIALIZATION LOGIC (FIXED) ---
-        function forceLocalMode() {
-            console.warn("Entrando em Modo Local (Fallback).");
-            isLocalMode = true;
-            currentUser = { uid: 'local' }; // Fake user
-            
-            // Esconder Login, Mostrar App
-            document.getElementById('auth-container').classList.add('hidden'); 
-            document.getElementById('app-container').classList.remove('hidden'); 
-            document.getElementById('app-nav').classList.remove('hidden');
-            
-            initApp(); // Carregar dados
-        }
-
         if (firebaseConfig.apiKey) {
-            try { 
-                firebaseApp = firebase.initializeApp(firebaseConfig); 
-                auth = firebase.auth(); 
-                db = firebase.firestore(); 
-                auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                setupAuthListeners();
-            } catch (e) { 
-                // Se falhar a inicialização, vai pro modo local
-                console.error("Erro Firebase Init:", e); 
-                forceLocalMode();
-            }
-        } else { 
-            forceLocalMode(); 
-        }
-
-        function setupAuthListeners() {
-            // Esse listener pode não disparar se a chave for inválida mas o init não estourar erro imediato.
-            // Por segurança, adicionamos um timeout? Não, melhor tratar erros de login.
-            auth.onAuthStateChanged(user => {
-                if(user) { 
-                    currentUser = user; 
-                    document.getElementById('auth-container').classList.add('hidden'); 
-                    document.getElementById('app-container').classList.remove('hidden'); 
-                    document.getElementById('app-nav').classList.remove('hidden'); 
-                    initApp(); 
-                } else { 
-                    currentUser = null; 
-                    document.getElementById('auth-container').classList.remove('hidden'); 
-                    document.getElementById('app-container').classList.add('hidden'); 
-                }
-            });
-
-            document.getElementById('login-form').addEventListener('submit', e => { 
-                e.preventDefault(); 
-                const email = document.getElementById('login-email').value;
-                const pass = document.getElementById('login-password').value;
-                
-                auth.signInWithEmailAndPassword(email, pass)
-                    .catch(e => {
-                        // Se der erro de API Key aqui ou rede, sugerir modo local
-                        if(e.code === 'auth/internal-error' || e.code === 'auth/network-request-failed' || e.code === 'auth/api-key-not-valid') {
-                            if(confirm("Erro de conexão com o servidor (Chave inválida ou sem internet). Deseja entrar no MODO OFFLINE (Local)?")) {
-                                forceLocalMode();
-                            }
-                        } else {
-                            showToast("Erro: " + e.message, 'error');
-                        }
-                    }); 
-            });
-            
-            // Logout agora recarrega a página para limpar estado
-            document.getElementById('logout-button').addEventListener('click', () => {
-                if(isLocalMode) location.reload();
-                else auth.signOut();
-            });
-        }
+            try { firebaseApp = firebase.initializeApp(firebaseConfig); auth = firebase.auth(); db = firebase.firestore(); auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); setupAuthListeners(); } catch (e) { console.error(e); isLocalMode = true; initApp(); }
+        } else { isLocalMode = true; initApp(); }
 
         function initDateAndLoad() {
             const today = new Date().toISOString().split('T')[0];
@@ -452,11 +373,12 @@
                     const coll = itemParaExcluir.collection;
                     if (!isLocalMode) cache[coll] = cache[coll].filter(i => i.id !== itemParaExcluir.id);
                     await fetchData(coll);
-                    // Force Refresh
-                    if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); }
-                    else if(coll === 'vendasDiarias') { loadDailySales(document.getElementById('venda-data').value); updateDashboard(); }
-                    else { showView(coll); }
-                    
+                    if(coll === 'fornecedores') { renderFornecedoresTable(); populateSelects(); }
+                    else if(coll === 'produtos') { renderProdutos(); populateSelects(); updateDashboard(); }
+                    else if(coll === 'insumos') { renderInsumos(); populateSelects(); updateDashboard(); }
+                    else if(coll === 'receitas') { renderReceitas(); populateSelects(); updateDashboard(); }
+                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); } 
+                    else if(coll === 'vendasDiarias') { updateDashboard(); }
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
                 finally { confirmModal.style.display = 'none'; btnYes.textContent = "Sim"; btnYes.disabled = false; itemParaExcluir = null; }
@@ -470,6 +392,7 @@
             confirmModal.style.display = 'block';
         }
 
+        function setupAuthListeners() { auth.onAuthStateChanged(user => { if(user) { currentUser = user; document.getElementById('auth-container').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('app-nav').classList.remove('hidden'); initApp(); } else { currentUser = null; document.getElementById('auth-container').classList.remove('hidden'); document.getElementById('app-container').classList.add('hidden'); } }); document.getElementById('login-form').addEventListener('submit', e => { e.preventDefault(); auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value).catch(e=>showToast(e.message,'error')); }); document.getElementById('logout-button').addEventListener('click', () => auth.signOut()); }
         async function initApp() { if(isLocalMode) currentUser = {uid:'local'}; await Promise.all([fetchConfiguracoes(), ...COLLECTIONS_LIST.map(c => fetchData(c))]); renderAll(); initDateAndLoad(); }
         async function fetchData(coll) { if(isLocalMode) { cache[coll] = localData[coll] || []; return; } cache[coll] = []; const snap = await db.collection(coll).where('userId','==',currentUser.uid).get(); cache[coll] = snap.docs.map(d => ({id:d.id, ...d.data()})); }
         async function fetchFullDataForBackup(coll) { if(isLocalMode) return localData[coll] || []; const snap = await db.collection(coll).where('userId','==',currentUser.uid).get(); return snap.docs.map(d => ({id:d.id, ...d.data()})); }
@@ -488,26 +411,7 @@
                 item = cache.insumos.find(i => i.id === id);
                 actualStock = parseFloat(item ? item.estoque_atual : 0) || 0;
             }
-
-            let reserved = 0;
-            dailySalesBuffer.forEach(sale => {
-                if (sale.tipo === 'Produto' && type === 'product' && sale.itemId === id) {
-                    reserved += parseFloat(sale.qtd);
-                } else if (sale.tipo === 'Pizza' && type === 'insumo') {
-                    let recipe = cache.receitas.find(r => r.id === sale.itemId);
-                    if (recipe && recipe.ingredientes) {
-                        let ing = recipe.ingredientes.find(i => i.id === id);
-                        if (ing) {
-                            let rawQty = parseFloat(ing.qtd);
-                            if (item.unidade_embalagem === 'kg' || item.unidade_embalagem === 'L') {
-                                rawQty = rawQty / 1000;
-                            }
-                            reserved += (rawQty * parseFloat(sale.qtd));
-                        }
-                    }
-                }
-            });
-            return actualStock - reserved;
+            return actualStock;
         }
 
         async function deductStock(item) {
@@ -524,6 +428,7 @@
                         const insumo = cache.insumos.find(i => i.id === ing.id);
                         if(insumo) {
                             let amountUsed = parseFloat(ing.qtd);
+                            // Conversion Logic
                             if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
                                 amountUsed = amountUsed / 1000;
                             }
@@ -551,6 +456,7 @@
                         const insumo = cache.insumos.find(i => i.id === ing.id);
                         if(insumo) {
                             let amountUsed = parseFloat(ing.qtd);
+                            // Conversion Logic
                             if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
                                 amountUsed = amountUsed / 1000;
                             }
