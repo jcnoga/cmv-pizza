@@ -7,9 +7,9 @@
 
     <style>
         :root {
-            --primary-color: #00695c; 
+            --primary-color: #00695c; /* Teal da inspiração */
             --primary-dark: #004d40;
-            --header-blue: #005b96;
+            --header-blue: #005b96; /* Azul do anexo */
             --secondary-color: #FFC107;
             --light-gray: #f5f7fa;
             --medium-gray: #e0e0e0;
@@ -30,9 +30,11 @@
         
         #auth-container, #app-container { width: 100%; max-width: 1250px; margin: 2rem auto; padding: 0 1rem; }
         
+        /* Auth Form */
         .auth-form { background: var(--white); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); max-width: 450px; margin: 2rem auto; border-top: 4px solid var(--primary-color); }
         .auth-form h2 { text-align: center; margin-bottom: 1.5rem; color: var(--primary-dark); }
         
+        /* Forms & Inputs */
         .form-group { margin-bottom: 1.25rem; }
         .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: var(--dark-gray); }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.65rem; border: 1px solid #cfd8dc; border-radius: 4px; font-size: 1rem; transition: border 0.2s; }
@@ -41,6 +43,7 @@
         .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
         .form-row .form-group { flex: 1; min-width: 150px; }
 
+        /* Buttons */
         .btn { display: inline-block; padding: 0.6rem 1.2rem; font-size: 0.95rem; font-weight: 600; text-align: center; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s; width: 100%; }
         .btn:active:not(:disabled) { transform: translateY(1px); }
         .btn-primary { background-color: var(--primary-color); color: var(--white); } .btn-primary:hover { background-color: var(--primary-dark); }
@@ -51,11 +54,13 @@
         .btn-warning { background-color: #ff9800; color: var(--white); }
         .btn-small { padding: 0.3rem 0.7rem; font-size: 0.85rem; width: auto; }
         
+        /* Export Buttons */
         .btn-export { background-color: #fff; border: 1px solid #ccc; color: #333; font-weight: 500; display: inline-flex; align-items: center; gap: 5px; padding: 0.4rem 0.8rem; }
         .btn-export:hover { background-color: #f5f5f5; border-color: #bbb; }
 
         .auth-link { text-align: center; margin-top: 1rem; } .auth-link a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
         
+        /* Nav */
         nav { display: flex; gap: 0.2rem; align-items: center; flex-wrap: wrap; margin-top: 10px; }
         nav a, nav button { color: rgba(255,255,255,0.9); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.5rem 0.8rem; border-radius: 4px; transition: background-color 0.2s; font-weight: 500; }
         nav a:hover, nav button:hover, nav a.active { background-color: rgba(255,255,255,0.15); color: #fff; }
@@ -67,6 +72,7 @@
         
         .card { background: var(--white); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; border: 1px solid #eceff1; }
         
+        /* --- KPI CARDS --- */
         .dashboard-section-title { font-size: 1.1rem; color: var(--primary-color); font-weight: 700; margin: 1.5rem 0 1rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #e0f2f1; }
 
         .kpi-card-modern {
@@ -85,9 +91,11 @@
         .action-title { font-weight: 700; color: var(--dark-gray); margin-bottom: 0.5rem; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
         .action-sug { font-size: 0.9rem; color: #546e7a; padding-left: 1rem; border-left: 3px solid #eceff1; margin-top: 0.5rem; }
 
+        /* Grids */
         .grid-container { display: grid; gap: 1.5rem; }
         @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: repeat(3, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
 
+        /* Tables */
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.95rem; }
         th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #eceff1; }
         th { background-color: #fafafa; font-weight: 600; color: var(--dark-gray); }
@@ -95,6 +103,7 @@
         .actions-cell { text-align: right; white-space: nowrap; }
         .actions-cell .btn { margin-left: 0.3rem; }
 
+        /* Special Table for Indicadores Mensais (Inspired by Image) */
         #ind-mensais-table thead tr th {
             background-color: var(--header-blue);
             color: #fff;
@@ -108,6 +117,7 @@
         .ind-val-blue { color: #0d47a1; font-weight: 700; }
         .ind-val-white { background-color: var(--primary-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;}
 
+        /* Utils */
         .total-cost { text-align: right; font-size: 1.3rem; font-weight: 700; margin-top: 1rem; color: var(--primary-dark); }
         .stock-warning { color: var(--error-color); font-weight: bold; }
         .stock-ok { color: var(--success-color); }
@@ -119,6 +129,7 @@
         .toast.show { opacity: 1; visibility: visible; }
         .toast.success { background-color: var(--success-color); } .toast.error { background-color: var(--error-color); }
 
+        /* Modal */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
         .modal-content { background-color: #fefefe; margin: 15% auto; padding: 25px; border: none; width: 90%; max-width: 400px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
         .modal-buttons { margin-top: 20px; display: flex; justify-content: center; gap: 10px; } 
@@ -231,7 +242,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v6.2 (Auto Fill Month)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v6.3 (Corrected Config Save)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -348,7 +359,7 @@
                     else if(coll === 'produtos') { renderProdutos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'insumos') { renderInsumos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'receitas') { renderReceitas(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); }
+                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); } // Update all indicators
                     else if(coll === 'vendasDiarias') { updateDashboard(); }
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
@@ -487,9 +498,41 @@
         function editReceita(id) { const r = cache.receitas.find(x => x.id === id); if (!r) return; showView('receitas'); document.getElementById('receita-id').value = r.id; document.getElementById('receita-nome').value = r.nome; document.getElementById('receita-venda').value = r.preco_venda || ''; const list = document.getElementById('ingredients-list'); list.innerHTML = ''; if (r.ingredientes && Array.isArray(r.ingredientes)) { r.ingredientes.forEach(ing => { addReceitaRow(ing.id, ing.qtd); }); } updateReceitaTotal(); document.getElementById('cancel-edit-receita').classList.remove('hidden'); document.getElementById('receita-form').scrollIntoView({behavior:'smooth'}); }
         document.getElementById('receita-form').addEventListener('submit', async e => { e.preventDefault(); const rows = document.querySelectorAll('.ingredient-row'); const ings = []; rows.forEach(r => { const id = r.querySelector('.ing-select').value; const qtd = parseFloat(r.querySelector('.ing-qtd').value); if(id && qtd>0) ings.push({id, qtd}); }); await saveData('receitas', { id: document.getElementById('receita-id').value || null, nome: document.getElementById('receita-nome').value, preco_venda: parseFloat(document.getElementById('receita-venda').value) || 0, ingredientes: ings }); document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('cancel-edit-receita').classList.add('hidden'); document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; await fetchData('receitas'); renderReceitas(); populateSelects(); updateDashboard(); showToast('Salvo!'); });
         document.getElementById('cancel-edit-receita').addEventListener('click', () => { document.getElementById('receita-form').reset(); document.getElementById('receita-id').value = ''; document.getElementById('ingredients-list').innerHTML = ''; document.getElementById('cancel-edit-receita').classList.add('hidden'); document.getElementById('custo-total-ingredientes').textContent = 'Custo: R$ 0,00'; });
-        async function fetchConfiguracoes(){if(isLocalMode)configCache=localData.configuracoes||{};else{try{const doc=await db.collection('configuracoes').doc(currentUser.uid).get();configCache=doc.exists?doc.data():{};}catch(e){}}displayConfiguracoes();}
-        function displayConfiguracoes(){Object.keys(configCache).forEach(k=>{const el=document.getElementById(`config-${k.replace(/_/g,'-')}`);if(el)el.value=configCache[k];});}
-        document.getElementById('configuracoes-form').addEventListener('submit', async e => { e.preventDefault(); const data = { custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value), rateio_por_pizza: parseFloat(document.getElementById('config-rateio-despesas-fixas').value), meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value), alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) }; if(isLocalMode) localData.configuracoes=data; else await db.collection('configuracoes').doc(currentUser.uid).set(data); configCache=data; showToast("Salvo!"); });
+
+        // --- CONFIGURATIONS (FIXED v6.3) ---
+        async function fetchConfiguracoes(){
+            if(isLocalMode) configCache=localData.configuracoes||{};
+            else{
+                try{ const doc=await db.collection('configuracoes').doc(currentUser.uid).get(); configCache=doc.exists?doc.data():{}; }catch(e){}
+            }
+            displayConfiguracoes();
+        }
+        function displayConfiguracoes(){
+            Object.keys(configCache).forEach(k => {
+                // Convert stored key (e.g., rateio_despesas_fixas) to HTML ID format (config-rateio-despesas-fixas)
+                const id = `config-${k.replace(/_/g,'-')}`;
+                const el = document.getElementById(id);
+                if(el) el.value=configCache[k];
+            });
+        }
+        document.getElementById('configuracoes-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = {
+                custo_hora_mao_de_obra: parseFloat(document.getElementById('config-custo-hora-mao-de-obra').value) || 0,
+                // FIX: Changed key name to match HTML ID logic (config-rateio-despesas-fixas -> rateio_despesas_fixas)
+                rateio_despesas_fixas: parseFloat(document.getElementById('config-rateio-despesas-fixas').value) || 0,
+                meta_cmv_padrao: parseFloat(document.getElementById('config-meta-cmv-padrao').value) || 0,
+                alerta_variacao: parseFloat(document.getElementById('config-alerta-variacao').value) || 0
+            };
+
+            if(isLocalMode) localData.configuracoes=data; 
+            else await db.collection('configuracoes').doc(currentUser.uid).set(data);
+            
+            configCache=data; 
+            showToast("Salvo!");
+        });
+        // ------------------------------------
+
         document.getElementById('btn-backup-download').addEventListener('click', async () => { if(!currentUser && !isLocalMode) return; const backupPayload = { timestamp: new Date(), configuracoes: configCache || {} }; for(const coll of COLLECTIONS_LIST) { backupPayload[coll] = await fetchFullDataForBackup(coll); } const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload)); const a = document.createElement('a'); a.href = url; a.download = `backup_pizzaria_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove(); });
         document.getElementById('btn-backup-restore-click').addEventListener('click', () => { if(confirm("ATENÇÃO: Restaurar o backup apagará os dados atuais e substituirá pelo arquivo. Deseja continuar?")) { document.getElementById('backup-file-input').click(); } });
         document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
