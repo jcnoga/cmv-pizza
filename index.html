@@ -187,7 +187,7 @@
                 <div style="overflow-x: auto;"><table id="ind-mensais-table"><thead><tr><th>Mês</th><th>Lucro Líquido</th><th>Margem Líquida (%)</th><th>Markup Realizado (%)</th></tr></thead><tbody></tbody></table></div>
             </section>
 
-            <!-- 3. PEDIDOS/VENDA DIÁRIOS -->
+            <!-- 3. VENDAS DIÁRIAS -->
             <section id="vendas-diarias-view" class="view">
                 <div class="card"><h2>Registrar Pedidos/Venda Diários</h2><div class="form-group"><label>Data do Movimento</label><input type="date" id="venda-data" required></div>
                     <div class="grid-container grid-2">
@@ -250,7 +250,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v6.5 (Realtime Stock Block)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v6.6 (Unit Conversion Fix)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -295,13 +295,9 @@
         document.getElementById('custo-mensal-mes')?.addEventListener('change', (e) => {
             const selectedMes = e.target.value;
             if (!selectedMes) return;
-
-            // Check if record exists
             const record = cache.custosMensais.find(c => c.mes === selectedMes);
             const chk = document.getElementById('enable-manual-edit');
-
             if (record) {
-                // Populate
                 document.getElementById('custo-mensal-id').value = record.id;
                 document.getElementById('custo-mensal-faturamento').value = record.faturamento;
                 document.getElementById('custo-mensal-custosVariaveis').value = record.custosVariaveis;
@@ -311,7 +307,6 @@
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = record.outrasReceitasDespesas;
                 showToast(`Dados de ${selectedMes} carregados.`);
             } else {
-                // Reset
                 document.getElementById('custo-mensal-id').value = '';
                 document.getElementById('custo-mensal-faturamento').value = '';
                 document.getElementById('custo-mensal-custosVariaveis').value = '';
@@ -319,16 +314,10 @@
                 document.getElementById('custo-mensal-despesasOperacionais').value = '';
                 document.getElementById('custo-mensal-impostos').value = '';
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = '';
-                // Check if there are daily sales for this new month to help user
                 const hasSales = cache.vendasDiarias.some(v => v.data && v.data.startsWith(selectedMes));
                 if(hasSales) showToast("Novo mês. Clique em 'Puxar do Diário' para importar o faturamento.");
             }
-
-            // Reset/Set Checkbox
-            if(chk) {
-                chk.checked = false; // Reset to disabled by default for safety
-                chk.dispatchEvent(new Event('change'));
-            }
+            if(chk) { chk.checked = false; chk.dispatchEvent(new Event('change')); }
         });
 
         // --- INDICADORES MENSAIS TABLE ---
@@ -367,7 +356,7 @@
                     else if(coll === 'produtos') { renderProdutos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'insumos') { renderInsumos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'receitas') { renderReceitas(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); } // Update all indicators
+                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); }
                     else if(coll === 'vendasDiarias') { updateDashboard(); }
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
@@ -391,9 +380,8 @@
 
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); renderIndicadoresMensais(); populateSelects(); updateDashboard(); }
 
-        // --- SMART STOCK LOGIC (NEW v6.5 - Realtime Simulation) ---
+        // --- SMART STOCK LOGIC (NEW v6.6 - Unit Conversion Fixed) ---
         function getVirtualStock(type, id) {
-            // 1. Get Real Stock from DB (Cache)
             let item, actualStock;
             if (type === 'product') {
                 item = cache.produtos.find(p => p.id === id);
@@ -403,25 +391,25 @@
                 actualStock = parseFloat(item ? item.estoque_atual : 0) || 0;
             }
 
-            // 2. Subtract what is currently in the buffer (pending sales)
             let reserved = 0;
             dailySalesBuffer.forEach(sale => {
-                // If user added a Product (Revenda)
                 if (sale.tipo === 'Produto' && type === 'product' && sale.itemId === id) {
                     reserved += parseFloat(sale.qtd);
-                } 
-                // If user added a Pizza, we need to check ingredients
-                else if (sale.tipo === 'Pizza' && type === 'insumo') {
+                } else if (sale.tipo === 'Pizza' && type === 'insumo') {
                     let recipe = cache.receitas.find(r => r.id === sale.itemId);
                     if (recipe && recipe.ingredientes) {
                         let ing = recipe.ingredientes.find(i => i.id === id);
                         if (ing) {
-                            reserved += (parseFloat(ing.qtd) * parseFloat(sale.qtd));
+                            let rawQty = parseFloat(ing.qtd);
+                            // Conversion Logic for Reservation
+                            if (item.unidade_embalagem === 'kg' || item.unidade_embalagem === 'L') {
+                                rawQty = rawQty / 1000;
+                            }
+                            reserved += (rawQty * parseFloat(sale.qtd));
                         }
                     }
                 }
             });
-
             return actualStock - reserved;
         }
 
@@ -438,7 +426,13 @@
                     for(const ing of receita.ingredientes) {
                         const insumo = cache.insumos.find(i => i.id === ing.id);
                         if(insumo) {
-                            const amountUsed = (parseFloat(ing.qtd)||0) * parseFloat(item.qtd);
+                            let amountUsed = parseFloat(ing.qtd);
+                            // Conversion Logic
+                            if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
+                                amountUsed = amountUsed / 1000;
+                            }
+                            amountUsed = amountUsed * parseFloat(item.qtd);
+                            
                             insumo.estoque_atual = (parseFloat(insumo.estoque_atual)||0) - amountUsed;
                             await saveData('insumos', insumo);
                         }
@@ -460,7 +454,13 @@
                     for(const ing of receita.ingredientes) {
                         const insumo = cache.insumos.find(i => i.id === ing.id);
                         if(insumo) {
-                            const amountUsed = (parseFloat(ing.qtd)||0) * parseFloat(item.qtd);
+                            let amountUsed = parseFloat(ing.qtd);
+                            // Conversion Logic
+                            if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
+                                amountUsed = amountUsed / 1000;
+                            }
+                            amountUsed = amountUsed * parseFloat(item.qtd);
+
                             insumo.estoque_atual = (parseFloat(insumo.estoque_atual)||0) + amountUsed;
                             await saveData('insumos', insumo);
                         }
@@ -588,11 +588,19 @@
                 let missing = [];
                 if(recipe && recipe.ingredientes) {
                     recipe.ingredientes.forEach(ing => {
+                        // Calculate needed amount in Base Unit (g or ml)
                         let needed = (parseFloat(ing.qtd) * qtd);
+                        let insumo = cache.insumos.find(i => i.id === ing.id);
+                        
+                        // Normalize NEEDED to Stock Unit for comparison
+                        if (insumo && (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L')) {
+                             needed = needed / 1000;
+                        }
+
                         let available = getVirtualStock('insumo', ing.id);
                         if(available < needed) {
-                            let insName = cache.insumos.find(i => i.id === ing.id)?.nome || 'Desconhecido';
-                            missing.push(`- ${insName}: Precisa ${needed}, Disp. ${available.toFixed(2)}`);
+                            let insName = insumo ? insumo.nome : 'Desconhecido';
+                            missing.push(`- ${insName}: Precisa ${needed.toFixed(2)}, Disp. ${available.toFixed(2)}`);
                         }
                     });
                 }
