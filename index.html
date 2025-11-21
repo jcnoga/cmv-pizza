@@ -251,7 +251,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v6.7 (Immediate Sale & Stock)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v6.8 (View Switch Fix)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -292,17 +292,64 @@
         const chkManual = document.getElementById('enable-manual-edit');
         if(chkManual) { chkManual.addEventListener('change', (e) => { const fields = ['custo-mensal-faturamento', 'custo-mensal-custosVariaveis','custo-mensal-custosFixos', 'custo-mensal-despesasOperacionais', 'custo-mensal-impostos', 'custo-mensal-outrasReceitasDespesas']; fields.forEach(id => { const el = document.getElementById(id); if(el) el.disabled = !e.target.checked; }); }); }
 
-        // --- NEW LOGIC: AUTO FILL MONTHLY FORM ---
+        // --- NEW: EXPANDED VIEW SWITCHER (v6.8) ---
+        async function showView(id) {
+            // 1. Toggle UI
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id + '-view')?.classList.add('active');
+            
+            // 2. Update Tab Specific Data
+            switch (id) {
+                case 'dashboard':
+                    updateDashboard();
+                    break;
+                case 'vendas-diarias':
+                    populateSelects();
+                    // Ensure sales table reflects current date selection
+                    const currentVal = document.getElementById('venda-data').value;
+                    if(currentVal) loadDailySales(currentVal);
+                    else initDateAndLoad();
+                    break;
+                case 'custos-mensais':
+                    renderCustosMensais();
+                    break;
+                case 'indicadores-mensais':
+                    renderIndicadoresMensais();
+                    break;
+                case 'produtos':
+                    renderProdutos();
+                    populateSelects();
+                    break;
+                case 'insumos':
+                    renderInsumos();
+                    populateSelects();
+                    break;
+                case 'receitas':
+                    renderReceitas();
+                    populateSelects();
+                    break;
+                case 'fornecedores':
+                    renderFornecedoresTable();
+                    break;
+                case 'configuracoes':
+                    await fetchConfiguracoes();
+                    break;
+                case 'lista-compras':
+                    // No default action needed, user clicks generate
+                    break;
+            }
+        }
+        // Update Nav Listener to call the new showView
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(l => l.addEventListener('click', e => { e.preventDefault(); showView(e.target.dataset.view); }));
+
+        // --- AUTO FILL MONTHLY FORM ---
         document.getElementById('custo-mensal-mes')?.addEventListener('change', (e) => {
             const selectedMes = e.target.value;
             if (!selectedMes) return;
-
-            // Check if record exists
             const record = cache.custosMensais.find(c => c.mes === selectedMes);
             const chk = document.getElementById('enable-manual-edit');
-
             if (record) {
-                // Populate
                 document.getElementById('custo-mensal-id').value = record.id;
                 document.getElementById('custo-mensal-faturamento').value = record.faturamento;
                 document.getElementById('custo-mensal-custosVariaveis').value = record.custosVariaveis;
@@ -312,7 +359,6 @@
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = record.outrasReceitasDespesas;
                 showToast(`Dados de ${selectedMes} carregados.`);
             } else {
-                // Reset
                 document.getElementById('custo-mensal-id').value = '';
                 document.getElementById('custo-mensal-faturamento').value = '';
                 document.getElementById('custo-mensal-custosVariaveis').value = '';
@@ -320,16 +366,10 @@
                 document.getElementById('custo-mensal-despesasOperacionais').value = '';
                 document.getElementById('custo-mensal-impostos').value = '';
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = '';
-                // Check if there are daily sales for this new month to help user
                 const hasSales = cache.vendasDiarias.some(v => v.data && v.data.startsWith(selectedMes));
                 if(hasSales) showToast("Novo mês. Clique em 'Puxar do Diário' para importar o faturamento.");
             }
-
-            // Reset/Set Checkbox
-            if(chk) {
-                chk.checked = false; // Reset to disabled by default for safety
-                chk.dispatchEvent(new Event('change'));
-            }
+            if(chk) { chk.checked = false; chk.dispatchEvent(new Event('change')); }
         });
 
         // --- INDICADORES MENSAIS TABLE ---
@@ -364,12 +404,11 @@
                     const coll = itemParaExcluir.collection;
                     if (!isLocalMode) cache[coll] = cache[coll].filter(i => i.id !== itemParaExcluir.id);
                     await fetchData(coll);
-                    if(coll === 'fornecedores') { renderFornecedoresTable(); populateSelects(); }
-                    else if(coll === 'produtos') { renderProdutos(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'insumos') { renderInsumos(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'receitas') { renderReceitas(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); }
-                    else if(coll === 'vendasDiarias') { updateDashboard(); }
+                    // Force Refresh for specific tabs if needed
+                    if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); }
+                    else if(coll === 'vendasDiarias') { loadDailySales(document.getElementById('venda-data').value); updateDashboard(); }
+                    else { showView(coll); } // General refresh
+                    
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
                 finally { confirmModal.style.display = 'none'; btnYes.textContent = "Sim"; btnYes.disabled = false; itemParaExcluir = null; }
@@ -691,7 +730,7 @@
         });
         document.getElementById('btn-backup-download').addEventListener('click', async () => { if(!currentUser && !isLocalMode) return; const backupPayload = { timestamp: new Date(), configuracoes: configCache || {} }; for(const coll of COLLECTIONS_LIST) { backupPayload[coll] = await fetchFullDataForBackup(coll); } const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload)); const a = document.createElement('a'); a.href = url; a.download = `backup_pizzaria_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove(); });
         document.getElementById('btn-backup-restore-click').addEventListener('click', () => { if(confirm("ATENÇÃO: Restaurar o backup apagará os dados atuais e substituirá pelo arquivo. Deseja continuar?")) { document.getElementById('backup-file-input').click(); } });
-        document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData.configuracoes = d.configuracoes; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
+        document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
         document.body.addEventListener('click', e => { const btn = e.target.closest('button'); if (!btn) return; const id = btn.dataset.id; 
             if(btn.classList.contains('btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(id); } 
             else if(btn.classList.contains('btn-edit-produto')) { e.preventDefault(); editProduto(id); } 
