@@ -194,7 +194,8 @@
                         <div style="background: #fff3e0; padding: 15px; border-radius: 8px;"><h3>🍕 Venda de Pizzas</h3><div class="form-group"><label>Sabor (Receita)</label><select id="venda-pizza-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-pizza-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-pizza-valor" step="0.01"></div></div><button class="btn btn-primary" id="btn-add-pizza-sale">Adicionar Pizza</button></div>
                         <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;"><h3>🥤 Venda de Produtos (Revenda)</h3><div class="form-group"><label>Produto</label><select id="venda-produto-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-produto-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-produto-valor" step="0.01"></div></div><button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button></div>
                     </div>
-                    <h3 style="margin-top: 20px;">Itens lançados no dia <span id="display-data-selecionada"></span>:</h3><table id="sales-table"><thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead><tbody></tbody></table><div class="total-cost" id="daily-total-display">Total do Dia: R$ 0,00</div><button class="btn btn-success" id="btn-save-day" style="margin-top: 15px;">💾 Salvar Movimento do Dia</button>
+                    <h3 style="margin-top: 20px;">Itens lançados no dia <span id="display-data-selecionada"></span>:</h3><table id="sales-table"><thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead><tbody></tbody></table><div class="total-cost" id="daily-total-display">Total do Dia: R$ 0,00</div>
+                    <!-- BUTTON REMOVED HERE -->
                 </div>
             </section>
 
@@ -250,7 +251,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v6.6 (Unit Conversion Fix)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v6.7 (Immediate Sale & Stock)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -295,9 +296,13 @@
         document.getElementById('custo-mensal-mes')?.addEventListener('change', (e) => {
             const selectedMes = e.target.value;
             if (!selectedMes) return;
+
+            // Check if record exists
             const record = cache.custosMensais.find(c => c.mes === selectedMes);
             const chk = document.getElementById('enable-manual-edit');
+
             if (record) {
+                // Populate
                 document.getElementById('custo-mensal-id').value = record.id;
                 document.getElementById('custo-mensal-faturamento').value = record.faturamento;
                 document.getElementById('custo-mensal-custosVariaveis').value = record.custosVariaveis;
@@ -307,6 +312,7 @@
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = record.outrasReceitasDespesas;
                 showToast(`Dados de ${selectedMes} carregados.`);
             } else {
+                // Reset
                 document.getElementById('custo-mensal-id').value = '';
                 document.getElementById('custo-mensal-faturamento').value = '';
                 document.getElementById('custo-mensal-custosVariaveis').value = '';
@@ -314,10 +320,16 @@
                 document.getElementById('custo-mensal-despesasOperacionais').value = '';
                 document.getElementById('custo-mensal-impostos').value = '';
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = '';
+                // Check if there are daily sales for this new month to help user
                 const hasSales = cache.vendasDiarias.some(v => v.data && v.data.startsWith(selectedMes));
                 if(hasSales) showToast("Novo mês. Clique em 'Puxar do Diário' para importar o faturamento.");
             }
-            if(chk) { chk.checked = false; chk.dispatchEvent(new Event('change')); }
+
+            // Reset/Set Checkbox
+            if(chk) {
+                chk.checked = false; // Reset to disabled by default for safety
+                chk.dispatchEvent(new Event('change'));
+            }
         });
 
         // --- INDICADORES MENSAIS TABLE ---
@@ -390,27 +402,7 @@
                 item = cache.insumos.find(i => i.id === id);
                 actualStock = parseFloat(item ? item.estoque_atual : 0) || 0;
             }
-
-            let reserved = 0;
-            dailySalesBuffer.forEach(sale => {
-                if (sale.tipo === 'Produto' && type === 'product' && sale.itemId === id) {
-                    reserved += parseFloat(sale.qtd);
-                } else if (sale.tipo === 'Pizza' && type === 'insumo') {
-                    let recipe = cache.receitas.find(r => r.id === sale.itemId);
-                    if (recipe && recipe.ingredientes) {
-                        let ing = recipe.ingredientes.find(i => i.id === id);
-                        if (ing) {
-                            let rawQty = parseFloat(ing.qtd);
-                            // Conversion Logic for Reservation
-                            if (item.unidade_embalagem === 'kg' || item.unidade_embalagem === 'L') {
-                                rawQty = rawQty / 1000;
-                            }
-                            reserved += (rawQty * parseFloat(sale.qtd));
-                        }
-                    }
-                }
-            });
-            return actualStock - reserved;
+            return actualStock; // Simplified for immediate mode
         }
 
         async function deductStock(item) {
@@ -559,103 +551,93 @@
         pizzaSelect.addEventListener('change', calcPizzaTotal); pizzaQtd.addEventListener('input', calcPizzaTotal);
         const prodSelect = document.getElementById('venda-produto-select'); const prodQtd = document.getElementById('venda-produto-qtd'); const prodVal = document.getElementById('venda-produto-valor'); function calcProdTotal() { const id = prodSelect.value; const qtd = parseFloat(prodQtd.value) || 0; if(!id) { prodVal.value = ''; return; } const produto = cache.produtos.find(p => p.id === id); if(produto && produto.preco_venda) { prodVal.value = (parseFloat(produto.preco_venda) * qtd).toFixed(2); } }
         prodSelect.addEventListener('change', calcProdTotal); prodQtd.addEventListener('input', calcProdTotal);
-        function renderDailySalesTable() { const tbody = document.getElementById('sales-table').querySelector('tbody'); tbody.innerHTML = ''; let total = 0; dailySalesBuffer.forEach((item, index) => { total += item.valor; tbody.innerHTML += `<tr><td>${item.tipo}</td><td>${item.nome}</td><td>${item.qtd}</td><td>${formatMoney(item.valor)}</td><td><button class="btn btn-danger btn-small" onclick="removeSaleItem(${index})">X</button></td></tr>`; }); document.getElementById('daily-total-display').textContent = 'Total do Dia: ' + formatMoney(total); }
+        function renderDailySalesTable() { const tbody = document.getElementById('sales-table').querySelector('tbody'); tbody.innerHTML = ''; let total = 0; dailySalesBuffer.forEach((item, index) => { total += item.valor; tbody.innerHTML += `<tr><td>${item.tipo}</td><td>${item.nome}</td><td>${item.qtd}</td><td>${formatMoney(item.valor)}</td><td><button class="btn btn-danger btn-small" onclick="removeSaleItem('${item.id}')">X</button></td></tr>`; }); document.getElementById('daily-total-display').textContent = 'Total do Dia: ' + formatMoney(total); }
         
-        window.removeSaleItem = async function(index) { 
-            const item = dailySalesBuffer[index]; 
-            if(item.id) { 
-                if(!confirm("Este item já está salvo. Ao excluir, o estoque será estornado. Continuar?")) return; 
-                await deleteData('vendasDiarias', item.id); 
-                await restockItem(item); // NEW: Restock
+        // --- IMMEDIATE REMOVE & RESTOCK ---
+        window.removeSaleItem = async function(id) { 
+            if(!confirm("Estornar venda e devolver ao estoque?")) return;
+            const item = cache.vendasDiarias.find(v => v.id === id);
+            if(item) {
+                await restockItem(item); 
+                await deleteData('vendasDiarias', id); 
                 await fetchData('vendasDiarias'); 
+                loadDailySales(document.getElementById('venda-data').value);
                 updateDashboard(); 
-            } 
-            dailySalesBuffer.splice(index, 1); 
-            renderDailySalesTable(); 
-            showToast("Item removido e estoque ajustado."); 
+                showToast("Venda estornada."); 
+            }
         };
 
-        // --- ADD BUTTON LOGIC (UPDATED FOR STOCK CHECK) ---
-        document.getElementById('btn-add-pizza-sale').addEventListener('click', () => {
+        // --- ADD BUTTON LOGIC (UPDATED v6.7 - IMMEDIATE ACTION) ---
+        document.getElementById('btn-add-pizza-sale').addEventListener('click', async () => {
             const id = pizzaSelect.value; 
             const qtd = parseFloat(pizzaQtd.value); 
             const val = parseFloat(pizzaVal.value); 
             if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; } 
             
+            const receita = cache.receitas.find(r => r.id === id);
+
             // CHECK STOCK
             if(configCache.controlar_estoque) {
-                let recipe = cache.receitas.find(r => r.id === id);
                 let missing = [];
-                if(recipe && recipe.ingredientes) {
-                    recipe.ingredientes.forEach(ing => {
-                        // Calculate needed amount in Base Unit (g or ml)
+                if(receita && receita.ingredientes) {
+                    receita.ingredientes.forEach(ing => {
                         let needed = (parseFloat(ing.qtd) * qtd);
                         let insumo = cache.insumos.find(i => i.id === ing.id);
-                        
-                        // Normalize NEEDED to Stock Unit for comparison
-                        if (insumo && (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L')) {
-                             needed = needed / 1000;
-                        }
-
-                        let available = getVirtualStock('insumo', ing.id);
+                        if (insumo && (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L')) { needed = needed / 1000; }
+                        let available = getVirtualStock('insumo', ing.id); // getVirtualStock actually just gets current stock in v6.7 context
                         if(available < needed) {
                             let insName = insumo ? insumo.nome : 'Desconhecido';
                             missing.push(`- ${insName}: Precisa ${needed.toFixed(2)}, Disp. ${available.toFixed(2)}`);
                         }
                     });
                 }
-                if(missing.length > 0) {
-                    alert("⚠️ ESTOQUE INSUFICIENTE!\n\n" + missing.join("\n"));
-                    return;
-                }
+                if(missing.length > 0) { alert("⚠️ ESTOQUE INSUFICIENTE!\n\n" + missing.join("\n")); return; }
             }
 
-            const receita = cache.receitas.find(r => r.id === id);
-            dailySalesBuffer.push({ tipo: 'Pizza', itemId: id, nome: receita ? receita.nome : '?', qtd: qtd, valor: val }); 
+            const saleItem = { tipo: 'Pizza', itemId: id, nome: receita ? receita.nome : '?', qtd: qtd, valor: val, data: document.getElementById('venda-data').value };
+            
+            await saveData('vendasDiarias', saleItem);
+            await deductStock(saleItem);
+            
+            await fetchData('vendasDiarias'); 
+            loadDailySales(saleItem.data); 
+            updateDashboard();
+            
             pizzaSelect.value = ''; pizzaQtd.value = 1; pizzaVal.value = ''; 
-            renderDailySalesTable(); 
+            showToast("Venda registrada e estoque baixado!");
         });
 
-        document.getElementById('btn-add-prod-sale').addEventListener('click', () => { 
+        document.getElementById('btn-add-prod-sale').addEventListener('click', async () => { 
             const id = prodSelect.value; 
             const qtd = parseFloat(prodQtd.value); 
             const val = parseFloat(prodVal.value); 
             if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; } 
             
+            const produto = cache.produtos.find(p => p.id === id); 
+
             // CHECK STOCK
             if(configCache.controlar_estoque) {
                 let available = getVirtualStock('product', id);
                 if(available < qtd) {
-                    let prodName = cache.produtos.find(p => p.id === id)?.nome || 'Produto';
+                    let prodName = produto ? produto.nome : 'Produto';
                     alert(`⚠️ ESTOQUE INSUFICIENTE!\n\n- ${prodName}: Precisa ${qtd}, Disp. ${available.toFixed(2)}`);
                     return;
                 }
             }
 
-            const produto = cache.produtos.find(p => p.id === id); 
-            dailySalesBuffer.push({ tipo: 'Produto', itemId: id, nome: produto ? produto.nome : '?', qtd: qtd, valor: val }); 
+            const saleItem = { tipo: 'Produto', itemId: id, nome: produto ? produto.nome : '?', qtd: qtd, valor: val, data: document.getElementById('venda-data').value };
+            
+            await saveData('vendasDiarias', saleItem);
+            await deductStock(saleItem);
+            
+            await fetchData('vendasDiarias');
+            loadDailySales(saleItem.data);
+            updateDashboard();
+
             prodSelect.value = ''; prodQtd.value = 1; prodVal.value = ''; 
-            renderDailySalesTable(); 
+            showToast("Venda registrada e estoque baixado!");
         });
         
-        // --- UPDATED SAVE DAY (REMOVED DUPLICATE CHECK, NOW HANDLED AT ADD) ---
-        document.getElementById('btn-save-day').addEventListener('click', async () => { 
-            if(dailySalesBuffer.length === 0) { showToast("Nenhum item para salvar", "error"); return; } 
-            const dataMov = document.getElementById('venda-data').value; 
-            if(!dataMov) { showToast("Selecione a data", "error"); return; } 
-
-            for(const item of dailySalesBuffer) { 
-                if(!item.id) {
-                    await saveData('vendasDiarias', { ...item, data: dataMov }); 
-                    await deductStock(item); 
-                }
-            } 
-            await fetchData('vendasDiarias'); 
-            loadDailySales(dataMov); 
-            updateDashboard(); 
-            showToast("Movimento do dia salvo e estoque atualizado!"); 
-        });
-
         // CRUD & HELPERS (Same as before)
         function renderFornecedoresTable() { const tbody = document.getElementById('fornecedores-table').querySelector('tbody'); tbody.innerHTML = ''; if (!cache.fornecedores.length) { tbody.innerHTML = '<tr><td colspan="5">Vazio.</td></tr>'; return; } [...cache.fornecedores].sort((a,b)=>(a.nome||"").localeCompare(b.nome||"")).forEach(f => { if(!f.id) return; tbody.innerHTML += `<tr><td>${f.nome}</td><td>${f.contato||''}</td><td>${f.telefone||''}</td><td>${f.endereco||''}</td><td class="actions-cell"><button class="btn btn-secondary btn-small btn-edit-fornecedor" data-id="${f.id}">✎</button> <button class="btn btn-danger btn-small btn-delete-fornecedor" data-id="${f.id}">🗑</button></td></tr>`; }); }
         function editFornecedor(id) { const f = cache.fornecedores.find(i => i.id === id); if (!f) return; showView('fornecedores'); document.getElementById('fornecedor-id').value = f.id; document.getElementById('fornecedor-nome').value = f.nome; document.getElementById('fornecedor-contato').value = f.contato||''; document.getElementById('fornecedor-telefone').value = f.telefone||''; document.getElementById('fornecedor-email').value = f.email||''; document.getElementById('fornecedor-endereco').value = f.endereco||''; document.getElementById('fornecedor-form-title').textContent = 'Editar Fornecedor'; document.getElementById('cancel-edit-fornecedor').classList.remove('hidden'); document.getElementById('fornecedor-form').scrollIntoView({behavior:'smooth'}); }
@@ -709,7 +691,7 @@
         });
         document.getElementById('btn-backup-download').addEventListener('click', async () => { if(!currentUser && !isLocalMode) return; const backupPayload = { timestamp: new Date(), configuracoes: configCache || {} }; for(const coll of COLLECTIONS_LIST) { backupPayload[coll] = await fetchFullDataForBackup(coll); } const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload)); const a = document.createElement('a'); a.href = url; a.download = `backup_pizzaria_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove(); });
         document.getElementById('btn-backup-restore-click').addEventListener('click', () => { if(confirm("ATENÇÃO: Restaurar o backup apagará os dados atuais e substituirá pelo arquivo. Deseja continuar?")) { document.getElementById('backup-file-input').click(); } });
-        document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
+        document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData.configuracoes = d.configuracoes; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
         document.body.addEventListener('click', e => { const btn = e.target.closest('button'); if (!btn) return; const id = btn.dataset.id; 
             if(btn.classList.contains('btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(id); } 
             else if(btn.classList.contains('btn-edit-produto')) { e.preventDefault(); editProduto(id); } 
