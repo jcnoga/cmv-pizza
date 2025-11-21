@@ -195,7 +195,6 @@
                         <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;"><h3>🥤 Venda de Produtos (Revenda)</h3><div class="form-group"><label>Produto</label><select id="venda-produto-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-produto-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-produto-valor" step="0.01"></div></div><button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button></div>
                     </div>
                     <h3 style="margin-top: 20px;">Itens lançados no dia <span id="display-data-selecionada"></span>:</h3><table id="sales-table"><thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead><tbody></tbody></table><div class="total-cost" id="daily-total-display">Total do Dia: R$ 0,00</div>
-                    <!-- BUTTON REMOVED HERE -->
                 </div>
             </section>
 
@@ -203,7 +202,6 @@
             <section id="custos-mensais-view" class="view">
                 <div class="card">
                     <h2>Fechamento Mensal (Dados Brutos)</h2>
-                    <!-- Adicionado ID ao form -->
                     <form id="custo-mensal-form">
                         <input type="hidden" id="custo-mensal-id">
                         <div class="form-row">
@@ -251,7 +249,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v6.7 (Immediate Sale & Stock)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v6.8 (Auto Conversion & Simulation)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -296,13 +294,9 @@
         document.getElementById('custo-mensal-mes')?.addEventListener('change', (e) => {
             const selectedMes = e.target.value;
             if (!selectedMes) return;
-
-            // Check if record exists
             const record = cache.custosMensais.find(c => c.mes === selectedMes);
             const chk = document.getElementById('enable-manual-edit');
-
             if (record) {
-                // Populate
                 document.getElementById('custo-mensal-id').value = record.id;
                 document.getElementById('custo-mensal-faturamento').value = record.faturamento;
                 document.getElementById('custo-mensal-custosVariaveis').value = record.custosVariaveis;
@@ -312,7 +306,6 @@
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = record.outrasReceitasDespesas;
                 showToast(`Dados de ${selectedMes} carregados.`);
             } else {
-                // Reset
                 document.getElementById('custo-mensal-id').value = '';
                 document.getElementById('custo-mensal-faturamento').value = '';
                 document.getElementById('custo-mensal-custosVariaveis').value = '';
@@ -320,19 +313,12 @@
                 document.getElementById('custo-mensal-despesasOperacionais').value = '';
                 document.getElementById('custo-mensal-impostos').value = '';
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = '';
-                // Check if there are daily sales for this new month to help user
                 const hasSales = cache.vendasDiarias.some(v => v.data && v.data.startsWith(selectedMes));
                 if(hasSales) showToast("Novo mês. Clique em 'Puxar do Diário' para importar o faturamento.");
             }
-
-            // Reset/Set Checkbox
-            if(chk) {
-                chk.checked = false; // Reset to disabled by default for safety
-                chk.dispatchEvent(new Event('change'));
-            }
+            if(chk) { chk.checked = false; chk.dispatchEvent(new Event('change')); }
         });
 
-        // --- INDICADORES MENSAIS TABLE ---
         function renderIndicadoresMensais() {
             const tbody = document.getElementById('ind-mensais-table').querySelector('tbody');
             tbody.innerHTML = '';
@@ -352,7 +338,6 @@
         document.getElementById('btn-export-pdf')?.addEventListener('click', () => { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.text("Indicadores Mensais - Pizzaria Cost Control", 14, 15); doc.autoTable({ html: '#ind-mensais-table', startY: 20, theme: 'striped', headStyles: { fillColor: [0, 91, 150] } }); doc.save('indicadores_mensais.pdf'); });
         document.getElementById('btn-export-excel')?.addEventListener('click', () => { let csvContent = "data:text/csv;charset=utf-8,Mes;Lucro Liquido;Margem Liquida;Markup Realizado\r\n"; const sorted = [...cache.custosMensais].sort((a,b) => a.mes.localeCompare(b.mes)); sorted.forEach(c => { const custoTotal = (c.custosVariaveis||0) + (c.custosFixos||0) + (c.despesasOperacionais||0) + (c.impostos||0); const lucro = (c.faturamento||0) - custoTotal + (c.outrasReceitasDespesas||0); const margem = c.faturamento > 0 ? (lucro / c.faturamento) * 100 : 0; const markup = custoTotal > 0 ? (((c.faturamento - custoTotal) / custoTotal) * 100) : 0; const row = `${c.mes};${lucro.toFixed(2)};${margem.toFixed(2)}%;${markup.toFixed(2)}%`; csvContent += row + "\r\n"; }); const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", "indicadores_mensais.csv"); document.body.appendChild(link); link.click(); link.remove(); });
 
-        // --- CORE FUNCTIONS ---
         const confirmModal = document.getElementById('confirm-modal');
         const btnYes = document.getElementById('confirm-modal-yes');
         const btnNo = document.getElementById('confirm-modal-no');
@@ -392,40 +377,39 @@
 
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); renderIndicadoresMensais(); populateSelects(); updateDashboard(); }
 
-        // --- SMART STOCK LOGIC (NEW v6.6 - Unit Conversion Fixed) ---
-        function getVirtualStock(type, id) {
-            let item, actualStock;
-            if (type === 'product') {
-                item = cache.produtos.find(p => p.id === id);
-                actualStock = parseFloat(item ? item.estoque_atual : 0) || 0;
-            } else {
-                item = cache.insumos.find(i => i.id === id);
-                actualStock = parseFloat(item ? item.estoque_atual : 0) || 0;
+        // ----------------------------------------------------
+        // FUNÇÕES DE CONTROLE DE ESTOQUE COM CONVERSÃO (ATUALIZADAS)
+        // ----------------------------------------------------
+
+        // Função auxiliar para calcular o valor a ser baixado já convertido
+        function calculateDeduction(insumo, qtdReceita, qtdVenda) {
+            let qtdTotalNecessaria = parseFloat(qtdReceita) * parseFloat(qtdVenda);
+            // Se o estoque está em KG ou Litros, mas a receita é g ou ml -> divide por 1000
+            let divisor = 1;
+            if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
+                divisor = 1000;
             }
-            return actualStock; // Simplified for immediate mode
+            return qtdTotalNecessaria / divisor;
         }
 
         async function deductStock(item) {
+            // 1. BAIXA DE PRODUTO (Revenda)
             if(item.tipo === 'Produto') {
                 const prod = cache.produtos.find(p => p.id === item.itemId);
                 if(prod) {
                     prod.estoque_atual = (parseFloat(prod.estoque_atual)||0) - parseFloat(item.qtd);
                     await saveData('produtos', prod);
                 }
-            } else if(item.tipo === 'Pizza') {
+            } 
+            // 2. BAIXA DE PIZZA (Baixa nos Insumos da Receita)
+            else if(item.tipo === 'Pizza') {
                 const receita = cache.receitas.find(r => r.id === item.itemId);
                 if(receita && receita.ingredientes) {
                     for(const ing of receita.ingredientes) {
                         const insumo = cache.insumos.find(i => i.id === ing.id);
                         if(insumo) {
-                            let amountUsed = parseFloat(ing.qtd);
-                            // Conversion Logic
-                            if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
-                                amountUsed = amountUsed / 1000;
-                            }
-                            amountUsed = amountUsed * parseFloat(item.qtd);
-                            
-                            insumo.estoque_atual = (parseFloat(insumo.estoque_atual)||0) - amountUsed;
+                            const amountToDeduct = calculateDeduction(insumo, ing.qtd, item.qtd);
+                            insumo.estoque_atual = (parseFloat(insumo.estoque_atual)||0) - amountToDeduct;
                             await saveData('insumos', insumo);
                         }
                     }
@@ -434,6 +418,7 @@
         }
 
         async function restockItem(item) {
+            // Função inversa (para estorno/exclusão da venda)
             if(item.tipo === 'Produto') {
                 const prod = cache.produtos.find(p => p.id === item.itemId);
                 if(prod) {
@@ -446,21 +431,15 @@
                     for(const ing of receita.ingredientes) {
                         const insumo = cache.insumos.find(i => i.id === ing.id);
                         if(insumo) {
-                            let amountUsed = parseFloat(ing.qtd);
-                            // Conversion Logic
-                            if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
-                                amountUsed = amountUsed / 1000;
-                            }
-                            amountUsed = amountUsed * parseFloat(item.qtd);
-
-                            insumo.estoque_atual = (parseFloat(insumo.estoque_atual)||0) + amountUsed;
+                            const amountToReturn = calculateDeduction(insumo, ing.qtd, item.qtd);
+                            insumo.estoque_atual = (parseFloat(insumo.estoque_atual)||0) + amountToReturn;
                             await saveData('insumos', insumo);
                         }
                     }
                 }
             }
         }
-        // -------------------------------------
+        // ----------------------------------------------------
 
         function updateDashboard() {
             document.getElementById('dashboard-num-receitas').textContent = cache.receitas.length;
@@ -468,7 +447,7 @@
             
             const alertsDiv = document.getElementById('stock-alerts');
             let alertsHtml = '';
-            cache.insumos.forEach(i => { if((parseFloat(i.estoque_atual)||0) <= (parseFloat(i.estoque_min)||0)) alertsHtml += `<div class="alert-item cmv-danger">⚠️ Insumo <strong>${i.nome}</strong> baixo (Atual: ${i.estoque_atual})</div>`; });
+            cache.insumos.forEach(i => { if((parseFloat(i.estoque_atual)||0) <= (parseFloat(i.estoque_min)||0)) alertsHtml += `<div class="alert-item cmv-danger">⚠️ Insumo <strong>${i.nome}</strong> baixo (Atual: ${parseFloat(i.estoque_atual).toFixed(2)} ${i.unidade_embalagem})</div>`; });
             cache.produtos.forEach(p => { if((parseFloat(p.estoque_atual)||0) <= (parseFloat(p.estoque_min)||0)) alertsHtml += `<div class="alert-item cmv-danger">⚠️ Produto <strong>${p.nome}</strong> baixo (Atual: ${p.estoque_atual})</div>`; });
             if(alertsHtml === '') alertsHtml = '<p class="stock-ok">✅ Tudo certo com o estoque.</p>';
             alertsDiv.innerHTML = alertsHtml;
@@ -561,79 +540,122 @@
                 await restockItem(item); 
                 await deleteData('vendasDiarias', id); 
                 await fetchData('vendasDiarias'); 
+                await fetchData('insumos');
+                await fetchData('produtos');
                 loadDailySales(document.getElementById('venda-data').value);
                 updateDashboard(); 
                 showToast("Venda estornada."); 
             }
         };
 
-        // --- ADD BUTTON LOGIC (UPDATED v6.7 - IMMEDIATE ACTION) ---
+        // --- BOTÃO ADICIONAR PIZZA (COM SIMULAÇÃO E BAIXA IMEDIATA) ---
         document.getElementById('btn-add-pizza-sale').addEventListener('click', async () => {
             const id = pizzaSelect.value; 
             const qtd = parseFloat(pizzaQtd.value); 
             const val = parseFloat(pizzaVal.value); 
+            
             if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; } 
             
             const receita = cache.receitas.find(r => r.id === id);
+            if (!receita) return;
 
-            // CHECK STOCK
+            // 1. SIMULAÇÃO DE ESTOQUE (Verificação antes da venda)
             if(configCache.controlar_estoque) {
                 let missing = [];
-                if(receita && receita.ingredientes) {
+                if(receita.ingredientes) {
                     receita.ingredientes.forEach(ing => {
-                        let needed = (parseFloat(ing.qtd) * qtd);
                         let insumo = cache.insumos.find(i => i.id === ing.id);
-                        if (insumo && (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L')) { needed = needed / 1000; }
-                        let available = getVirtualStock('insumo', ing.id); // getVirtualStock actually just gets current stock in v6.7 context
-                        if(available < needed) {
-                            let insName = insumo ? insumo.nome : 'Desconhecido';
-                            missing.push(`- ${insName}: Precisa ${needed.toFixed(2)}, Disp. ${available.toFixed(2)}`);
+                        if(insumo) {
+                            // Calcula quanto precisa para ESSA venda especificamente
+                            let neededForThisSale = calculateDeduction(insumo, ing.qtd, qtd);
+                            let currentStock = parseFloat(insumo.estoque_atual) || 0;
+
+                            // Verifica se o estoque atual suporta a baixa
+                            if(currentStock < neededForThisSale) {
+                                let unitDisplay = insumo.unidade_embalagem; 
+                                missing.push(`- ${insumo.nome}: Precisa ${neededForThisSale.toFixed(3)}${unitDisplay}, Disp. ${currentStock.toFixed(3)}${unitDisplay}`);
+                            }
                         }
                     });
                 }
-                if(missing.length > 0) { alert("⚠️ ESTOQUE INSUFICIENTE!\n\n" + missing.join("\n")); return; }
+                
+                if(missing.length > 0) { 
+                    alert("⚠️ ESTOQUE INSUFICIENTE PARA ESTA VENDA!\n\nSimulação da baixa:\n" + missing.join("\n")); 
+                    return; // Bloqueia a venda aqui se faltar estoque
+                }
             }
 
-            const saleItem = { tipo: 'Pizza', itemId: id, nome: receita ? receita.nome : '?', qtd: qtd, valor: val, data: document.getElementById('venda-data').value };
+            // 2. REGISTRA A VENDA
+            const saleItem = { 
+                tipo: 'Pizza', 
+                itemId: id, 
+                nome: receita.nome, 
+                qtd: qtd, 
+                valor: val, 
+                data: document.getElementById('venda-data').value 
+            };
             
+            // Salva no histórico de vendas
             await saveData('vendasDiarias', saleItem);
+            
+            // 3. EFETUA A BAIXA NO ESTOQUE REALMENTE
             await deductStock(saleItem);
             
-            await fetchData('vendasDiarias'); 
+            // Atualiza visualização
+            await fetchData('vendasDiarias'); // Recarrega vendas
+            await fetchData('insumos');       // Recarrega insumos (para atualizar números na memória)
             loadDailySales(saleItem.data); 
             updateDashboard();
             
+            // Limpa formulário
             pizzaSelect.value = ''; pizzaQtd.value = 1; pizzaVal.value = ''; 
-            showToast("Venda registrada e estoque baixado!");
+            showToast("Venda registrada e insumos baixados!");
         });
 
+        // --- BOTÃO ADICIONAR PRODUTO (COM SIMULAÇÃO E BAIXA IMEDIATA) ---
         document.getElementById('btn-add-prod-sale').addEventListener('click', async () => { 
             const id = prodSelect.value; 
             const qtd = parseFloat(prodQtd.value); 
             const val = parseFloat(prodVal.value); 
+            
             if(!id || !qtd || !val) { showToast("Preencha todos os campos", "error"); return; } 
             
             const produto = cache.produtos.find(p => p.id === id); 
+            if (!produto) return;
 
-            // CHECK STOCK
+            // 1. SIMULAÇÃO DE ESTOQUE PRODUTO
             if(configCache.controlar_estoque) {
-                let available = getVirtualStock('product', id);
-                if(available < qtd) {
-                    let prodName = produto ? produto.nome : 'Produto';
-                    alert(`⚠️ ESTOQUE INSUFICIENTE!\n\n- ${prodName}: Precisa ${qtd}, Disp. ${available.toFixed(2)}`);
+                let currentStock = parseFloat(produto.estoque_atual) || 0;
+                
+                if(currentStock < qtd) {
+                    alert(`⚠️ ESTOQUE INSUFICIENTE!\n\nProduto: ${produto.nome}\nPrecisa: ${qtd}\nDisponível: ${currentStock}`);
                     return;
                 }
             }
 
-            const saleItem = { tipo: 'Produto', itemId: id, nome: produto ? produto.nome : '?', qtd: qtd, valor: val, data: document.getElementById('venda-data').value };
+            // 2. REGISTRA A VENDA
+            const saleItem = { 
+                tipo: 'Produto', 
+                itemId: id, 
+                nome: produto.nome, 
+                qtd: qtd, 
+                valor: val, 
+                data: document.getElementById('venda-data').value 
+            };
             
+            // Salva Venda
             await saveData('vendasDiarias', saleItem);
+            
+            // 3. BAIXA ESTOQUE
             await deductStock(saleItem);
             
+            // Atualiza visualização
             await fetchData('vendasDiarias');
+            await fetchData('produtos');
             loadDailySales(saleItem.data);
             updateDashboard();
 
+            // Limpa formulário
             prodSelect.value = ''; prodQtd.value = 1; prodVal.value = ''; 
             showToast("Venda registrada e estoque baixado!");
         });
