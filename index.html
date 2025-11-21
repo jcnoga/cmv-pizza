@@ -195,7 +195,7 @@
                         <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;"><h3>🥤 Venda de Produtos (Revenda)</h3><div class="form-group"><label>Produto</label><select id="venda-produto-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-produto-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-produto-valor" step="0.01"></div></div><button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button></div>
                     </div>
                     <h3 style="margin-top: 20px;">Itens lançados no dia <span id="display-data-selecionada"></span>:</h3><table id="sales-table"><thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead><tbody></tbody></table><div class="total-cost" id="daily-total-display">Total do Dia: R$ 0,00</div>
-                    <!-- BUTTON REMOVED HERE -->
+                    <!-- BOTAO DE SALVAR DIA REMOVIDO POIS AÇAO AGORA É IMEDIATA -->
                 </div>
             </section>
 
@@ -203,7 +203,6 @@
             <section id="custos-mensais-view" class="view">
                 <div class="card">
                     <h2>Fechamento Mensal (Dados Brutos)</h2>
-                    <!-- Adicionado ID ao form -->
                     <form id="custo-mensal-form">
                         <input type="hidden" id="custo-mensal-id">
                         <div class="form-row">
@@ -228,30 +227,11 @@
             <!-- 9. FORNECEDORES -->
             <section id="fornecedores-view" class="view"><div class="card"><h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div><div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div></div><div class="form-row"><div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div><div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div></div><div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form></div><div class="card"><h2>Lista de Fornecedores</h2><div class="table-container"><table id="fornecedores-table"><thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Endereço</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div></div><div class="card" style="margin-top:20px;border:1px solid red;"><h3 style="color:red;">Zona de Perigo</h3><p>Apagar TODOS os fornecedores?</p><button id="btn-zerar-fornecedores" class="btn btn-danger">ZERAR TODOS OS FORNECEDORES</button></div></section>
             <!-- 10. CONFIGURAÇÕES -->
-            <section id="configuracoes-view" class="view">
-                <div class="card">
-                    <h2>Configurações Gerais</h2>
-                    <form id="configuracoes-form">
-                        <div class="form-group"><label>Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div>
-                        <div class="form-group"><label>Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div>
-                        <div class="form-group"><label>Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div>
-                        <div class="form-group"><label>Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div>
-                        
-                        <!-- NOVA CONFIGURAÇÃO DE BLOQUEIO DE ESTOQUE -->
-                        <div class="checkbox-wrapper" style="background-color: #fff3e0; border: 1px solid #ffcc80; color: #d84315;">
-                            <input type="checkbox" id="config-controlar-estoque">
-                            <label for="config-controlar-estoque"><strong>🚫 Bloquear Venda se Estoque Insuficiente</strong></label>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Salvar Configurações</button>
-                    </form>
-                </div>
-                <div class="card backup-area"><h3>💾 Backup e Restauração</h3><p>Salve seus dados no computador ou restaure um backup.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button><button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button><input type="file" id="backup-file-input" accept=".json" class="hidden"></div></div>
-            </section>
+            <section id="configuracoes-view" class="view"><div class="card"><h2>Configurações Gerais</h2><form id="configuracoes-form"><div class="form-group"><label>Custo Mão de Obra (R$/hora)</label><input type="number" id="config-custo-hora-mao-de-obra" step="0.01"></div><div class="form-group"><label>Rateio Fixo (R$/pizza)</label><input type="number" id="config-rateio-despesas-fixas" step="0.01"></div><div class="form-group"><label>Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div><div class="form-group"><label>Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div><div class="checkbox-wrapper" style="background-color: #fff3e0; border: 1px solid #ffcc80; color: #d84315;"><input type="checkbox" id="config-controlar-estoque"><label for="config-controlar-estoque"><strong>🚫 Bloquear Venda se Estoque Insuficiente</strong></label></div><button type="submit" class="btn btn-primary">Salvar Configurações</button></form></div><div class="card backup-area"><h3>💾 Backup e Restauração</h3><p>Salve seus dados no computador ou restaure um backup.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button><button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button><input type="file" id="backup-file-input" accept=".json" class="hidden"></div></div></section>
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v6.10 (Auth Restored + Immediate Logic)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v7.0 (Final Stable)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -292,7 +272,7 @@
         const chkManual = document.getElementById('enable-manual-edit');
         if(chkManual) { chkManual.addEventListener('change', (e) => { const fields = ['custo-mensal-faturamento', 'custo-mensal-custosVariaveis','custo-mensal-custosFixos', 'custo-mensal-despesasOperacionais', 'custo-mensal-impostos', 'custo-mensal-outrasReceitasDespesas']; fields.forEach(id => { const el = document.getElementById(id); if(el) el.disabled = !e.target.checked; }); }); }
 
-        // --- NEW: EXPANDED VIEW SWITCHER (v6.8) ---
+        // --- EXPANDED VIEW SWITCHER (v6.8) ---
         async function showView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id + '-view')?.classList.add('active');
@@ -373,12 +353,10 @@
                     const coll = itemParaExcluir.collection;
                     if (!isLocalMode) cache[coll] = cache[coll].filter(i => i.id !== itemParaExcluir.id);
                     await fetchData(coll);
-                    if(coll === 'fornecedores') { renderFornecedoresTable(); populateSelects(); }
-                    else if(coll === 'produtos') { renderProdutos(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'insumos') { renderInsumos(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'receitas') { renderReceitas(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); } 
-                    else if(coll === 'vendasDiarias') { updateDashboard(); }
+                    // Force Refresh
+                    if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); }
+                    else if(coll === 'vendasDiarias') { loadDailySales(document.getElementById('venda-data').value); updateDashboard(); }
+                    else { showView(coll); }
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
                 finally { confirmModal.style.display = 'none'; btnYes.textContent = "Sim"; btnYes.disabled = false; itemParaExcluir = null; }
@@ -401,8 +379,9 @@
 
         function renderAll() { renderFornecedoresTable(); renderInsumos(); renderProdutos(); renderReceitas(); renderCustosMensais(); renderIndicadoresMensais(); populateSelects(); updateDashboard(); }
 
-        // --- SMART STOCK LOGIC (NEW v6.6 - Unit Conversion Fixed) ---
+        // --- SMART STOCK LOGIC (SIMPLIFIED FOR IMMEDIATE v7.0) ---
         function getVirtualStock(type, id) {
+            // Only check CURRENT available stock
             let item, actualStock;
             if (type === 'product') {
                 item = cache.produtos.find(p => p.id === id);
@@ -428,7 +407,6 @@
                         const insumo = cache.insumos.find(i => i.id === ing.id);
                         if(insumo) {
                             let amountUsed = parseFloat(ing.qtd);
-                            // Conversion Logic
                             if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
                                 amountUsed = amountUsed / 1000;
                             }
@@ -456,7 +434,6 @@
                         const insumo = cache.insumos.find(i => i.id === ing.id);
                         if(insumo) {
                             let amountUsed = parseFloat(ing.qtd);
-                            // Conversion Logic
                             if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
                                 amountUsed = amountUsed / 1000;
                             }
@@ -569,14 +546,19 @@
             if(item) {
                 await restockItem(item); 
                 await deleteData('vendasDiarias', id); 
-                await fetchData('vendasDiarias'); 
+                await fetchData('vendasDiarias');
+                
+                // Refresh caches that might have changed due to stock update
+                await fetchData('produtos');
+                await fetchData('insumos');
+
                 loadDailySales(document.getElementById('venda-data').value);
                 updateDashboard(); 
                 showToast("Venda estornada."); 
             }
         };
 
-        // --- ADD BUTTON LOGIC (UPDATED v6.7 - IMMEDIATE ACTION) ---
+        // --- ADD BUTTON LOGIC (IMMEDIATE) ---
         document.getElementById('btn-add-pizza-sale').addEventListener('click', async () => {
             const id = pizzaSelect.value; 
             const qtd = parseFloat(pizzaQtd.value); 
@@ -593,7 +575,7 @@
                         let needed = (parseFloat(ing.qtd) * qtd);
                         let insumo = cache.insumos.find(i => i.id === ing.id);
                         if (insumo && (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L')) { needed = needed / 1000; }
-                        let available = getVirtualStock('insumo', ing.id); // getVirtualStock actually just gets current stock in v6.7 context
+                        let available = getVirtualStock('insumo', ing.id); 
                         if(available < needed) {
                             let insName = insumo ? insumo.nome : 'Desconhecido';
                             missing.push(`- ${insName}: Precisa ${needed.toFixed(2)}, Disp. ${available.toFixed(2)}`);
@@ -605,10 +587,16 @@
 
             const saleItem = { tipo: 'Pizza', itemId: id, nome: receita ? receita.nome : '?', qtd: qtd, valor: val, data: document.getElementById('venda-data').value };
             
+            // 1. Save Sale
             await saveData('vendasDiarias', saleItem);
+            // 2. Deduct Stock
             await deductStock(saleItem);
             
-            await fetchData('vendasDiarias'); 
+            // 3. Update Caches & UI
+            await fetchData('vendasDiarias');
+            await fetchData('produtos');
+            await fetchData('insumos');
+            
             loadDailySales(saleItem.data); 
             updateDashboard();
             
@@ -640,6 +628,8 @@
             await deductStock(saleItem);
             
             await fetchData('vendasDiarias');
+            await fetchData('produtos');
+            
             loadDailySales(saleItem.data);
             updateDashboard();
 
