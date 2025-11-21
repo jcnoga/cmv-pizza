@@ -50,9 +50,7 @@
         .btn-info { background-color: var(--info-color); color: var(--white); }
         .btn-warning { background-color: #ff9800; color: var(--white); }
         .btn-small { padding: 0.3rem 0.7rem; font-size: 0.85rem; width: auto; }
-        .btn-discrete { background: transparent; border: 1px solid #ccc; color: #777; font-size: 0.8rem; padding: 0.3rem 0.6rem; width: auto; display: inline-block; margin-top: 10px; }
-        .btn-discrete:hover { background: #eee; color: #333; }
-
+        
         .btn-export { background-color: #fff; border: 1px solid #ccc; color: #333; font-weight: 500; display: inline-flex; align-items: center; gap: 5px; padding: 0.4rem 0.8rem; }
         .btn-export:hover { background-color: #f5f5f5; border-color: #bbb; }
 
@@ -197,6 +195,7 @@
                         <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;"><h3>🥤 Venda de Produtos (Revenda)</h3><div class="form-group"><label>Produto</label><select id="venda-produto-select"><option value="">Selecione...</option></select></div><div class="form-row"><div class="form-group"><label>Qtd</label><input type="number" id="venda-produto-qtd" value="1" min="1"></div><div class="form-group"><label>Valor Total (R$)</label><input type="number" id="venda-produto-valor" step="0.01"></div></div><button class="btn btn-info" id="btn-add-prod-sale">Adicionar Produto</button></div>
                     </div>
                     <h3 style="margin-top: 20px;">Itens lançados no dia <span id="display-data-selecionada"></span>:</h3><table id="sales-table"><thead><tr><th>Tipo</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Ação</th></tr></thead><tbody></tbody></table><div class="total-cost" id="daily-total-display">Total do Dia: R$ 0,00</div>
+                    <!-- BUTTON REMOVED HERE -->
                 </div>
             </section>
 
@@ -204,6 +203,7 @@
             <section id="custos-mensais-view" class="view">
                 <div class="card">
                     <h2>Fechamento Mensal (Dados Brutos)</h2>
+                    <!-- Adicionado ID ao form -->
                     <form id="custo-mensal-form">
                         <input type="hidden" id="custo-mensal-id">
                         <div class="form-row">
@@ -246,21 +246,12 @@
                         <button type="submit" class="btn btn-primary">Salvar Configurações</button>
                     </form>
                 </div>
-                <div class="card backup-area">
-                    <h3>💾 Backup e Restauração</h3><p>Salve seus dados no computador ou restaure um backup.</p>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button>
-                        <button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button>
-                        <input type="file" id="backup-file-input" accept=".json" class="hidden">
-                        <!-- BUTTON TO POPULATE DATA -->
-                        <button id="btn-seed-data" class="btn btn-discrete" style="margin-left: auto;">🛠️ Gerar Dados de Exemplo</button>
-                    </div>
-                </div>
+                <div class="card backup-area"><h3>💾 Backup e Restauração</h3><p>Salve seus dados no computador ou restaure um backup.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button><button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button><input type="file" id="backup-file-input" accept=".json" class="hidden"></div></div>
             </section>
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v7.1 (Mock Data)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v6.7 (Immediate Sale & Stock)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -301,33 +292,17 @@
         const chkManual = document.getElementById('enable-manual-edit');
         if(chkManual) { chkManual.addEventListener('change', (e) => { const fields = ['custo-mensal-faturamento', 'custo-mensal-custosVariaveis','custo-mensal-custosFixos', 'custo-mensal-despesasOperacionais', 'custo-mensal-impostos', 'custo-mensal-outrasReceitasDespesas']; fields.forEach(id => { const el = document.getElementById(id); if(el) el.disabled = !e.target.checked; }); }); }
 
-        // --- EXPANDED VIEW SWITCHER (v6.8) ---
-        async function showView(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id + '-view')?.classList.add('active');
-            switch (id) {
-                case 'dashboard': updateDashboard(); break;
-                case 'vendas-diarias': populateSelects(); const currentVal = document.getElementById('venda-data').value; if(currentVal) loadDailySales(currentVal); else initDateAndLoad(); break;
-                case 'custos-mensais': renderCustosMensais(); break;
-                case 'indicadores-mensais': renderIndicadoresMensais(); break;
-                case 'produtos': renderProdutos(); populateSelects(); break;
-                case 'insumos': renderInsumos(); populateSelects(); break;
-                case 'receitas': renderReceitas(); populateSelects(); break;
-                case 'fornecedores': renderFornecedoresTable(); break;
-                case 'configuracoes': await fetchConfiguracoes(); break;
-                case 'lista-compras': break;
-            }
-        }
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(l => l.addEventListener('click', e => { e.preventDefault(); showView(e.target.dataset.view); }));
-
-        // --- AUTO FILL MONTHLY FORM ---
+        // --- NEW LOGIC: AUTO FILL MONTHLY FORM ---
         document.getElementById('custo-mensal-mes')?.addEventListener('change', (e) => {
             const selectedMes = e.target.value;
             if (!selectedMes) return;
+
+            // Check if record exists
             const record = cache.custosMensais.find(c => c.mes === selectedMes);
             const chk = document.getElementById('enable-manual-edit');
+
             if (record) {
+                // Populate
                 document.getElementById('custo-mensal-id').value = record.id;
                 document.getElementById('custo-mensal-faturamento').value = record.faturamento;
                 document.getElementById('custo-mensal-custosVariaveis').value = record.custosVariaveis;
@@ -337,6 +312,7 @@
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = record.outrasReceitasDespesas;
                 showToast(`Dados de ${selectedMes} carregados.`);
             } else {
+                // Reset
                 document.getElementById('custo-mensal-id').value = '';
                 document.getElementById('custo-mensal-faturamento').value = '';
                 document.getElementById('custo-mensal-custosVariaveis').value = '';
@@ -344,10 +320,16 @@
                 document.getElementById('custo-mensal-despesasOperacionais').value = '';
                 document.getElementById('custo-mensal-impostos').value = '';
                 document.getElementById('custo-mensal-outrasReceitasDespesas').value = '';
+                // Check if there are daily sales for this new month to help user
                 const hasSales = cache.vendasDiarias.some(v => v.data && v.data.startsWith(selectedMes));
                 if(hasSales) showToast("Novo mês. Clique em 'Puxar do Diário' para importar o faturamento.");
             }
-            if(chk) { chk.checked = false; chk.dispatchEvent(new Event('change')); }
+
+            // Reset/Set Checkbox
+            if(chk) {
+                chk.checked = false; // Reset to disabled by default for safety
+                chk.dispatchEvent(new Event('change'));
+            }
         });
 
         // --- INDICADORES MENSAIS TABLE ---
@@ -386,7 +368,7 @@
                     else if(coll === 'produtos') { renderProdutos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'insumos') { renderInsumos(); populateSelects(); updateDashboard(); }
                     else if(coll === 'receitas') { renderReceitas(); populateSelects(); updateDashboard(); }
-                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); } 
+                    else if(coll === 'custosMensais') { renderCustosMensais(); renderIndicadoresMensais(); updateDashboard(); }
                     else if(coll === 'vendasDiarias') { updateDashboard(); }
                     showToast('Excluído com sucesso!', 'success');
                 } catch (e) { console.error(e); showToast('Erro: ' + e.message, 'error'); } 
@@ -585,7 +567,7 @@
             }
         };
 
-        // --- ADD BUTTON LOGIC (IMMEDIATE) ---
+        // --- ADD BUTTON LOGIC (UPDATED v6.7 - IMMEDIATE ACTION) ---
         document.getElementById('btn-add-pizza-sale').addEventListener('click', async () => {
             const id = pizzaSelect.value; 
             const qtd = parseFloat(pizzaQtd.value); 
@@ -602,7 +584,7 @@
                         let needed = (parseFloat(ing.qtd) * qtd);
                         let insumo = cache.insumos.find(i => i.id === ing.id);
                         if (insumo && (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L')) { needed = needed / 1000; }
-                        let available = getVirtualStock('insumo', ing.id); 
+                        let available = getVirtualStock('insumo', ing.id); // getVirtualStock actually just gets current stock in v6.7 context
                         if(available < needed) {
                             let insName = insumo ? insumo.nome : 'Desconhecido';
                             missing.push(`- ${insName}: Precisa ${needed.toFixed(2)}, Disp. ${available.toFixed(2)}`);
@@ -614,16 +596,10 @@
 
             const saleItem = { tipo: 'Pizza', itemId: id, nome: receita ? receita.nome : '?', qtd: qtd, valor: val, data: document.getElementById('venda-data').value };
             
-            // 1. Save Sale
             await saveData('vendasDiarias', saleItem);
-            // 2. Deduct Stock
             await deductStock(saleItem);
             
-            // 3. Update Caches & UI
-            await fetchData('vendasDiarias');
-            await fetchData('produtos');
-            await fetchData('insumos');
-            
+            await fetchData('vendasDiarias'); 
             loadDailySales(saleItem.data); 
             updateDashboard();
             
@@ -643,7 +619,7 @@
             if(configCache.controlar_estoque) {
                 let available = getVirtualStock('product', id);
                 if(available < qtd) {
-                    let prodName = cache.produtos.find(p => p.id === id)?.nome || 'Produto';
+                    let prodName = produto ? produto.nome : 'Produto';
                     alert(`⚠️ ESTOQUE INSUFICIENTE!\n\n- ${prodName}: Precisa ${qtd}, Disp. ${available.toFixed(2)}`);
                     return;
                 }
@@ -655,8 +631,6 @@
             await deductStock(saleItem);
             
             await fetchData('vendasDiarias');
-            await fetchData('produtos');
-            
             loadDailySales(saleItem.data);
             updateDashboard();
 
@@ -717,161 +691,7 @@
         });
         document.getElementById('btn-backup-download').addEventListener('click', async () => { if(!currentUser && !isLocalMode) return; const backupPayload = { timestamp: new Date(), configuracoes: configCache || {} }; for(const coll of COLLECTIONS_LIST) { backupPayload[coll] = await fetchFullDataForBackup(coll); } const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload)); const a = document.createElement('a'); a.href = url; a.download = `backup_pizzaria_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove(); });
         document.getElementById('btn-backup-restore-click').addEventListener('click', () => { if(confirm("ATENÇÃO: Restaurar o backup apagará os dados atuais e substituirá pelo arquivo. Deseja continuar?")) { document.getElementById('backup-file-input').click(); } });
-        document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
-        
-        // --- SEED DATA BUTTON (v7.1) ---
-        document.getElementById('btn-seed-data').addEventListener('click', async () => {
-            if(!confirm("ATENÇÃO: Isso irá adicionar muitos dados de exemplo ao sistema. Continuar?")) return;
-
-            // 1. INSUMOS
-            const seedInsumos = [
-                { nome: 'Farinha de Trigo', custo_embalagem: 25.00, qtd_embalagem_g: 5000, unidade_embalagem: 'kg', estoque_atual: 20000, estoque_min: 5000 },
-                { nome: 'Fermento Biológico', custo_embalagem: 15.00, qtd_embalagem_g: 500, unidade_embalagem: 'g', estoque_atual: 1000, estoque_min: 200 },
-                { nome: 'Açúcar', custo_embalagem: 6.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 5000, estoque_min: 1000 },
-                { nome: 'Sal', custo_embalagem: 4.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 3000, estoque_min: 500 },
-                { nome: 'Azeite de Oliva', custo_embalagem: 35.00, qtd_embalagem_g: 500, unidade_embalagem: 'ml', estoque_atual: 2000, estoque_min: 500 },
-                { nome: 'Água Mineral', custo_embalagem: 0.00, qtd_embalagem_g: 1000, unidade_embalagem: 'L', estoque_atual: 100000, estoque_min: 0 },
-                { nome: 'Molho de Tomate', custo_embalagem: 45.00, qtd_embalagem_g: 3000, unidade_embalagem: 'kg', estoque_atual: 15000, estoque_min: 3000 },
-                { nome: 'Mussarela', custo_embalagem: 180.00, qtd_embalagem_g: 4000, unidade_embalagem: 'kg', estoque_atual: 12000, estoque_min: 2000 },
-                { nome: 'Calabresa', custo_embalagem: 40.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 5000, estoque_min: 1000 },
-                { nome: 'Presunto', custo_embalagem: 35.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 4000, estoque_min: 1000 },
-                { nome: 'Cebola', custo_embalagem: 6.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 5000, estoque_min: 1000 },
-                { nome: 'Ovo', custo_embalagem: 20.00, qtd_embalagem_g: 30, unidade_embalagem: 'un', estoque_atual: 120, estoque_min: 30 },
-                { nome: 'Azeitona Preta', custo_embalagem: 28.00, qtd_embalagem_g: 2000, unidade_embalagem: 'kg', estoque_atual: 4000, estoque_min: 1000 },
-                { nome: 'Azeitona Verde', custo_embalagem: 25.00, qtd_embalagem_g: 2000, unidade_embalagem: 'kg', estoque_atual: 4000, estoque_min: 1000 },
-                { nome: 'Orégano', custo_embalagem: 40.00, qtd_embalagem_g: 500, unidade_embalagem: 'g', estoque_atual: 1000, estoque_min: 200 },
-                { nome: 'Tomate Fresco', custo_embalagem: 8.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 6000, estoque_min: 2000 },
-                { nome: 'Manjericão', custo_embalagem: 5.00, qtd_embalagem_g: 100, unidade_embalagem: 'g', estoque_atual: 500, estoque_min: 100 },
-                { nome: 'Parmesão Ralado', custo_embalagem: 70.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 3000, estoque_min: 500 },
-                { nome: 'Catupiry', custo_embalagem: 45.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 5000, estoque_min: 1000 },
-                { nome: 'Bacon', custo_embalagem: 38.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 4000, estoque_min: 1000 },
-                { nome: 'Frango Desfiado', custo_embalagem: 25.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 8000, estoque_min: 2000 },
-                { nome: 'Milho', custo_embalagem: 10.00, qtd_embalagem_g: 2000, unidade_embalagem: 'kg', estoque_atual: 6000, estoque_min: 2000 },
-                { nome: 'Ervilha', custo_embalagem: 10.00, qtd_embalagem_g: 2000, unidade_embalagem: 'kg', estoque_atual: 4000, estoque_min: 1000 },
-                { nome: 'Palmito', custo_embalagem: 50.00, qtd_embalagem_g: 1800, unidade_embalagem: 'kg', estoque_atual: 3000, estoque_min: 1000 },
-                { nome: 'Champignon', custo_embalagem: 40.00, qtd_embalagem_g: 2000, unidade_embalagem: 'kg', estoque_atual: 2000, estoque_min: 500 },
-                { nome: 'Provolone', custo_embalagem: 60.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 2000, estoque_min: 500 },
-                { nome: 'Gorgonzola', custo_embalagem: 70.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 1500, estoque_min: 500 },
-                { nome: 'Atum', custo_embalagem: 45.00, qtd_embalagem_g: 1000, unidade_embalagem: 'kg', estoque_atual: 2000, estoque_min: 500 },
-                { nome: 'Rúcula', custo_embalagem: 4.00, qtd_embalagem_g: 300, unidade_embalagem: 'g', estoque_atual: 1200, estoque_min: 300 },
-                { nome: 'Alho Frito', custo_embalagem: 30.00, qtd_embalagem_g: 500, unidade_embalagem: 'g', estoque_atual: 1000, estoque_min: 200 }
-            ];
-
-            // Local IDs generator helper
-            let tempIdCounter = Date.now();
-            const getNextId = () => (tempIdCounter++).toString();
-            const createdIngs = {};
-
-            for(const ing of seedInsumos) {
-                const newItem = { ...ing, id: getNextId(), unidade_base: (ing.unidade_embalagem==='kg'?'g':(ing.unidade_embalagem==='L'?'ml':ing.unidade_embalagem)) };
-                await saveData('insumos', newItem);
-                createdIngs[ing.nome] = newItem.id;
-            }
-
-            // 2. PRODUTOS
-            const seedProdutos = [
-                { nome: 'Coca-Cola 2L', preco_compra: 8.50, preco_venda: 16.00, estoque_atual: 60, estoque_min: 12 },
-                { nome: 'Guaraná Antarctica 2L', preco_compra: 7.50, preco_venda: 14.00, estoque_atual: 48, estoque_min: 12 },
-                { nome: 'Fanta Laranja 2L', preco_compra: 7.50, preco_venda: 14.00, estoque_atual: 24, estoque_min: 6 },
-                { nome: 'Sprite 2L', preco_compra: 7.50, preco_venda: 14.00, estoque_atual: 20, estoque_min: 6 },
-                { nome: 'Suco de Laranja 1L', preco_compra: 10.00, preco_venda: 18.00, estoque_atual: 15, estoque_min: 5 },
-                { nome: 'Suco de Uva 1L', preco_compra: 12.00, preco_venda: 20.00, estoque_atual: 15, estoque_min: 5 },
-                { nome: 'Água Mineral s/ Gás', preco_compra: 1.50, preco_venda: 4.00, estoque_atual: 100, estoque_min: 20 },
-                { nome: 'Água Mineral c/ Gás', preco_compra: 1.80, preco_venda: 4.50, estoque_atual: 80, estoque_min: 20 },
-                { nome: 'Heineken Long Neck', preco_compra: 5.00, preco_venda: 12.00, estoque_atual: 40, estoque_min: 12 },
-                { nome: 'Brahma Lata', preco_compra: 3.00, preco_venda: 6.00, estoque_atual: 60, estoque_min: 24 }
-            ];
-            for(const prod of seedProdutos) {
-                await saveData('produtos', { ...prod, id: getNextId() });
-            }
-
-            // 3. RECEITAS
-            const doughIngredients = [
-                { id: createdIngs['Farinha de Trigo'], qtd: 250 },
-                { id: createdIngs['Água Mineral'], qtd: 150 },
-                { id: createdIngs['Azeite de Oliva'], qtd: 10 },
-                { id: createdIngs['Sal'], qtd: 5 },
-                { id: createdIngs['Açúcar'], qtd: 5 },
-                { id: createdIngs['Fermento Biológico'], qtd: 3 }
-            ];
-
-            const seedReceitas = [
-                // Doughs (as requested)
-                { nome: 'Massa de Pizza Tradicional', preco_venda: 0, ingredientes: doughIngredients },
-                { nome: 'Massa de Pizza Integral', preco_venda: 0, ingredientes: [...doughIngredients] }, // Same for demo
-
-                // Pizzas
-                { 
-                    nome: 'Pizza Calabresa', 
-                    preco_venda: 45.00, 
-                    ingredientes: [
-                        ...doughIngredients,
-                        { id: createdIngs['Molho de Tomate'], qtd: 80 },
-                        { id: createdIngs['Mussarela'], qtd: 150 },
-                        { id: createdIngs['Calabresa'], qtd: 120 },
-                        { id: createdIngs['Cebola'], qtd: 40 },
-                        { id: createdIngs['Azeitona Preta'], qtd: 20 }
-                    ]
-                },
-                { 
-                    nome: 'Pizza Mussarela', 
-                    preco_venda: 40.00, 
-                    ingredientes: [
-                        ...doughIngredients,
-                        { id: createdIngs['Molho de Tomate'], qtd: 80 },
-                        { id: createdIngs['Mussarela'], qtd: 250 },
-                        { id: createdIngs['Tomate Fresco'], qtd: 60 },
-                        { id: createdIngs['Orégano'], qtd: 2 }
-                    ]
-                },
-                { 
-                    nome: 'Pizza Portuguesa', 
-                    preco_venda: 50.00, 
-                    ingredientes: [
-                        ...doughIngredients,
-                        { id: createdIngs['Molho de Tomate'], qtd: 80 },
-                        { id: createdIngs['Mussarela'], qtd: 150 },
-                        { id: createdIngs['Presunto'], qtd: 100 },
-                        { id: createdIngs['Ovo'], qtd: 2 },
-                        { id: createdIngs['Cebola'], qtd: 30 },
-                        { id: createdIngs['Ervilha'], qtd: 30 },
-                        { id: createdIngs['Palmito'], qtd: 40 }
-                    ]
-                }
-            ];
-
-            for(const rec of seedReceitas) {
-                await saveData('receitas', { ...rec, id: getNextId() });
-            }
-
-            // 4. MENSAL (Jan to Dec 2024)
-            const months = ['2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06', '2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12'];
-            for(const m of months) {
-                // Simulate slight growth
-                let base = 30000 + (Math.random() * 5000);
-                if(m.endsWith('12')) base += 10000; // December boost
-
-                await saveData('custosMensais', {
-                    id: getNextId(),
-                    mes: m,
-                    faturamento: parseFloat(base.toFixed(2)),
-                    custosVariaveis: parseFloat((base * 0.35).toFixed(2)), // ~35%
-                    custosFixos: 8000.00,
-                    despesasOperacionais: 2500.00,
-                    impostos: parseFloat((base * 0.06).toFixed(2)), // ~6%
-                    outrasReceitasDespesas: 0
-                });
-            }
-
-            // Refresh
-            await fetchData('insumos');
-            await fetchData('produtos');
-            await fetchData('receitas');
-            await fetchData('custosMensais');
-            renderAll();
-            showToast("Dados de exemplo criados com sucesso!");
-        });
-
+        document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData.configuracoes = d.configuracoes; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
         document.body.addEventListener('click', e => { const btn = e.target.closest('button'); if (!btn) return; const id = btn.dataset.id; 
             if(btn.classList.contains('btn-edit-fornecedor')) { e.preventDefault(); editFornecedor(id); } 
             else if(btn.classList.contains('btn-edit-produto')) { e.preventDefault(); editProduto(id); } 
