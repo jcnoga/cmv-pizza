@@ -224,7 +224,7 @@
             <!-- 8. RECEITAS -->
             <section id="receitas-view" class="view"><div class="card"><h2>Criar Receita</h2><form id="receita-form"><input type="hidden" id="receita-id"><div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="receita-nome" required></div><div class="form-group"><label>Preço Venda (R$)</label><input type="number" id="receita-venda" step="0.01"></div></div><h3>Ingredientes</h3><div id="ingredients-list"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary btn-small">Adicionar Ingrediente</button><div class="total-cost" id="custo-total-ingredientes">Custo: R$ 0,00</div><button type="submit" class="btn btn-primary" style="margin-top:10px;">Salvar Receita</button><button type="button" id="cancel-edit-receita" class="btn btn-secondary hidden">Cancelar Edição</button></form></div><div class="card"><h2>Receitas</h2><table id="receitas-table"><thead><tr><th>Nome</th><th>Custo (COGS)</th><th>Venda</th><th>Ações</th></tr></thead><tbody></tbody></table></div></section>
             <!-- 9. FORNECEDORES -->
-            <section id="fornecedores-view" class="view"><div class="card"><h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div><div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div></div><div class="form-row"><div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div><div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div></div><div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form></div><div class="card"><h2>Lista de Fornecedores</h2><div class="table-container"><table id="fornecedores-table"><thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Endereço</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div></div><div class="card" style="margin-top:20px;border:1px solid red;"><h3 style="color:red;">Zona de Perigo</h3><p>Apagar TODOS os fornecedores?</p><button id="btn-zerar-fornecedores" class="btn btn-danger">ZERAR TODOS OS FORNECEDORES</button></div></section>
+            <section id="fornecedores-view" class="view"><div class="card"><h2 id="fornecedor-form-title">Cadastrar Fornecedor</h2><form id="fornecedor-form"><input type="hidden" id="fornecedor-id"><div class="form-row"><div class="form-group"><label>Nome da Empresa</label><input type="text" id="fornecedor-nome" required placeholder="Ex: Distribuidora Queijos"></div><div class="form-group"><label>Pessoa de Contato</label><input type="text" id="fornecedor-contato" placeholder="Ex: Sr. João"></div></div><div class="form-row"><div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="fornecedor-telefone" placeholder="(99) 99999-9999"></div><div class="form-group"><label>Email</label><input type="email" id="fornecedor-email" placeholder="contato@fornecedor.com"></div></div><div class="form-group"><label>Endereço Completo</label><input type="text" id="fornecedor-endereco" placeholder="Rua, Número, Bairro, Cidade"></div><button type="submit" class="btn btn-primary">Salvar Fornecedor</button><button type="button" id="cancel-edit-fornecedor" class="btn btn-secondary hidden" style="margin-top: 0.5rem;">Cancelar Edição</button></form></div><div class="card"><h2>Lista de Fornecedores</h2><div class="table-container"><table id="fornecedores-table"><thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Endereço</th><th class="actions-cell">Ações</th></tr></thead><tbody></tbody></table></div></div></section>
             <!-- 10. CONFIGURAÇÕES -->
             <section id="configuracoes-view" class="view">
                 <div class="card">
@@ -235,7 +235,6 @@
                         <div class="form-group"><label>Meta CMV Padrão (%)</label><input type="number" id="config-meta-cmv-padrao" step="0.1"></div>
                         <div class="form-group"><label>Alerta Variação Preço (%)</label><input type="number" id="config-alerta-variacao" step="1" value="10"></div>
                         
-                        <!-- NOVA CONFIGURAÇÃO DE BLOQUEIO DE ESTOQUE -->
                         <div class="checkbox-wrapper" style="background-color: #fff3e0; border: 1px solid #ffcc80; color: #d84315;">
                             <input type="checkbox" id="config-controlar-estoque">
                             <label for="config-controlar-estoque"><strong>🚫 Bloquear Venda se Estoque Insuficiente</strong></label>
@@ -244,12 +243,47 @@
                         <button type="submit" class="btn btn-primary">Salvar Configurações</button>
                     </form>
                 </div>
+
+                <!-- NOVA ZONA DE PERIGO (RESET DE DADOS) -->
+                <div class="card" style="border-top: 4px solid var(--error-color); border-left: 4px solid var(--error-color);">
+                    <h2 style="color: var(--error-color); text-transform: uppercase; font-size: 1rem;">🧨 Zona de Perigo - Resetar Dados</h2>
+                    <p style="margin-bottom: 1rem; color: #555;">Selecione os dados que deseja <strong>apagar permanentemente</strong> do sistema. Essa ação não pode ser desfeita.</p>
+                    
+                    <div id="reset-options" class="grid-container grid-2" style="margin-bottom: 1.5rem;">
+                        <div class="checkbox-wrapper" style="background-color: #ffebee; color: #c62828;">
+                            <input type="checkbox" id="del-fornecedores">
+                            <label for="del-fornecedores">Apagar Fornecedores</label>
+                        </div>
+                        <div class="checkbox-wrapper" style="background-color: #ffebee; color: #c62828;">
+                            <input type="checkbox" id="del-insumos">
+                            <label for="del-insumos">Apagar Insumos</label>
+                        </div>
+                        <div class="checkbox-wrapper" style="background-color: #ffebee; color: #c62828;">
+                            <input type="checkbox" id="del-produtos">
+                            <label for="del-produtos">Apagar Produtos (Revenda)</label>
+                        </div>
+                        <div class="checkbox-wrapper" style="background-color: #ffebee; color: #c62828;">
+                            <input type="checkbox" id="del-receitas">
+                            <label for="del-receitas">Apagar Receitas</label>
+                        </div>
+                        <div class="checkbox-wrapper" style="background-color: #ffebee; color: #c62828;">
+                            <input type="checkbox" id="del-vendas">
+                            <label for="del-vendas">Apagar Histórico de Vendas</label>
+                        </div>
+                        <div class="checkbox-wrapper" style="background-color: #ffebee; color: #c62828;">
+                            <input type="checkbox" id="del-custos">
+                            <label for="del-custos">Apagar Fechamentos Mensais</label>
+                        </div>
+                    </div>
+                    <button id="btn-master-reset" class="btn btn-danger">🗑 Apagar Dados Selecionados</button>
+                </div>
+
                 <div class="card backup-area"><h3>💾 Backup e Restauração</h3><p>Salve seus dados no computador ou restaure um backup.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button id="btn-backup-download" class="btn btn-info">⬇️ Fazer Backup Completo</button><button id="btn-backup-restore-click" class="btn btn-warning">⬆️ Restaurar Backup</button><input type="file" id="backup-file-input" accept=".json" class="hidden"></div></div>
             </section>
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v6.9 (Full Auto & Conversion)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v7.1 (Confirmed Pull)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -390,10 +424,8 @@ const firebaseConfig = {
         // FUNÇÕES DE CONTROLE DE ESTOQUE COM CONVERSÃO
         // ----------------------------------------------------
 
-        // Função auxiliar para calcular o valor a ser baixado já convertido (g -> kg)
         function calculateDeduction(insumo, qtdReceita, qtdVenda) {
             let qtdTotalNecessaria = parseFloat(qtdReceita) * parseFloat(qtdVenda);
-            // Se o estoque está em KG ou Litros, mas a receita é g ou ml -> divide por 1000
             let divisor = 1;
             if (insumo.unidade_embalagem === 'kg' || insumo.unidade_embalagem === 'L') {
                 divisor = 1000;
@@ -402,7 +434,6 @@ const firebaseConfig = {
         }
 
         async function deductStock(item) {
-            // 1. BAIXA DE PRODUTO (Revenda)
             if(item.tipo === 'Produto') {
                 const prod = cache.produtos.find(p => p.id === item.itemId);
                 if(prod) {
@@ -410,7 +441,6 @@ const firebaseConfig = {
                     await saveData('produtos', prod);
                 }
             } 
-            // 2. BAIXA DE PIZZA (Baixa nos Insumos da Receita)
             else if(item.tipo === 'Pizza') {
                 const receita = cache.receitas.find(r => r.id === item.itemId);
                 if(receita && receita.ingredientes) {
@@ -427,7 +457,6 @@ const firebaseConfig = {
         }
 
         async function restockItem(item) {
-            // Função inversa (para estorno/exclusão da venda)
             if(item.tipo === 'Produto') {
                 const prod = cache.produtos.find(p => p.id === item.itemId);
                 if(prod) {
@@ -498,6 +527,10 @@ const firebaseConfig = {
         document.getElementById('btn-pull-daily')?.addEventListener('click', () => {
             const mesAno = document.getElementById('custo-mensal-mes').value;
             if (!mesAno) { showToast("Selecione o Mês/Ano primeiro.", "error"); return; }
+            
+            // ADICIONADO: Confirmação antes de substituir
+            if(!confirm("O somatório dos movimentos diários do mês irá substituir o valor de faturamento mensal, confirma?")) return;
+
             const vendasDoMes = cache.vendasDiarias.filter(v => v.data && v.data.startsWith(mesAno));
             const totalFaturamento = vendasDoMes.reduce((acc, curr) => acc + (parseFloat(curr.valor) || 0), 0);
             const chkManual = document.getElementById('enable-manual-edit'); if(chkManual) { chkManual.checked = true; chkManual.dispatchEvent(new Event('change')); }
@@ -712,6 +745,78 @@ const firebaseConfig = {
             configCache=data; 
             showToast("Salvo!");
         });
+
+        // ==========================================
+        //  LÓGICA DE APAGAR DADOS (ZONA DE PERIGO)
+        // ==========================================
+        document.getElementById('btn-master-reset').addEventListener('click', async () => {
+            // Mapeamento checkbox ID -> Coleção
+            const mapping = [
+                { id: 'del-fornecedores', coll: 'fornecedores', label: 'Fornecedores' },
+                { id: 'del-insumos', coll: 'insumos', label: 'Insumos' },
+                { id: 'del-produtos', coll: 'produtos', label: 'Produtos' },
+                { id: 'del-receitas', coll: 'receitas', label: 'Receitas' },
+                { id: 'del-vendas', coll: 'vendasDiarias', label: 'Histórico de Vendas' },
+                { id: 'del-custos', coll: 'custosMensais', label: 'Fechamentos Mensais' }
+            ];
+
+            // 1. Verificar seleção
+            const selected = mapping.filter(item => document.getElementById(item.id).checked);
+            if (selected.length === 0) {
+                showToast("Selecione pelo menos um item para apagar.", "error");
+                return;
+            }
+
+            // 2. Confirmação
+            const msg = `ATENÇÃO! Você selecionou apagar:\n\n${selected.map(s => '- ' + s.label).join('\n')}\n\nEssa ação é irreversível. Deseja continuar?`;
+            if (!confirm(msg)) return;
+            if (!confirm("Confirmação Final: Todos os dados selecionados serão PERDIDOS. Continuar?")) return;
+
+            // 3. Executar Exclusão
+            showToast("Apagando dados...", "info");
+            document.body.style.cursor = 'wait';
+
+            try {
+                for (const item of selected) {
+                    const collName = item.coll;
+                    if (isLocalMode) {
+                        localData[collName] = [];
+                        cache[collName] = [];
+                    } else {
+                        // Firebase Batch Delete (looping because batch limit is 500)
+                        const snapshot = await db.collection(collName).where('userId', '==', currentUser.uid).get();
+                        if (!snapshot.empty) {
+                            const batchSize = 400; 
+                            let batch = db.batch();
+                            let count = 0;
+                            for (const doc of snapshot.docs) {
+                                batch.delete(doc.ref);
+                                count++;
+                                if (count >= batchSize) {
+                                    await batch.commit();
+                                    batch = db.batch();
+                                    count = 0;
+                                }
+                            }
+                            if (count > 0) await batch.commit();
+                        }
+                    }
+                    // Desmarcar checkbox
+                    document.getElementById(item.id).checked = false;
+                }
+
+                // 4. Atualizar UI
+                await initApp(); 
+                showToast("Dados apagados com sucesso.", "success");
+
+            } catch (error) {
+                console.error(error);
+                showToast("Erro ao apagar: " + error.message, "error");
+            } finally {
+                document.body.style.cursor = 'default';
+            }
+        });
+
         document.getElementById('btn-backup-download').addEventListener('click', async () => { if(!currentUser && !isLocalMode) return; const backupPayload = { timestamp: new Date(), configuracoes: configCache || {} }; for(const coll of COLLECTIONS_LIST) { backupPayload[coll] = await fetchFullDataForBackup(coll); } const url = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload)); const a = document.createElement('a'); a.href = url; a.download = `backup_pizzaria_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove(); });
         document.getElementById('btn-backup-restore-click').addEventListener('click', () => { if(confirm("ATENÇÃO: Restaurar o backup apagará os dados atuais e substituirá pelo arquivo. Deseja continuar?")) { document.getElementById('backup-file-input').click(); } });
         document.getElementById('backup-file-input').addEventListener('change', async (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const d = JSON.parse(ev.target.result); if(!d.fornecedores && !d.produtos && !d.insumos) throw new Error("Arquivo inválido ou vazio."); showToast("Iniciando restauração...", "info"); if(!isLocalMode) { if(d.configuracoes) await db.collection('configuracoes').doc(currentUser.uid).set(d.configuracoes); for(const collName of COLLECTIONS_LIST) { const snapshot = await db.collection(collName).where('userId','==',currentUser.uid).get(); if (!snapshot.empty) { const batch = db.batch(); snapshot.docs.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } if(d[collName] && Array.isArray(d[collName]) && d[collName].length > 0) { for(const item of d[collName]) { item.userId = currentUser.uid; if(item.id) await db.collection(collName).doc(item.id).set(item, {merge: true}); else await db.collection(collName).add(item); } } } } else { localData.configuracoes = d.configuracoes || {}; for(const collName of COLLECTIONS_LIST) { localData.configuracoes = d.configuracoes; for(const collName of COLLECTIONS_LIST) { localData[collName] = d[collName] || []; } } } await initApp(); showToast("Restauração concluída com sucesso!", "success"); } catch(err){ console.error(err); showToast("Erro na restauração: " + err.message, "error"); } finally { e.target.value = ''; } }; reader.readAsText(file); });
