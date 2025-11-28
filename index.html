@@ -30,8 +30,12 @@
         
         #auth-container, #app-container { width: 100%; max-width: 1250px; margin: 2rem auto; padding: 0 1rem; }
         
+        /* Estilos de Autenticação melhorados para diferenciar telas */
         .auth-form { background: var(--white); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); max-width: 450px; margin: 2rem auto; border-top: 4px solid var(--primary-color); }
         .auth-form h2 { text-align: center; margin-bottom: 1.5rem; color: var(--primary-dark); }
+        
+        /* Destaque visual para saber se está no Login ou Cadastro */
+        #register-view { border-top-color: var(--secondary-color); } 
         
         .form-group { margin-bottom: 1.25rem; }
         .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: var(--dark-gray); }
@@ -151,28 +155,30 @@
     <main>
         <!-- TELAS DE AUTENTICAÇÃO -->
         <div id="auth-container">
+            <!-- TELA DE LOGIN -->
             <div id="login-view" class="auth-form">
                 <h2>Login</h2>
                 <form id="login-form">
-                    <div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required></div>
-                    <div class="form-group"><label for="login-password">Senha</label><input type="password" id="login-password" required></div>
+                    <div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" required placeholder="seu@email.com"></div>
+                    <div class="form-group"><label for="login-password">Senha</label><input type="password" id="login-password" required placeholder="********"></div>
                     <button type="submit" class="btn btn-primary">Entrar</button>
                 </form>
                 <div class="auth-link"><p>Não tem conta? <a href="#" id="show-register">Cadastre-se</a></p></div>
             </div>
             
+            <!-- TELA DE CADASTRO -->
             <div id="register-view" class="auth-form hidden">
-                <h2>Cadastro</h2>
+                <h2>Cadastro de Novo Usuário</h2>
                 <form id="register-form">
-                    <div class="form-group"><label for="register-email">Email</label><input type="email" id="register-email" required></div>
-                    <div class="form-group"><label for="register-password">Senha</label><input type="password" id="register-password" required minlength="6"></div>
-                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                    <div class="form-group"><label for="register-email">Email</label><input type="email" id="register-email" required placeholder="seu@email.com"></div>
+                    <div class="form-group"><label for="register-password">Senha (Mínimo 6 dígitos)</label><input type="password" id="register-password" required minlength="6" placeholder="********"></div>
+                    <button type="submit" class="btn btn-warning" style="color:#000; font-weight:bold;">Cadastrar</button>
                 </form>
-                <div class="auth-link"><p>Já tem conta? <a href="#" id="show-login">Faça login</a></p></div>
+                <div class="auth-link"><p>Já tem conta? <a href="#" id="show-login">Voltar para Login</a></p></div>
             </div>
         </div>
 
-        <!-- ÁREA DO APLICATIVO -->
+        <!-- ÁREA DO APLICATIVO (Oculta até login) -->
         <div id="app-container" class="hidden">
             
             <!-- 1. INDICADORES ANUAIS -->
@@ -300,7 +306,7 @@
         </div>
     </main>
 
-    <footer><p>Pizzaria Cost Control Pro v7.2 (Login & Register Fix)</p></footer>
+    <footer><p>Pizzaria Cost Control Pro v7.3 (Auth Errors Fix)</p></footer>
     <div id="toast" class="toast"></div>
     <div id="confirm-modal" class="modal"><div class="modal-content" style="text-align: center;"><p id="confirm-modal-text">Confirmar?</p><div class="modal-buttons"><button id="confirm-modal-yes" class="btn btn-danger">Sim</button><button id="confirm-modal-no" class="btn btn-secondary">Não</button></div></div></div>
 
@@ -428,6 +434,9 @@ const firebaseConfig = {
             confirmModal.style.display = 'block';
         }
 
+        // =================================================================
+        // SETUP DE AUTENTICAÇÃO COM TRADUÇÃO DE ERROS
+        // =================================================================
         function setupAuthListeners() { 
             auth.onAuthStateChanged(user => { 
                 if(user) { 
@@ -443,26 +452,47 @@ const firebaseConfig = {
                 } 
             }); 
 
-            // LOGIN SUBMIT
+            // LOGICA DE LOGIN (ENTRAR)
             document.getElementById('login-form').addEventListener('submit', e => { 
                 e.preventDefault(); 
-                auth.signInWithEmailAndPassword(
-                    document.getElementById('login-email').value, 
-                    document.getElementById('login-password').value
-                ).catch(e => showToast(e.message, 'error')); 
+                console.log("Tentando Logar...");
+                const email = document.getElementById('login-email').value;
+                const pass = document.getElementById('login-password').value;
+                
+                auth.signInWithEmailAndPassword(email, pass)
+                    .then(() => showToast("Login realizado!", "success"))
+                    .catch(error => {
+                        console.error("Erro no login:", error);
+                        let msg = error.message;
+                        if(error.code === 'auth/invalid-login-credentials' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                            msg = "Email ou senha incorretos. Se não tem conta, cadastre-se.";
+                        } else if(error.code === 'auth/too-many-requests') {
+                            msg = "Muitas tentativas. Tente novamente mais tarde.";
+                        }
+                        showToast(msg, 'error'); 
+                    }); 
             }); 
             
-            // REGISTER SUBMIT (ADICIONADO)
+            // LOGICA DE CADASTRO (CRIAR CONTA)
             document.getElementById('register-form').addEventListener('submit', e => {
                 e.preventDefault();
+                console.log("Tentando Cadastrar...");
                 const email = document.getElementById('register-email').value;
                 const pass = document.getElementById('register-password').value;
+                
                 auth.createUserWithEmailAndPassword(email, pass)
                     .then(() => showToast("Conta criada com sucesso!", "success"))
-                    .catch(e => showToast("Erro ao criar conta: " + e.message, "error"));
+                    .catch(error => {
+                        console.error("Erro no cadastro:", error);
+                        let msg = error.message;
+                        if(error.code === 'auth/email-already-in-use') msg = "Este email já está cadastrado.";
+                        if(error.code === 'auth/weak-password') msg = "A senha é muito fraca (min 6 caracteres).";
+                        if(error.code === 'auth/invalid-email') msg = "Formato de email inválido.";
+                        showToast(msg, "error");
+                    });
             });
 
-            // VIEW TOGGLING (ADICIONADO)
+            // ALTERNAR TELAS VISUALMENTE
             document.getElementById('show-register').addEventListener('click', (e) => {
                 e.preventDefault();
                 document.getElementById('login-view').classList.add('hidden');
